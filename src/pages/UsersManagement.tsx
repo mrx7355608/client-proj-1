@@ -115,31 +115,51 @@ export default function UsersManagement() {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password,
-      });
-      // Calls a custom postgresql function in supabase
-      // const { data, error: inviteError } = await supabase
-      //   .rpc('invite_user', {
-      //     user_email: formData.email,
-      //     admin_status: formData.role === 'admin',
-      //     user_status: 'active',
-      //     reset_required: false,
-      //     user_first_name: formData.first_name,
-      //     user_last_name: formData.last_name,
-      //     user_company: formData.company,
-      //     user_phone: formData.phone,
-      //     user_password: formData.password
-      //   });
-      //
-      // if (inviteError) throw inviteError;
+      // Get current admin session
+      const { data: currentSession } = await supabase.auth.getSession();
 
-      if (error) {
-        throw error;
+      /**
+       * The signUp() function creates a new user but it auto logs in the
+       * user, and logs out the admin account
+       * So to prevent this, I fetched the admin session before making
+       * signUp() request and manually set the admin session after
+       * the signup() request completes.
+       */
+      const { data: signupData, error: signupError } =
+        await supabase.auth.signUp({
+          email: formData.email.trim().toLowerCase(),
+          password: formData.password,
+        });
+      if (signupError) {
+        throw signupError;
       }
 
-      console.log("User:", data);
+      if (signupData.user === null) {
+        throw new Error("Unable to create user");
+      }
+
+      // Manually set admin session
+      await supabase.auth.setSession(currentSession.session!);
+
+      // Call a custom postgresql function in supabase to create
+      // a new user entry.
+      const { data: newUser, error: inviteError } = await supabase.rpc(
+        "new_invite_user",
+        {
+          new_user_id: signupData.user.id,
+          user_email: formData.email,
+          admin_status: formData.role === "admin",
+          user_status: "active",
+          reset_required: false,
+          user_first_name: formData.first_name,
+          user_last_name: formData.last_name,
+          user_company: formData.company,
+          user_phone: formData.phone,
+          user_password: formData.password,
+        },
+      );
+
+      if (inviteError) throw inviteError;
 
       setFormData({
         first_name: "",
@@ -667,4 +687,3 @@ export default function UsersManagement() {
     </div>
   );
 }
-
