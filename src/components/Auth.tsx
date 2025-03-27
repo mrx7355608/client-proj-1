@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
-import { Lock } from "lucide-react";
+import { Lock, LockKeyhole, Mail } from "lucide-react";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -222,7 +222,12 @@ export default function Auth() {
             </div>
           )}
           <div className="rounded-md shadow-sm -space-y-px">
-            <div>
+            <div className="relative">
+              <Mail
+                size={15}
+                color="gray"
+                className="absolute z-10 top-3 left-3"
+              />
               <label htmlFor="email" className="sr-only">
                 Email address
               </label>
@@ -233,14 +238,19 @@ export default function Auth() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none pl-9 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
               />
             </div>
-            <div>
+            <div className="relative">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
+              <LockKeyhole
+                size={15}
+                color="gray"
+                className="absolute z-10 top-3 left-3"
+              />
               <input
                 id="password"
                 name="password"
@@ -248,7 +258,7 @@ export default function Auth() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md pl-9 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
               />
             </div>
@@ -268,4 +278,3 @@ export default function Auth() {
     </div>
   );
 }
-
