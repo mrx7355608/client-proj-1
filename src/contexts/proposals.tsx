@@ -1,13 +1,10 @@
 import { ArrowLeft } from "lucide-react";
-import { useState, createContext, FC, ReactNode, useContext } from "react";
+import { useState, createContext, ReactNode, useContext } from "react";
 
 const initialState = {
   currentStep: 1,
   setCurrentStep: (step: number) => {},
   onBack: () => {},
-  handleEquipmentBack: () => {},
-  handleFeesBack: () => {},
-  handleReviewBack: () => {},
 };
 
 // Context
@@ -16,19 +13,25 @@ const ProposalContext = createContext(initialState);
 // Proposals Hook
 export const useProposal = () => useContext(ProposalContext);
 
+type Props = {
+  children: ReactNode;
+  goToSelectionScreen: () => void;
+};
+
 // Context Provider
-const ProposalsProvider: FC<{ children: ReactNode }> = ({ children }) => {
+export default function ProposalsProvider({
+  children,
+  goToSelectionScreen,
+}: Props) {
   const [currentStep, setCurrentStep] = useState(1);
 
   const onBack = () => {
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1);
+    } else {
+      goToSelectionScreen();
     }
   };
-
-  const handleEquipmentBack = () => setCurrentStep(1);
-  const handleFeesBack = () => setCurrentStep(2);
-  const handleReviewBack = () => setCurrentStep(3);
 
   return (
     <ProposalContext.Provider
@@ -36,9 +39,6 @@ const ProposalsProvider: FC<{ children: ReactNode }> = ({ children }) => {
         currentStep,
         setCurrentStep,
         onBack,
-        handleReviewBack,
-        handleFeesBack,
-        handleEquipmentBack,
       }}
     >
       <div className="max-w-4xl mx-auto pt-8 px-4 bg-gray-50 sm:px-6 lg:px-8">
@@ -120,6 +120,4 @@ const ProposalsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       {children}
     </ProposalContext.Provider>
   );
-};
-
-export default ProposalsProvider;
+}

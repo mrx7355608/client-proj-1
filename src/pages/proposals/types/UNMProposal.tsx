@@ -64,13 +64,7 @@ export default function UNMProposal() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [proposalId, setProposalId] = useState<string | null>(null);
-  const {
-    currentStep,
-    setCurrentStep,
-    handleEquipmentBack,
-    handleFeesBack,
-    handleReviewBack,
-  } = useProposal();
+  const { currentStep, setCurrentStep, onBack } = useProposal();
 
   useEffect(() => {
     loadExistingProposal();
@@ -152,11 +146,6 @@ export default function UNMProposal() {
     }
   };
 
-  // Handle back operation
-  // const handleEquipmentBack = () => setCurrentStep(1);
-  // const handleFeesBack = () => setCurrentStep(2);
-  // const handleReviewBack = () => setCurrentStep(3);
-
   // Handle submit operations
   const handleClientSubmit = (data: ClientForm) => {
     setClientForm(data);
@@ -204,7 +193,7 @@ export default function UNMProposal() {
         {currentStep === 2 && (
           <EquipmentStep
             sections={sections}
-            onBack={handleEquipmentBack}
+            onBack={onBack}
             onSubmit={handleEquipmentSubmit}
           />
         )}
@@ -212,7 +201,7 @@ export default function UNMProposal() {
           <FeesStep
             initialNRC={fees.nrc}
             initialMRC={fees.mrc}
-            onBack={handleFeesBack}
+            onBack={onBack}
             onSubmit={handleFeesSubmit}
           />
         )}
@@ -227,7 +216,7 @@ export default function UNMProposal() {
               })),
               mrc: parseFloat(fees.mrc) || 0,
             }}
-            onBack={handleReviewBack}
+            onBack={onBack}
             onSubmit={handleReviewSubmit}
             proposalId={proposalId}
           />
@@ -236,4 +225,3 @@ export default function UNMProposal() {
     </div>
   );
 }
-

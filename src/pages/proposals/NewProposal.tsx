@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Network, Settings, Shield, Building2, ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { Network, Settings, Shield, Building2 } from "lucide-react";
 import UNMProposal from "./types/UNMProposal";
 import MSPProposal from "./types/MSPProposal";
 import CyberProposal from "./types/CyberProposal";
@@ -46,26 +46,16 @@ export default function NewProposal() {
     setSelectedType(typeId);
   };
 
-  const handleBack = () => {
-    setSelectedType(null);
-  };
-
   // Render type-specific proposal flow
   if (selectedType) {
-    switch (selectedType) {
-      case "unm":
-        return (
-          <ProposalsProvider>
-            <UNMProposal />
-          </ProposalsProvider>
-        );
-      case "msp":
-        return <MSPProposal onBack={handleBack} />;
-      case "cybersecurity":
-        return <CyberProposal onBack={handleBack} />;
-      case "buildouts":
-        return <BuildoutProposal onBack={handleBack} />;
-    }
+    return (
+      <ProposalsProvider goToSelectionScreen={() => setSelectedType(null)}>
+        {selectedType === "unm" && <UNMProposal />}
+        {selectedType === "msp" && <MSPProposal />}
+        {selectedType === "cybersecurity" && <CyberProposal />}
+        {selectedType === "buildouts" && <BuildoutProposal />}
+      </ProposalsProvider>
+    );
   }
 
   // Render proposal type selection
@@ -108,4 +98,3 @@ export default function NewProposal() {
     </div>
   );
 }
-

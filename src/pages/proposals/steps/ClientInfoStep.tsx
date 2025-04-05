@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Save } from 'lucide-react';
-import { supabase } from '../../../lib/supabase';
+import React, { useState } from "react";
+import { Save } from "lucide-react";
+import { supabase } from "../../../lib/supabase";
 
 interface ClientForm {
   name: string;
@@ -20,12 +20,16 @@ interface ClientInfoStepProps {
   proposalId: string | null;
 }
 
-export default function ClientInfoStep({ initialData, onSubmit, proposalId }: ClientInfoStepProps) {
+export default function ClientInfoStep({
+  initialData,
+  onSubmit,
+  proposalId,
+}: ClientInfoStepProps) {
   const [formData, setFormData] = useState<ClientForm>(initialData);
   const [isSaving, setIsSaving] = useState(false);
 
   const formatPhoneNumber = (value: string) => {
-    const cleaned = value.replace(/\D/g, '');
+    const cleaned = value.replace(/\D/g, "");
     if (cleaned.length <= 10) {
       let formatted = cleaned;
       if (cleaned.length > 3) {
@@ -46,15 +50,15 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
 
   const handleAutofill = () => {
     setFormData({
-      name: 'John Smith',
-      title: 'IT Director',
-      email: 'john.smith@example.com',
-      phone: '(407) 555-1234',
-      organization: 'ITX Demo',
-      streetAddress: '123 Business Ave',
-      city: 'Orlando',
-      state: 'FL',
-      zipCode: '32801'
+      name: "John Smith",
+      title: "IT Director",
+      email: "john.smith@example.com",
+      phone: "(407) 555-1234",
+      organization: "ITX Demo",
+      streetAddress: "123 Business Ave",
+      city: "Orlando",
+      state: "FL",
+      zipCode: "32801",
     });
   };
 
@@ -62,23 +66,23 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
     setIsSaving(true);
     try {
       // Generate quote number
-      const { data: quoteNumber } = await supabase.rpc('generate_quote_number');
+      const { data: quoteNumber } = await supabase.rpc("generate_quote_number");
 
       // Create or update the quote record
       const quoteData = {
         title: `UNM Agreement - ${formData.organization}`,
         quote_number: quoteNumber,
-        status: 'draft',
-        notes: `Draft proposal for ${formData.organization}`
+        status: "draft",
+        notes: `Draft proposal for ${formData.organization}`,
       };
 
       let quote;
       if (proposalId) {
         // Update existing quote
         const { data, error } = await supabase
-          .from('quotes')
+          .from("quotes")
           .update(quoteData)
-          .eq('id', proposalId)
+          .eq("id", proposalId)
           .select()
           .single();
 
@@ -87,7 +91,7 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
       } else {
         // Create new quote
         const { data, error } = await supabase
-          .from('quotes')
+          .from("quotes")
           .insert([quoteData])
           .select()
           .single();
@@ -98,39 +102,42 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
 
       // Create or update quote variables
       const variables = [
-        { name: 'customer_name', value: formData.name },
-        { name: 'customer_title', value: formData.title },
-        { name: 'customer_email', value: formData.email },
-        { name: 'customer_phone', value: formData.phone },
-        { name: 'client', value: formData.organization },
-        { name: 'address', value: `${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}` }
+        { name: "customer_name", value: formData.name },
+        { name: "customer_title", value: formData.title },
+        { name: "customer_email", value: formData.email },
+        { name: "customer_phone", value: formData.phone },
+        { name: "client", value: formData.organization },
+        {
+          name: "address",
+          value: `${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}`,
+        },
       ];
 
       if (proposalId) {
         // Delete existing variables first
         await supabase
-          .from('quote_variables')
+          .from("quote_variables")
           .delete()
-          .eq('quote_id', proposalId);
+          .eq("quote_id", proposalId);
       }
 
       // Insert new variables
       const { error: variablesError } = await supabase
-        .from('quote_variables')
+        .from("quote_variables")
         .insert(
-          variables.map(v => ({
+          variables.map((v) => ({
             quote_id: quote.id,
             name: v.name,
-            value: v.value
-          }))
+            value: v.value,
+          })),
         );
 
       if (variablesError) throw variablesError;
 
-      alert('Proposal saved as draft');
+      alert("Proposal saved as draft");
     } catch (error) {
-      console.error('Error saving proposal:', error);
-      alert('Error saving proposal. Please try again.');
+      console.error("Error saving proposal:", error);
+      alert("Error saving proposal. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -141,13 +148,15 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
       {/* Header with UNM - Organization */}
       <div className="mb-8 pb-6 border-b border-gray-200">
         <h2 className="text-2xl font-semibold text-gray-900">
-          UNM - {formData.organization || 'New Client'}
+          UNM - {formData.organization || "New Client"}
         </h2>
       </div>
 
       <div className="flex justify-between items-start mb-8">
         <div>
-          <h3 className="text-xl font-semibold text-gray-900">Client Information</h3>
+          <h3 className="text-xl font-semibold text-gray-900">
+            Client Information
+          </h3>
           <p className="mt-2 text-gray-600">
             Enter the client details for your UNM proposal
           </p>
@@ -170,7 +179,9 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
               type="text"
               required
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
               placeholder="Enter customer name"
             />
@@ -184,7 +195,9 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
               type="text"
               required
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
               placeholder="Enter job title"
             />
@@ -198,7 +211,9 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
               type="email"
               required
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
               placeholder="Enter email address"
             />
@@ -212,7 +227,12 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
               type="tel"
               required
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  phone: formatPhoneNumber(e.target.value),
+                })
+              }
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
               placeholder="(555) 555-5555"
             />
@@ -226,7 +246,9 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
               type="text"
               required
               value={formData.organization}
-              onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, organization: e.target.value })
+              }
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
               placeholder="Enter client name"
             />
@@ -240,7 +262,9 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
               type="text"
               required
               value={formData.streetAddress}
-              onChange={(e) => setFormData({ ...formData, streetAddress: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, streetAddress: e.target.value })
+              }
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
               placeholder="Enter street address"
             />
@@ -254,7 +278,9 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
               type="text"
               required
               value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, city: e.target.value })
+              }
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
               placeholder="Enter city"
             />
@@ -268,7 +294,9 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
               type="text"
               required
               value={formData.state}
-              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, state: e.target.value })
+              }
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
               placeholder="Enter state"
             />
@@ -283,7 +311,9 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
               required
               pattern="[0-9]{5}(-[0-9]{4})?"
               value={formData.zipCode}
-              onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, zipCode: e.target.value })
+              }
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
               placeholder="Enter ZIP code"
             />
@@ -298,7 +328,7 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
             className="px-6 py-2.5 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center"
           >
             <Save className="w-5 h-5 mr-2" />
-            {isSaving ? 'Saving...' : 'Save Draft'}
+            {isSaving ? "Saving..." : "Save Draft"}
           </button>
           <button
             type="submit"
@@ -311,3 +341,4 @@ export default function ClientInfoStep({ initialData, onSubmit, proposalId }: Cl
     </div>
   );
 }
+
