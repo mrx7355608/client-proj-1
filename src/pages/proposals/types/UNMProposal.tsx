@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import ClientInfoStep from '../steps/ClientInfoStep';
-import EquipmentStep from '../steps/EquipmentStep';
-import FeesStep from '../steps/FeesStep';
-import ReviewStep from '../steps/ReviewStep';
-import { supabase } from '../../../lib/supabase';
-
-interface UNMProposalProps {
-  onBack: () => void;
-}
+import { useState, useEffect } from "react";
+import ClientInfoStep from "../steps/ClientInfoStep";
+import EquipmentStep from "../steps/EquipmentStep";
+import FeesStep from "../steps/FeesStep";
+import ReviewStep from "../steps/ReviewStep";
+import { supabase } from "../../../lib/supabase";
+import { useProposal } from "../../../contexts/proposals";
 
 interface ClientForm {
   name: string;
@@ -39,36 +35,42 @@ interface Fee {
   description: string;
   amount: string;
   notes: string;
-  type: 'nrc' | 'mrc';
+  type: "nrc" | "mrc";
 }
 
 const INITIAL_CLIENT_FORM: ClientForm = {
-  name: '',
-  title: '',
-  email: '',
-  phone: '',
-  organization: '',
-  streetAddress: '',
-  city: '',
-  state: '',
-  zipCode: ''
+  name: "",
+  title: "",
+  email: "",
+  phone: "",
+  organization: "",
+  streetAddress: "",
+  city: "",
+  state: "",
+  zipCode: "",
 };
 
-export default function UNMProposal({ onBack }: UNMProposalProps) {
-  const [currentStep, setCurrentStep] = useState(1);
+export default function UNMProposal() {
   const [clientForm, setClientForm] = useState<ClientForm>(INITIAL_CLIENT_FORM);
   const [sections, setSections] = useState<Section[]>([
-    { id: '1', name: 'Network Equipment', equipment: [] }
+    { id: "1", name: "Network Equipment", equipment: [] },
   ]);
   const [fees, setFees] = useState<{
     nrc: Fee[];
     mrc: string;
   }>({
     nrc: [],
-    mrc: ''
+    mrc: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [proposalId, setProposalId] = useState<string | null>(null);
+  const {
+    currentStep,
+    setCurrentStep,
+    handleEquipmentBack,
+    handleFeesBack,
+    handleReviewBack,
+  } = useProposal();
 
   useEffect(() => {
     loadExistingProposal();
@@ -77,7 +79,7 @@ export default function UNMProposal({ onBack }: UNMProposalProps) {
   const loadExistingProposal = async () => {
     try {
       // Check for saved proposal data
-      const savedData = localStorage.getItem('editProposal');
+      const savedData = localStorage.getItem("editProposal");
       if (!savedData) {
         setIsLoading(false);
         return;
@@ -88,21 +90,22 @@ export default function UNMProposal({ onBack }: UNMProposalProps) {
 
       // Load client info
       setClientForm({
-        name: editData.clientInfo.name || '',
-        title: editData.clientInfo.title || '',
-        email: editData.clientInfo.email || '',
-        phone: editData.clientInfo.phone || '',
-        organization: editData.clientInfo.organization || '',
-        streetAddress: editData.clientInfo.address?.split(',')[0]?.trim() || '',
-        city: editData.clientInfo.address?.split(',')[1]?.trim() || '',
-        state: editData.clientInfo.address?.split(',')[2]?.trim() || '',
-        zipCode: editData.clientInfo.address?.split(',')[3]?.trim() || '',
+        name: editData.clientInfo.name || "",
+        title: editData.clientInfo.title || "",
+        email: editData.clientInfo.email || "",
+        phone: editData.clientInfo.phone || "",
+        organization: editData.clientInfo.organization || "",
+        streetAddress: editData.clientInfo.address?.split(",")[0]?.trim() || "",
+        city: editData.clientInfo.address?.split(",")[1]?.trim() || "",
+        state: editData.clientInfo.address?.split(",")[2]?.trim() || "",
+        zipCode: editData.clientInfo.address?.split(",")[3]?.trim() || "",
       });
 
       // Load quote items and sections
       const { data: quoteItems } = await supabase
-        .from('quote_items')
-        .select(`
+        .from("quote_items")
+        .select(
+          `
           id,
           description,
           quantity,
@@ -114,20 +117,21 @@ export default function UNMProposal({ onBack }: UNMProposalProps) {
             category,
             image_url
           )
-        `)
-        .eq('quote_id', editData.id);
+        `,
+        )
+        .eq("quote_id", editData.id);
 
       if (quoteItems) {
         const equipmentSection = {
-          id: '1',
-          name: 'Network Equipment',
+          id: "1",
+          name: "Network Equipment",
           equipment: quoteItems.map((item: any) => ({
             id: item.inventory_item.id,
             name: item.inventory_item.name,
             quantity: item.quantity,
             category: item.inventory_item.category,
-            image_url: item.inventory_item.image_url
-          }))
+            image_url: item.inventory_item.image_url,
+          })),
         };
         setSections([equipmentSection]);
       }
@@ -135,19 +139,25 @@ export default function UNMProposal({ onBack }: UNMProposalProps) {
       // Set fees
       setFees({
         nrc: [], // You'll need to load these from your database
-        mrc: editData.total_mrr?.toString() || ''
+        mrc: editData.total_mrr?.toString() || "",
       });
 
       // Clear the stored data
-      localStorage.removeItem('editProposal');
+      localStorage.removeItem("editProposal");
     } catch (error) {
-      console.error('Error loading proposal:', error);
-      alert('Error loading proposal data');
+      console.error("Error loading proposal:", error);
+      alert("Error loading proposal data");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Handle back operation
+  // const handleEquipmentBack = () => setCurrentStep(1);
+  // const handleFeesBack = () => setCurrentStep(2);
+  // const handleReviewBack = () => setCurrentStep(3);
+
+  // Handle submit operations
   const handleClientSubmit = (data: ClientForm) => {
     setClientForm(data);
     setCurrentStep(2);
@@ -158,32 +168,20 @@ export default function UNMProposal({ onBack }: UNMProposalProps) {
     setCurrentStep(3);
   };
 
-  const handleEquipmentBack = () => {
-    setCurrentStep(1);
-  };
-
   const handleFeesSubmit = (submittedFees: Fee[]) => {
-    const nrcFees = submittedFees.filter(fee => fee.type === 'nrc');
-    const mrcFee = submittedFees.find(fee => fee.type === 'mrc');
-    
+    const nrcFees = submittedFees.filter((fee) => fee.type === "nrc");
+    const mrcFee = submittedFees.find((fee) => fee.type === "mrc");
+
     setFees({
       nrc: nrcFees,
-      mrc: mrcFee?.amount || ''
+      mrc: mrcFee?.amount || "",
     });
     setCurrentStep(4);
   };
 
-  const handleFeesBack = () => {
-    setCurrentStep(2);
-  };
-
-  const handleReviewBack = () => {
-    setCurrentStep(3);
-  };
-
   const handleReviewSubmit = (signature: string) => {
     // Here you would typically save the proposal to your database
-    console.log('Proposal completed with signature:', signature);
+    console.log("Proposal completed with signature:", signature);
     // Close the proposal window
     window.close();
   };
@@ -195,59 +193,9 @@ export default function UNMProposal({ onBack }: UNMProposalProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={onBack}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  currentStep === 1 ? 'bg-blue-500 text-white' : 'bg-blue-100 text-blue-500'
-                }`}>
-                  1
-                </div>
-                <div className="ml-2 text-sm font-medium text-gray-600">Client Info</div>
-              </div>
-              <div className="w-16 h-0.5 bg-gray-200" />
-              <div className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  currentStep === 2 ? 'bg-blue-500 text-white' : currentStep > 2 ? 'bg-blue-100 text-blue-500' : 'bg-gray-200 text-gray-400'
-                }`}>
-                  2
-                </div>
-                <div className="ml-2 text-sm font-medium text-gray-600">Equipment</div>
-              </div>
-              <div className="w-16 h-0.5 bg-gray-200" />
-              <div className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  currentStep === 3 ? 'bg-blue-500 text-white' : currentStep > 3 ? 'bg-blue-100 text-blue-500' : 'bg-gray-200 text-gray-400'
-                }`}>
-                  3
-                </div>
-                <div className="ml-2 text-sm font-medium text-gray-600">Fees</div>
-              </div>
-              <div className="w-16 h-0.5 bg-gray-200" />
-              <div className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  currentStep === 4 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'
-                }`}>
-                  4
-                </div>
-                <div className="ml-2 text-sm font-medium text-gray-600">Review</div>
-              </div>
-            </div>
-            <div className="w-5" /> {/* Spacer */}
-          </div>
-        </div>
-
         {/* Step Content */}
         {currentStep === 1 && (
-          <ClientInfoStep 
+          <ClientInfoStep
             initialData={clientForm}
             onSubmit={handleClientSubmit}
             proposalId={proposalId}
@@ -273,11 +221,11 @@ export default function UNMProposal({ onBack }: UNMProposalProps) {
             clientInfo={clientForm}
             sections={sections}
             fees={{
-              nrc: fees.nrc.map(fee => ({
+              nrc: fees.nrc.map((fee) => ({
                 ...fee,
-                amount: parseFloat(fee.amount)
+                amount: parseFloat(fee.amount),
               })),
-              mrc: parseFloat(fees.mrc) || 0
+              mrc: parseFloat(fees.mrc) || 0,
             }}
             onBack={handleReviewBack}
             onSubmit={handleReviewSubmit}
@@ -288,3 +236,4 @@ export default function UNMProposal({ onBack }: UNMProposalProps) {
     </div>
   );
 }
+
