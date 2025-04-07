@@ -4,10 +4,14 @@
 
 /* Print styles */
 @media print {
+  /* ----- THIS CSS CAUSED THE PRINT ISSUES ----- */
+
   /* Hide all UI elements except the proposal content */
-  body > *:not(.print-content) {
-    display: none !important;
-  }
+  /* body > *:not(.print-content) { */
+  /*   display: none !important; */
+  /* } */
+
+  /* ----------------------------------------------- */
 
   /* Reset page margins */
   @page {
@@ -60,3 +64,4 @@
   position: relative;
   min-height: 11in;
 }
+

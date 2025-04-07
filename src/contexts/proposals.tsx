@@ -41,9 +41,9 @@ export default function ProposalsProvider({
         onBack,
       }}
     >
-      <div className="max-w-4xl mx-auto pt-8 px-4 bg-gray-50 sm:px-6 lg:px-8">
+      <div className="no-print mx-auto pt-8 px-4 bg-gray-50 sm:px-6 lg:px-8">
         {/* Progress Bar */}
-        <div className="flex items-center justify-between">
+        <div className="flex max-w-3xl mx-auto items-center justify-between">
           <button
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
