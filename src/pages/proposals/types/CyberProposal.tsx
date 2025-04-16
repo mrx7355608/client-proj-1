@@ -180,7 +180,7 @@ export default function CyberProposal() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
         {/* Step Content */}
         {currentStep === 1 && (
           <ClientInfoStep
@@ -224,4 +224,3 @@ export default function CyberProposal() {
     </div>
   );
 }
-

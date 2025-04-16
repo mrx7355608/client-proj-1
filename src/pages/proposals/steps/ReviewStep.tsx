@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   FileText,
   Building2,
@@ -151,7 +151,7 @@ export default function ReviewStep({
 
   const renderPreview = () => {
     return (
-      <div>
+      <div className="bg-gray-100">
         <div className="bg-white border-b sticky top-0 z-10 no-print">
           <div className="max-w-[8.5in] mx-auto px-4 py-2 flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-800">
@@ -182,7 +182,7 @@ export default function ReviewStep({
           </div>
         </div>
 
-        <div className="print-content bg-gray-100 min-h-screen pt-8 pb-16">
+        <div className="print-content min-h-screen w-[8.5in] mx-auto">
           {/* Cover Page */}
           <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto relative">
             {/* Top Half - Cover */}
@@ -798,4 +798,3 @@ export default function ReviewStep({
     </div>
   );
 }
-
