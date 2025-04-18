@@ -50,7 +50,17 @@ const INITIAL_CLIENT_FORM: ClientForm = {
   zipCode: "",
 };
 
-export default function BuildoutProposal() {
+export default function BuildoutProposal({
+  data,
+}: {
+  data: {
+    id: string;
+    name: string;
+    description: string;
+    icon: any;
+    color: string;
+  };
+}) {
   const [clientForm, setClientForm] = useState<ClientForm>(INITIAL_CLIENT_FORM);
   const [sections, setSections] = useState<Section[]>([
     { id: "1", name: "Network Equipment", equipment: [] },
@@ -184,6 +194,7 @@ export default function BuildoutProposal() {
         {/* Step Content */}
         {currentStep === 1 && (
           <ClientInfoStep
+            proposalType="Buildout"
             initialData={clientForm}
             onSubmit={handleClientSubmit}
             proposalId={proposalId}
@@ -206,6 +217,7 @@ export default function BuildoutProposal() {
         )}
         {currentStep === 4 && (
           <ReviewStep
+            proposalTypeInfo={data}
             clientInfo={clientForm}
             sections={sections}
             fees={{

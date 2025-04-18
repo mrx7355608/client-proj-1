@@ -49,7 +49,17 @@ const INITIAL_CLIENT_FORM: ClientForm = {
   state: "",
   zipCode: "",
 };
-export default function MSPProposal() {
+export default function MSPProposal({
+  data,
+}: {
+  data: {
+    id: string;
+    name: string;
+    description: string;
+    icon: any;
+    color: string;
+  };
+}) {
   const [clientForm, setClientForm] = useState<ClientForm>(INITIAL_CLIENT_FORM);
   const [sections, setSections] = useState<Section[]>([
     { id: "1", name: "Network Equipment", equipment: [] },
@@ -184,6 +194,7 @@ export default function MSPProposal() {
         {/* Step Content */}
         {currentStep === 1 && (
           <ClientInfoStep
+            proposalType="MSP"
             initialData={clientForm}
             onSubmit={handleClientSubmit}
             proposalId={proposalId}
@@ -218,6 +229,7 @@ export default function MSPProposal() {
             onBack={onBack}
             onSubmit={handleReviewSubmit}
             proposalId={proposalId}
+            proposalTypeInfo={data}
           />
         )}
       </div>

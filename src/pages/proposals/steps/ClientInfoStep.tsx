@@ -15,12 +15,14 @@ interface ClientForm {
 }
 
 interface ClientInfoStepProps {
+  proposalType: string;
   initialData: ClientForm;
   onSubmit: (data: ClientForm) => void;
   proposalId: string | null;
 }
 
 export default function ClientInfoStep({
+  proposalType,
   initialData,
   onSubmit,
   proposalId,
@@ -145,10 +147,10 @@ export default function ClientInfoStep({
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      {/* Header with UNM - Organization */}
+      {/* Header */}
       <div className="mb-8 pb-6 border-b border-gray-200">
         <h2 className="text-2xl font-semibold text-gray-900">
-          UNM - {formData.organization || "New Client"}
+          {proposalType} - {formData.organization || "New Client"}
         </h2>
       </div>
 
@@ -158,7 +160,7 @@ export default function ClientInfoStep({
             Client Information
           </h3>
           <p className="mt-2 text-gray-600">
-            Enter the client details for your UNM proposal
+            Enter the client details for your {proposalType} proposal
           </p>
         </div>
         <button
@@ -341,4 +343,3 @@ export default function ClientInfoStep({
     </div>
   );
 }
-

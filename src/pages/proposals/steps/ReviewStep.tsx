@@ -14,6 +14,7 @@ import {
   Server,
   Clock,
   Save,
+  IconNode,
 } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
 
@@ -49,11 +50,19 @@ interface ReviewStepProps {
     }[];
     mrc: number;
   };
+  proposalTypeInfo: {
+    id: string;
+    name: string;
+    description: string;
+    icon: IconNode;
+    color: string;
+  };
   onBack: () => void;
   onSubmit: () => void;
 }
 
 export default function ReviewStep({
+  proposalTypeInfo,
   clientInfo,
   sections,
   fees,
@@ -211,13 +220,14 @@ export default function ReviewStep({
                   <div className="w-24 h-1 bg-white"></div>
                 </div>
 
+                {/* Name of the proposal */}
                 <div className="mt-16">
                   <h2 className="text-5xl font-bold text-white mb-4">
-                    Unified
+                    {proposalTypeInfo.description.split(" ")[0]}
                     <br />
-                    Network
+                    {proposalTypeInfo.description.split(" ")[1]}
                     <br />
-                    Management
+                    {proposalTypeInfo.description.split(" ")[2]}
                   </h2>
                   <p className="text-2xl text-white/90 mt-8">
                     Service Agreement
@@ -454,12 +464,12 @@ export default function ReviewStep({
           </div>
 
           {/* Terms & Conditions */}
-          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Terms and Conditions
             </h2>
 
-            <div className="space-y-8 text-gray-600">
+            <div className="space-y-6 text-gray-600">
               <p className="mb-8">
                 These Terms of Service constitute the agreement ("Agreement")
                 between ITX Solutions ("Provider", "we", "us", or "ITX
@@ -534,7 +544,11 @@ export default function ReviewStep({
                   Florida.
                 </p>
               </div>
+            </div>
+          </div>
 
+          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+            <div className="space-y-6 text-gray-600">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">
                   7. Service Level Agreement (SLA)
@@ -559,7 +573,7 @@ export default function ReviewStep({
           </div>
 
           {/* Signature Page */}
-          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <div className="space-y-8">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
