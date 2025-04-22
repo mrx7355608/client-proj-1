@@ -4,6 +4,7 @@ import EquipmentStep from "../steps/EquipmentStep";
 import FeesStep from "../steps/FeesStep";
 import ReviewStep from "../steps/ReviewStep";
 import { useProposal } from "../../../contexts/proposals";
+import { supabase } from "../../../lib/supabase";
 
 type Props = {
   data: {
@@ -96,12 +97,6 @@ export default function ProposalItem({ data }: Props) {
     setCurrentStep(4);
   };
 
-  const handleReviewSubmit = (signature: string) => {
-    // TODO: do something here please xd
-    console.log("Proposal completed with signature:", signature);
-    window.close();
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto">
@@ -142,7 +137,6 @@ export default function ProposalItem({ data }: Props) {
               mrc: parseFloat(fees.mrc) || 0,
             }}
             onBack={onBack}
-            onSubmit={handleReviewSubmit}
             proposalId={proposalId}
           />
         )}

@@ -51,6 +51,10 @@
     print-color-adjust: exact !important;
   }
 }
+.page-break {
+  page-break-before: always; /* or "after" */
+  break-before: page; /* modern, works with flex/grid too */
+}
 
 /* Page sizing for screen view */
 .proposal-page {

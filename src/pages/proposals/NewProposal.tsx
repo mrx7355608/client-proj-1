@@ -48,6 +48,8 @@ export default function NewProposal() {
     setSelectedType(typeId);
   };
 
+  const gotoMainSelectionScreen = () => setSelectedType(null);
+
   // Render type-specific proposal flow
   if (selectedType) {
     return (
@@ -57,7 +59,9 @@ export default function NewProposal() {
         {selectedType === "buildouts" && (
           <ProposalItem data={proposalTypes[3]} />
         )}
-        {selectedType === "cybersecurity" && <ShowCyberProposalTypes />}
+        {selectedType === "cybersecurity" && (
+          <ShowCyberProposalTypes gotoMainScreen={gotoMainSelectionScreen} />
+        )}
 
         {/* {selectedType === "unm" && <UNMProposal data={proposalTypes[0]} />} */}
         {/* {selectedType === "msp" && <MSPProposal data={proposalTypes[1]} />} */}

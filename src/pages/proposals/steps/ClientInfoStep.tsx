@@ -72,7 +72,7 @@ export default function ClientInfoStep({
 
       // Create or update the quote record
       const quoteData = {
-        title: `UNM Agreement - ${formData.organization}`,
+        title: `${proposalType} Agreement - ${formData.organization}`,
         quote_number: quoteNumber,
         status: "draft",
         notes: `Draft proposal for ${formData.organization}`,

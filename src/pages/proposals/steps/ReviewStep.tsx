@@ -17,6 +17,7 @@ import {
   IconNode,
 } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
+import { useNavigate } from "react-router-dom";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -67,10 +68,10 @@ export default function ReviewStep({
   sections,
   fees,
   onBack,
-  onSubmit,
 }: ReviewStepProps) {
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const navigateTo = useNavigate();
 
   const calculateNRCTotal = () => {
     return fees.nrc.reduce((sum, fee) => sum + fee.amount, 0);
@@ -93,7 +94,7 @@ export default function ReviewStep({
         .from("quotes")
         .insert([
           {
-            title: `UNM Agreement - ${clientInfo.organization}`,
+            title: `${proposalTypeInfo.name} Agreement - ${clientInfo.organization}`,
             quote_number: quoteNumber,
             status: "draft",
             total_mrr: fees.mrc,
@@ -158,6 +159,11 @@ export default function ReviewStep({
     }
   };
 
+  const handleRequestSignature = async () => {
+    await handleSave();
+    location.href = "/request-signature";
+  };
+
   const renderPreview = () => {
     return (
       <div className="bg-gray-100">
@@ -181,11 +187,11 @@ export default function ReviewStep({
                 Close Preview
               </button>
               <button
-                onClick={onSubmit}
+                onClick={handleRequestSignature}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                Request Signature
+                {isSaving ? "Saving proposoal..." : "Request Signature"}
               </button>
             </div>
           </div>
@@ -293,7 +299,7 @@ export default function ReviewStep({
           </div>
 
           {/* Services & Equipment */}
-          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Services & Equipment
             </h2>
@@ -328,7 +334,7 @@ export default function ReviewStep({
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-8 mb-8">
+            <div className="bg-gray-50 rounded-xl p-8 mb-8 page-break">
               <h3 className="text-xl font-bold text-gray-900 mb-6">
                 Equipment Provided
               </h3>

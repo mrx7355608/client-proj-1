@@ -2,7 +2,7 @@ import RequestSignatureForm from "../components/RequestSignatureForm";
 
 export default function RequestSignature() {
   return (
-    <div>
+    <div className="">
       <RequestSignatureForm />
     </div>
   );
