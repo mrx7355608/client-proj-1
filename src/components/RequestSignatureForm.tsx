@@ -14,8 +14,13 @@ import {
   Users,
 } from "lucide-react";
 import { sendSimpleMessage } from "../lib/send-email";
+import { supabase } from "../lib/supabase";
 
-export default function RequestSignatureForm() {
+export default function RequestSignatureForm({
+  agreementId,
+}: {
+  agreementId: string;
+}) {
   const [formData, setFormData] = useState({
     clientEmail: "",
     subject: "",
@@ -55,6 +60,18 @@ export default function RequestSignatureForm() {
         agreementPdf: selectedFile,
       });
       setMessage("Email sent successfully!");
+
+      // Update the proposal status to "Sent"
+      const { data, error } = await supabase
+        .from("quotes")
+        .update({ status: "sent" })
+        .eq("id", agreementId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      console.log(data);
     } catch (err) {
       setError((err as Error).message || "Unable to send email");
     } finally {
