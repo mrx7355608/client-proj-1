@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Save } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
+import { useProposal } from "../../../contexts/proposals";
 
 interface ClientForm {
   name: string;
@@ -18,17 +19,16 @@ interface ClientInfoStepProps {
   proposalType: string;
   initialData: ClientForm;
   onSubmit: (data: ClientForm) => void;
-  proposalId: string | null;
 }
 
 export default function ClientInfoStep({
   proposalType,
   initialData,
   onSubmit,
-  proposalId,
 }: ClientInfoStepProps) {
   const [formData, setFormData] = useState<ClientForm>(initialData);
   const [isSaving, setIsSaving] = useState(false);
+  const { proposal, setProposal } = useProposal();
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, "");
@@ -64,6 +64,65 @@ export default function ClientInfoStep({
     });
   };
 
+  const updateQuote = async (
+    proposalId: string,
+    quoteData: any,
+    variables: any[],
+  ) => {
+    // Update existing quote
+    const { data, error } = await supabase
+      .from("quotes")
+      .update(quoteData)
+      .eq("id", proposalId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Delete existing quote variables
+    await supabase.from("quote_variables").delete().eq("quote_id", proposalId);
+
+    // Insert new variables
+    const { error: variablesError } = await supabase
+      .from("quote_variables")
+      .insert(
+        variables.map((v) => ({
+          quote_id: data.id,
+          name: v.name,
+          value: v.value,
+        })),
+      );
+
+    if (variablesError) throw variablesError;
+
+    return data;
+  };
+
+  const createQuote = async (quoteData: any, variables: any[]) => {
+    const { data, error } = await supabase
+      .from("quotes")
+      .insert([quoteData])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Insert new variables
+    const { error: variablesError } = await supabase
+      .from("quote_variables")
+      .insert(
+        variables.map((v) => ({
+          quote_id: data.id,
+          name: v.name,
+          value: v.value,
+        })),
+      );
+
+    if (variablesError) throw variablesError;
+
+    return data;
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -79,31 +138,7 @@ export default function ClientInfoStep({
       };
 
       let quote;
-      if (proposalId) {
-        // Update existing quote
-        const { data, error } = await supabase
-          .from("quotes")
-          .update(quoteData)
-          .eq("id", proposalId)
-          .select()
-          .single();
-
-        if (error) throw error;
-        quote = data;
-      } else {
-        // Create new quote
-        const { data, error } = await supabase
-          .from("quotes")
-          .insert([quoteData])
-          .select()
-          .single();
-
-        if (error) throw error;
-        quote = data;
-      }
-
-      // Create or update quote variables
-      const variables = [
+      const quoteVariables = [
         { name: "customer_name", value: formData.name },
         { name: "customer_title", value: formData.title },
         { name: "customer_email", value: formData.email },
@@ -115,28 +150,14 @@ export default function ClientInfoStep({
         },
       ];
 
-      if (proposalId) {
-        // Delete existing variables first
-        await supabase
-          .from("quote_variables")
-          .delete()
-          .eq("quote_id", proposalId);
+      if (!proposal) {
+        quote = await createQuote(quoteData, quoteVariables);
+      } else {
+        quote = await updateQuote(proposal.id, quoteData, quoteVariables);
       }
 
-      // Insert new variables
-      const { error: variablesError } = await supabase
-        .from("quote_variables")
-        .insert(
-          variables.map((v) => ({
-            quote_id: quote.id,
-            name: v.name,
-            value: v.value,
-          })),
-        );
-
-      if (variablesError) throw variablesError;
-
       alert("Proposal saved as draft");
+      setProposal(quote); // Update the quote in context
     } catch (error) {
       console.error("Error saving proposal:", error);
       alert("Error saving proposal. Please try again.");

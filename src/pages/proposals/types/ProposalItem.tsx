@@ -4,7 +4,6 @@ import EquipmentStep from "../steps/EquipmentStep";
 import FeesStep from "../steps/FeesStep";
 import ReviewStep from "../steps/ReviewStep";
 import { useProposal } from "../../../contexts/proposals";
-import { supabase } from "../../../lib/supabase";
 
 type Props = {
   data: {
@@ -71,8 +70,6 @@ export default function ProposalItem({ data }: Props) {
     nrc: [],
     mrc: "",
   });
-  const [isLoading, setIsLoading] = useState(true);
-  const [proposalId, setProposalId] = useState<string | null>(null);
   const { currentStep, setCurrentStep, onBack } = useProposal();
 
   // Handle submit operations
@@ -106,7 +103,6 @@ export default function ProposalItem({ data }: Props) {
             proposalType={data.name}
             initialData={clientForm}
             onSubmit={handleClientSubmit}
-            proposalId={proposalId}
           />
         )}
         {currentStep === 2 && (
@@ -137,7 +133,6 @@ export default function ProposalItem({ data }: Props) {
               mrc: parseFloat(fees.mrc) || 0,
             }}
             onBack={onBack}
-            proposalId={proposalId}
           />
         )}
       </div>

@@ -5,6 +5,8 @@ const initialState = {
   currentStep: 1,
   setCurrentStep: (step: number) => {},
   onBack: () => {},
+  proposal: null,
+  setProposal: (data: any) => null,
 };
 
 // Context
@@ -24,6 +26,7 @@ export default function ProposalsProvider({
   goToSelectionScreen,
 }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [proposal, setProposal] = useState(null);
 
   const onBack = () => {
     if (currentStep > 1) {
@@ -39,6 +42,8 @@ export default function ProposalsProvider({
         currentStep,
         setCurrentStep,
         onBack,
+        proposal,
+        setProposal,
       }}
     >
       <div className="no-print mx-auto py-8 px-4 bg-gray-50 sm:px-6 lg:px-8">
