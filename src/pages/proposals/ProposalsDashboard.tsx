@@ -1,8 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
-import { Settings, List, Plus, DollarSign, Users, Clock, FileCheck } from 'lucide-react';
-import { format } from 'date-fns';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "../../lib/supabase";
+import {
+  Settings,
+  List,
+  Plus,
+  DollarSign,
+  Users,
+  Clock,
+  FileCheck,
+} from "lucide-react";
+import { format } from "date-fns";
 
 interface ProposalStats {
   totalProposals: number;
@@ -43,8 +51,9 @@ export default function ProposalsDashboard() {
     try {
       // Fetch quotes data
       const { data: quotes, error: quotesError } = await supabase
-        .from('quotes')
-        .select(`
+        .from("quotes")
+        .select(
+          `
           id,
           title,
           status,
@@ -55,23 +64,29 @@ export default function ProposalsDashboard() {
             name,
             company_name
           )
-        `)
-        .order('created_at', { ascending: false });
+        `,
+        )
+        .order("created_at", { ascending: false });
 
       if (quotesError) throw quotesError;
 
       // Calculate stats
       const totalProposals = quotes?.length || 0;
-      const activeProposals = quotes?.filter(q => q.status === 'sent' || q.status === 'draft').length || 0;
-      const signedProposals = quotes?.filter(q => q.status === 'signed').length || 0;
-      const conversionRate = totalProposals > 0 ? (signedProposals / totalProposals) * 100 : 0;
-      
+      const activeProposals =
+        quotes?.filter((q) => q.status === "sent" || q.status === "draft")
+          .length || 0;
+      const signedProposals =
+        quotes?.filter((q) => q.status === "signed").length || 0;
+      const conversionRate =
+        totalProposals > 0 ? (signedProposals / totalProposals) * 100 : 0;
+
       // Calculate total value (MRR * 12 + NRC)
-      const totalValue = quotes?.reduce((sum, quote) => {
-        const annualMRR = (quote.total_mrr || 0) * 12;
-        const nrc = quote.total_nrc || 0;
-        return sum + annualMRR + nrc;
-      }, 0) || 0;
+      const totalValue =
+        quotes?.reduce((sum, quote) => {
+          const annualMRR = (quote.total_mrr || 0) * 12;
+          const nrc = quote.total_nrc || 0;
+          return sum + annualMRR + nrc;
+        }, 0) || 0;
 
       // Calculate average response time (mock for now)
       const avgResponseTime = 2.5; // This would normally be calculated from actual data
@@ -86,29 +101,29 @@ export default function ProposalsDashboard() {
 
       // Set recent proposals
       setRecentProposals(
-        (quotes || []).slice(0, 5).map(quote => ({
+        (quotes || []).slice(0, 5).map((quote) => ({
           id: quote.id,
           title: quote.title,
           status: quote.status,
           client: quote.client,
           created_at: quote.created_at,
           total_value: (quote.total_mrr || 0) * 12 + (quote.total_nrc || 0),
-        }))
+        })),
       );
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleNewProposal = () => {
-    window.open('/proposals/new', '_blank', 'width=1200,height=800');
+    window.open("/proposals/new", "_blank", "width=1200,height=800");
   };
 
   const getClientDisplayName = (proposal: RecentProposal) => {
-    if (!proposal.client) return 'N/A';
-    return proposal.client.company_name || proposal.client.name || 'N/A';
+    if (!proposal.client) return "N/A";
+    return proposal.client.company_name || proposal.client.name || "N/A";
   };
 
   if (isLoading) {
@@ -134,7 +149,7 @@ export default function ProposalsDashboard() {
             <List className="w-4 h-4 mr-1.5" />
             View All
           </Link>
-          <button 
+          <button
             onClick={handleNewProposal}
             className="bg-blue-500 text-white px-3 py-1.5 text-sm rounded-lg flex items-center hover:bg-blue-600 transition-colors"
           >
@@ -152,8 +167,12 @@ export default function ProposalsDashboard() {
               <FileCheck className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-600">Total Proposals</h3>
-              <p className="text-lg font-bold text-gray-800">{stats.totalProposals}</p>
+              <h3 className="text-sm font-medium text-gray-600">
+                Total Proposals
+              </h3>
+              <p className="text-lg font-bold text-gray-800">
+                {stats.totalProposals}
+              </p>
             </div>
           </div>
         </div>
@@ -165,7 +184,9 @@ export default function ProposalsDashboard() {
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-600">Total Value</h3>
-              <p className="text-lg font-bold text-gray-800">${stats.totalValue.toLocaleString()}</p>
+              <p className="text-lg font-bold text-gray-800">
+                ${stats.totalValue.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
@@ -176,8 +197,12 @@ export default function ProposalsDashboard() {
               <Clock className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-600">Avg. Response Time</h3>
-              <p className="text-lg font-bold text-gray-800">{stats.avgResponseTime} days</p>
+              <h3 className="text-sm font-medium text-gray-600">
+                Avg. Response Time
+              </h3>
+              <p className="text-lg font-bold text-gray-800">
+                {stats.avgResponseTime} days
+              </p>
             </div>
           </div>
         </div>
@@ -188,8 +213,12 @@ export default function ProposalsDashboard() {
               <Users className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-600">Conversion Rate</h3>
-              <p className="text-lg font-bold text-gray-800">{stats.conversionRate.toFixed(1)}%</p>
+              <h3 className="text-sm font-medium text-gray-600">
+                Conversion Rate
+              </h3>
+              <p className="text-lg font-bold text-gray-800">
+                {stats.conversionRate.toFixed(1)}%
+              </p>
             </div>
           </div>
         </div>
@@ -197,7 +226,9 @@ export default function ProposalsDashboard() {
 
       {/* Recent Proposals */}
       <div className="bg-white rounded-lg shadow-md p-5">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Proposals</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          Recent Proposals
+        </h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -217,12 +248,18 @@ export default function ProposalsDashboard() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Value
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {recentProposals.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                  <td
+                    colSpan={5}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
                     No proposals yet
                   </td>
                 </tr>
@@ -230,27 +267,39 @@ export default function ProposalsDashboard() {
                 recentProposals.map((proposal) => (
                   <tr key={proposal.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{proposal.title}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {proposal.title}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{getClientDisplayName(proposal)}</div>
+                      <div className="text-sm text-gray-900">
+                        {getClientDisplayName(proposal)}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {format(new Date(proposal.created_at), 'MMM d, yyyy')}
+                      {format(new Date(proposal.created_at), "MMM d, yyyy")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        proposal.status === 'signed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : proposal.status === 'sent'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          proposal.status === "signed"
+                            ? "bg-green-100 text-green-800"
+                            : proposal.status === "sent"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {proposal.status.charAt(0).toUpperCase() +
+                          proposal.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       ${proposal.total_value.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500">
+                        Convert to Client
+                      </button>
                     </td>
                   </tr>
                 ))

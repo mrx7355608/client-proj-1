@@ -1,23 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
+
+.font-signature {
+  font-family: "Dancing Script", cursive;
+}
 
 /* Print styles */
 @media print {
+  /* ----- THIS CSS CAUSED THE PRINT ISSUES ----- */
+
   /* Hide all UI elements except the proposal content */
-  body > *:not(.print-content) {
-    display: none !important;
-  }
+  /* body > *:not(.print-content) { */
+  /*   display: none !important; */
+  /* } */
+
+  /* ----------------------------------------------- */
 
   /* Reset page margins */
   @page {
-    size: letter;
     margin: 0;
+    padding: 0;
   }
 
   body {
     margin: 0;
     padding: 0;
+    box-shadow: none !important;
     background: white !important;
   }
 
@@ -25,12 +35,9 @@
   .proposal-page {
     width: 8.5in !important;
     height: 11in !important;
-    margin: 0 auto !important;
-    page-break-after: always;
-    position: relative;
+    margin: 0 !important;
     box-shadow: none !important;
     border: none !important;
-    background: white;
   }
 
   /* Hide UI elements */
@@ -41,18 +48,17 @@
   /* Ensure text is black for better printing */
   .print-content {
     color: black !important;
+    background-color: white !important;
   }
 
-  /* Fix page breaks */
-  .page-break {
-    page-break-before: always;
-  }
-
-  /* Ensure backgrounds print */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+}
+.page-break {
+  page-break-before: always; /* or "after" */
+  break-before: page; /* modern, works with flex/grid too */
 }
 
 /* Page sizing for screen view */

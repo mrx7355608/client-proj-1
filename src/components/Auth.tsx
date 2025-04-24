@@ -226,7 +226,7 @@ export default function Auth() {
               <Mail
                 size={15}
                 color="gray"
-                className="absolute z-10 top-3 left-3"
+                className="absolute z-20 top-3 left-3"
               />
               <label htmlFor="email" className="sr-only">
                 Email address
@@ -249,7 +249,7 @@ export default function Auth() {
               <LockKeyhole
                 size={15}
                 color="gray"
-                className="absolute z-10 top-3 left-3"
+                className="absolute z-20 top-3 left-3"
               />
               <input
                 id="password"
