@@ -691,7 +691,7 @@ export default function ReviewStep({
               </div>
 
               <Link
-                to={`http://localhost:5173/confirm-agreement/${proposal?.id}`}
+                to={`${import.meta.env.VITE_BASE_URL}/confirm-agreement/${proposal?.id}`}
               >
                 <button className="bg-sky-500 text-white text-xl font-bold px-7 py-4 mt-8">
                   Accept Quote
