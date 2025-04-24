@@ -54,6 +54,8 @@ export default function RequestSignatureForm({
       setError("");
       setIsSending(true);
       await sendSimpleMessage({
+        cc: ccEmails,
+        bcc: bccEmails,
         to: formData.clientEmail,
         message: formData.message,
         subject: formData.subject,

@@ -6,11 +6,17 @@ export async function sendSimpleMessage({
   message,
   subject,
   agreementPdf,
+  from,
+  cc,
+  bcc,
 }: {
+  from?: string;
+  cc: string[];
+  bcc: string[];
   to: string;
   message: string;
   subject: string;
-  agreementPdf: File;
+  agreementPdf: File | null;
 }) {
   // FIXME: the mailgun api key should not be public!!!
   const apiKey = import.meta.env.VITE_MAILGUN_API_KEY;
@@ -26,16 +32,25 @@ export async function sendSimpleMessage({
     key: apiKey,
   });
   try {
+    let mailData = {
+      from:
+        from ||
+        "Mailgun Sandbox <postmaster@sandbox9cbe43c569f34153b8efc76c9d298927.mailgun.org>",
+      to: [to],
+      cc: cc,
+      bcc: bcc,
+      subject: subject,
+      text: message,
+    };
+
+    if (agreementPdf) {
+      mailData = { ...mailData, attachment: agreementPdf };
+    }
+
     // TODO: add an email template
     const data = await mg.messages.create(
       "sandbox9cbe43c569f34153b8efc76c9d298927.mailgun.org",
-      {
-        from: "Mailgun Sandbox <postmaster@sandbox9cbe43c569f34153b8efc76c9d298927.mailgun.org>",
-        to: [to],
-        subject: subject,
-        text: message,
-        attachment: agreementPdf,
-      },
+      mailData,
     );
 
     console.log(data); // logs response data
