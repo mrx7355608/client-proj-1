@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import ConfirmAgreementForm from "../components/ConfirmAgreementForm";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import ConfirmAgreementForm from "../components/ConfirmAgreementForm";
 
 export default function ConfirmAgreement() {
   const { id } = useParams();
@@ -12,15 +12,12 @@ export default function ConfirmAgreement() {
   useEffect(() => {
     getQuote()
       .then((quote) => setQuote(quote))
-      .catch((err) => setError((err as Error).message));
-
-    getQuoteVariables()
-      .then((vars) => setQuote((prev) => ({ ...prev, variables: vars })))
       .catch((err) => setError((err as Error).message))
       .finally(() => setLoading(false));
   }, []);
 
   const getQuote = async () => {
+    // Get quote
     const { data, error } = await supabase
       .from("quotes")
       .select()
@@ -30,19 +27,16 @@ export default function ConfirmAgreement() {
     if (error) throw error;
     if (!data) throw new Error("Agreement not found");
 
-    return data;
-  };
-
-  const getQuoteVariables = async () => {
-    const { data, error } = await supabase
+    // Get quote variables
+    const { data: data2, error: error2 } = await supabase
       .from("quote_variables")
       .select()
       .eq("quote_id", id);
 
-    if (error) throw error;
-    if (!data) throw new Error("Agreement not found");
+    if (error2) throw error;
+    if (!data2) throw new Error("Agreement not found");
 
-    return data;
+    return { ...data, variables: data2 };
   };
 
   // Show loading state
