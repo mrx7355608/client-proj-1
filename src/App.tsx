@@ -89,6 +89,19 @@ function App() {
     return "Set up profile";
   };
 
+  // Check if we're on the confirm agreement page
+  const isConfirmAgreementPage =
+    window.location.pathname.startsWith("/confirm-agreement");
+  if (isConfirmAgreementPage) {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/confirm-agreement/:id" element={<ConfirmAgreement />} />
+        </Routes>
+      </Router>
+    );
+  }
+
   if (!session) {
     return <Auth />;
   }
@@ -212,7 +225,10 @@ function App() {
             <Route path="/expenses" element={<GlobalExpenses />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/confirm-agreement" element={<ConfirmAgreement />} />
-            <Route path="/request-signature" element={<RequestSignature />} />
+            <Route
+              path="/request-signature/:agreementId"
+              element={<RequestSignature />}
+            />
             <Route path="/user-settings" element={<UserSettings />} />
             {userProfile?.is_admin && (
               <>
@@ -251,4 +267,3 @@ function NavLink({
 }
 
 export default App;
-

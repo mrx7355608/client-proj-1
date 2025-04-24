@@ -1,6 +1,5 @@
 import type React from "react";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Building2,
   User,
@@ -10,8 +9,11 @@ import {
   MapPin,
   CheckCircle,
 } from "lucide-react";
+import { supabase } from "../lib/supabase";
 
-export default function ConfirmAgreementForm() {
+export default function ConfirmAgreementForm({ quote }: { quote: any }) {
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     businessName: "",
     contactName: "",
@@ -24,6 +26,30 @@ export default function ConfirmAgreementForm() {
     zipCode: "",
   });
 
+  useEffect(() => {
+    if (!quote) return;
+
+    const vars = quote.variables;
+    const clientName = vars.filter((v) => v.name === "client_name")[0].value;
+    const clientEmail = vars.filter((v) => v.name === "client_email")[0].value;
+    const clientPhone = vars.filter((v) => v.name === "client_phone")[0].value;
+    const clientTitle = vars.filter((v) => v.name === "client_title")[0].value;
+    const organization = vars.filter((v) => v.name === "organization")[0].value;
+    const address = vars.filter((v) => v.name === "address")[0].value;
+
+    setFormData({
+      businessName: organization,
+      contactName: clientName,
+      title: clientTitle,
+      email: clientEmail,
+      phone: clientPhone,
+      streetAddress: address,
+      city: "",
+      state: "",
+      zipCode: "",
+    });
+  }, [quote]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -32,20 +58,41 @@ export default function ConfirmAgreementForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission with formData
-    console.log(formData);
+    setIsConfirming(true);
+
+    try {
+      // Update proposal status to "signed"
+      const { data, error } = await supabase
+        .from("quotes")
+        .update({ status: "signed" })
+        .eq("id", quote.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (data.status === "signed")
+        throw new Error("You have already signed this proposal");
+
+      // Send email to the owner about confirmation of the agreement
+      alert("Proposal has been confirmed!");
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setIsConfirming(false);
+    }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-gradient-to-b from-white to-gray-50 rounded-xl shadow-lg border border-gray-100">
-      <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center">
+    <div className="max-w-2xl mx-auto p-8 flex items-center flex-col min-h-screen justify-center">
+      <h2 className="text-2xl font-bold mb-12 text-gray-800 flex items-center">
         <CheckCircle className="mr-2 text-gray-700" size={24} />
         <span>Confirm Agreement</span>
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {error && <p className="text-red-500">{error}</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
@@ -192,10 +239,11 @@ export default function ConfirmAgreementForm() {
         <div className="pt-4">
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-3 px-6 rounded-lg hover:from-gray-800 hover:to-black flex items-center justify-center font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+            className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-3 px-6 rounded-lg hover:from-gray-800 hover:to-black flex items-center justify-center font-medium transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed"
+            disabled={isConfirming}
           >
             <CheckCircle size={18} className="mr-2" />
-            Confirm Agreement
+            {isConfirming ? "Confirming..." : "Confirm Agreement"}
           </button>
         </div>
       </form>
