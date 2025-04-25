@@ -1,6 +1,7 @@
 import { ShieldAlert, Bug, BadgeCheck, Layers, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import ProposalItem from "./ProposalItem";
+import ProposalsProvider from "../../../contexts/proposals";
 
 type ProposalType = "vulscan" | "pentest" | "compliancy" | "fullsuite";
 
@@ -34,7 +35,7 @@ export default function ShowCyberProposalTypes({
       color: "bg-green-500",
     },
     {
-      id: "fullsuit",
+      id: "fullsuite",
       name: "Fullsuite Cubersecurity",
       description: "Complete Cybersecurity Package",
       icon: <Layers className="w-6 h-6" />,
@@ -48,7 +49,7 @@ export default function ShowCyberProposalTypes({
 
   if (selectedType) {
     return (
-      <>
+      <ProposalsProvider goToSelectionScreen={gotoMainScreen}>
         {selectedType === "vulscan" && (
           <ProposalItem data={cyberProposalsTypes[0]} />
         )}
@@ -61,7 +62,7 @@ export default function ShowCyberProposalTypes({
         {selectedType === "fullsuite" && (
           <ProposalItem data={cyberProposalsTypes[3]} />
         )}
-      </>
+      </ProposalsProvider>
     );
   }
 

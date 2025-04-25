@@ -1,9 +1,5 @@
 import { useState } from "react";
 import { Network, Settings, Shield, Building2 } from "lucide-react";
-// import UNMProposal from "./types/UNMProposal";
-// import MSPProposal from "./types/MSPProposal";
-// import CyberProposal from "./types/CyberProposal";
-// import BuildoutProposal from "./types/BuildoutProposal";
 import ProposalsProvider from "../../contexts/proposals";
 import ProposalItem from "./types/ProposalItem";
 import ShowCyberProposalTypes from "./types/ShowCyberProposalTypes";
@@ -50,6 +46,10 @@ export default function NewProposal() {
 
   const gotoMainSelectionScreen = () => setSelectedType(null);
 
+  if (selectedType === "cybersecurity") {
+    return <ShowCyberProposalTypes gotoMainScreen={gotoMainSelectionScreen} />;
+  }
+
   // Render type-specific proposal flow
   if (selectedType) {
     return (
@@ -59,18 +59,6 @@ export default function NewProposal() {
         {selectedType === "buildouts" && (
           <ProposalItem data={proposalTypes[3]} />
         )}
-        {selectedType === "cybersecurity" && (
-          <ShowCyberProposalTypes gotoMainScreen={gotoMainSelectionScreen} />
-        )}
-
-        {/* {selectedType === "unm" && <UNMProposal data={proposalTypes[0]} />} */}
-        {/* {selectedType === "msp" && <MSPProposal data={proposalTypes[1]} />} */}
-        {/* {selectedType === "cybersecurity" && ( */}
-        {/*   <CyberProposal data={proposalTypes[2]} /> */}
-        {/* )} */}
-        {/* {selectedType === "buildouts" && ( */}
-        {/*   <BuildoutProposal data={proposalTypes[3]} /> */}
-        {/* )} */}
       </ProposalsProvider>
     );
   }
