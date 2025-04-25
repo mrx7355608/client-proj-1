@@ -16,30 +16,30 @@ export default function ShowCyberProposalTypes({
     {
       id: "vulscan",
       name: "Vulnerability Security",
-      description: "Unified Network Management",
+      description: "Vulnerability scans for your whole system",
       icon: <ShieldAlert className="w-6 h-6" />,
-      color: "bg-purple-500",
+      color: "bg-red-500",
     },
     {
       id: "pentest",
       name: "PenTest",
       description: "Pen Testing Solutions",
       icon: <Bug className="w-6 h-6" />,
-      color: "bg-blue-500",
+      color: "bg-red-500",
     },
     {
       id: "compliancy",
       name: "Compliancy",
       description: "Compliancy Service",
       icon: <BadgeCheck className="w-6 h-6" />,
-      color: "bg-green-500",
+      color: "bg-red-500",
     },
     {
       id: "fullsuite",
       name: "Fullsuite Cubersecurity",
       description: "Complete Cybersecurity Package",
       icon: <Layers className="w-6 h-6" />,
-      color: "bg-orange-500",
+      color: "bg-red-500",
     },
   ];
 
