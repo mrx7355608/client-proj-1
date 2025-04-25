@@ -71,6 +71,7 @@ export default function ReviewStep({
 }: ReviewStepProps) {
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRequesting, setIsRequesting] = useState(false);
   const { proposal, setProposal } = useProposal();
 
   useEffect(() => {
@@ -241,7 +242,9 @@ export default function ReviewStep({
   };
 
   const handleRequestSignature = async () => {
+    setIsRequesting(true);
     await saveQuote("draft");
+    setIsRequesting(false);
     location.href = `/request-signature/${(proposal as any).id}`;
   };
 
@@ -272,7 +275,7 @@ export default function ReviewStep({
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                {isSaving ? "Saving proposoal..." : "Request Signature"}
+                {isRequesting ? "Saving proposoal..." : "Request Signature"}
               </button>
             </div>
           </div>
