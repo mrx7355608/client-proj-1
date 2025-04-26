@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Save } from "lucide-react";
-import { supabase } from "../../../lib/supabase";
 import { useProposal } from "../../../contexts/proposals";
+import { saveProposal } from "../../../lib/data/proposals.data";
+import { QuoteInput } from "../../../lib/types";
 
 interface ClientForm {
   name: string;
@@ -16,13 +17,13 @@ interface ClientForm {
 }
 
 interface ClientInfoStepProps {
-  proposalType: string;
+  proposalName: string;
   initialData: ClientForm;
   onSubmit: (data: ClientForm) => void;
 }
 
 export default function ClientInfoStep({
-  proposalType,
+  proposalName,
   initialData,
   onSubmit,
 }: ClientInfoStepProps) {
@@ -64,100 +65,38 @@ export default function ClientInfoStep({
     });
   };
 
-  const updateQuote = async (
-    proposalId: string,
-    quoteData: any,
-    variables: any[],
-  ) => {
-    // Update existing quote
-    const { data, error } = await supabase
-      .from("quotes")
-      .update(quoteData)
-      .eq("id", proposalId)
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    // Delete existing quote variables
-    await supabase.from("quote_variables").delete().eq("quote_id", proposalId);
-
-    // Insert new variables
-    const { error: variablesError } = await supabase
-      .from("quote_variables")
-      .insert(
-        variables.map((v) => ({
-          quote_id: data.id,
-          name: v.name,
-          value: v.value,
-        })),
-      );
-
-    if (variablesError) throw variablesError;
-
-    return data;
-  };
-
-  const createQuote = async (quoteData: any, variables: any[]) => {
-    const { data, error } = await supabase
-      .from("quotes")
-      .insert([quoteData])
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    // Insert new variables
-    const { error: variablesError } = await supabase
-      .from("quote_variables")
-      .insert(
-        variables.map((v) => ({
-          quote_id: data.id,
-          name: v.name,
-          value: v.value,
-        })),
-      );
-
-    if (variablesError) throw variablesError;
-
-    return data;
-  };
-
   const handleSave = async () => {
     setIsSaving(true);
+
+    const quoteData: QuoteInput = {
+      title: `${proposalName} Agreement - ${formData.organization}`,
+      status: "draft",
+      total_mrr: 0,
+      total_nrc: 0,
+      term_months: 36,
+      notes: `Draft proposal for ${formData.organization}`,
+    };
+
+    const quoteVariables = [
+      { name: "customer_name", value: formData.name },
+      { name: "customer_title", value: formData.title },
+      { name: "customer_email", value: formData.email },
+      { name: "customer_phone", value: formData.phone },
+      { name: "client", value: formData.organization },
+      {
+        name: "address",
+        value: `${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}`,
+      },
+    ];
+
     try {
-      // Generate quote number
-      const { data: quoteNumber } = await supabase.rpc("generate_quote_number");
-
-      // Create or update the quote record
-      const quoteData = {
-        title: `${proposalType} Agreement - ${formData.organization}`,
-        quote_number: quoteNumber,
-        status: "draft",
-        notes: `Draft proposal for ${formData.organization}`,
-      };
-
-      let quote;
-      const quoteVariables = [
-        { name: "customer_name", value: formData.name },
-        { name: "customer_title", value: formData.title },
-        { name: "customer_email", value: formData.email },
-        { name: "customer_phone", value: formData.phone },
-        { name: "client", value: formData.organization },
-        {
-          name: "address",
-          value: `${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}`,
-        },
-      ];
-
-      if (!proposal) {
-        quote = await createQuote(quoteData, quoteVariables);
-      } else {
-        quote = await updateQuote(proposal.id, quoteData, quoteVariables);
-      }
-
-      alert("Proposal saved as draft");
+      const quote = await saveProposal(
+        proposal?.id || null,
+        quoteData,
+        quoteVariables,
+      );
       setProposal(quote); // Update the quote in context
+      alert("Proposal saved as draft");
     } catch (error) {
       console.error("Error saving proposal:", error);
       alert("Error saving proposal. Please try again.");
@@ -171,7 +110,7 @@ export default function ClientInfoStep({
       {/* Header */}
       <div className="mb-8 pb-6 border-b border-gray-200">
         <h2 className="text-2xl font-semibold text-gray-900">
-          {proposalType} - {formData.organization || "New Client"}
+          {proposalName} - {formData.organization || "New Client"}
         </h2>
       </div>
 
@@ -181,7 +120,7 @@ export default function ClientInfoStep({
             Client Information
           </h3>
           <p className="mt-2 text-gray-600">
-            Enter the client details for your {proposalType} proposal
+            Enter the client details for your {proposalName} proposal
           </p>
         </div>
         <button
