@@ -148,7 +148,6 @@ export default function ReviewStep({
     try {
       setIsRequesting(true);
       await saveQuote("draft");
-      alert("Proposal saved as draft");
       location.href = `/request-signature/${proposal?.id}`;
     } finally {
       setIsRequesting(false);

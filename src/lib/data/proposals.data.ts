@@ -96,7 +96,7 @@ export const saveProposal = async (
   proposalId: string | null,
   quote: QuoteInput,
   quoteVars: QuoteVariableInput[],
-  quoteItems: QuoteItemInput[],
+  quoteItems: QuoteItemInput[] = [],
 ) => {
   if (proposalId) {
     console.log("updating...");

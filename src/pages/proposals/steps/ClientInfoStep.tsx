@@ -78,11 +78,11 @@ export default function ClientInfoStep({
     };
 
     const quoteVariables = [
-      { name: "customer_name", value: formData.name },
-      { name: "customer_title", value: formData.title },
-      { name: "customer_email", value: formData.email },
-      { name: "customer_phone", value: formData.phone },
-      { name: "client", value: formData.organization },
+      { name: "client_name", value: formData.name },
+      { name: "client_title", value: formData.title },
+      { name: "client_email", value: formData.email },
+      { name: "client_phone", value: formData.phone },
+      { name: "organization", value: formData.organization },
       {
         name: "address",
         value: `${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}`,
