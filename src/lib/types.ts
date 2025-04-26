@@ -41,6 +41,8 @@ export interface Quote {
   notes: string;
   created_at: Date;
   updated_at: Date;
+  variables: QuoteVariable[];
+  items: QuoteItem[];
 }
 
 export interface QuoteVariable {
@@ -51,7 +53,6 @@ export interface QuoteVariable {
 }
 
 export interface QuoteItemInput {
-  quote_id: string;
   inventory_item_id: string;
   description: string;
   quantity: number;
