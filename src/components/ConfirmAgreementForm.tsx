@@ -15,6 +15,7 @@ import {
   Edit3,
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { sendSimpleMessage } from "../lib/send-email";
 
 interface QuoteVariable {
   name: string;
@@ -290,14 +291,40 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
 
       if (error) throw error;
 
-      // TODO: Send email to the owner about confirmation of the agreement
+      // Send email to the owner about confirmation of the agreement
+      const emailReceiver = import.meta.env.VITE_EMAIL_RECEIVER;
+
+      if (!emailReceiver) {
+        throw new Error(
+          "Reciever's email is not defined, please define VITE_EMAIL_RECEIVER in .env",
+        );
+      }
+
+      const clientName = quote.variables.filter(
+        (f) => f.name === "client_name",
+      )[0].value;
+      const clientOrg = quote.variables.filter(
+        (f) => f.name === "organization",
+      )[0].value;
+
+      await sendSimpleMessage({
+        to: emailReceiver,
+        subject: "Agreement Confirmed",
+        message: `
+          An agreement has been confirmed, details are following:
+          Title: ${quote.title}
+          Status: ${quote.status}
+          Quote #: ${quote.quote_number}
+          Client: ${clientName}
+          Organization: ${clientOrg}
+        `,
+      });
       alert("Proposal has been confirmed!");
     } catch (error) {
       setError((error as Error).message);
     } finally {
       setIsConfirming(false);
     }
-    console.log(formData);
   };
 
   return (
