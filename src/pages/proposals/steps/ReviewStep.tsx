@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FileText,
   Building2,
@@ -71,6 +71,7 @@ export default function ReviewStep({
 }: ReviewStepProps) {
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRequesting, setIsRequesting] = useState(false);
   const { proposal, setProposal } = useProposal();
 
   useEffect(() => {
@@ -241,7 +242,9 @@ export default function ReviewStep({
   };
 
   const handleRequestSignature = async () => {
+    setIsRequesting(true);
     await saveQuote("draft");
+    setIsRequesting(false);
     location.href = `/request-signature/${(proposal as any).id}`;
   };
 
@@ -272,7 +275,7 @@ export default function ReviewStep({
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                {isSaving ? "Saving proposoal..." : "Request Signature"}
+                {isRequesting ? "Saving proposoal..." : "Request Signature"}
               </button>
             </div>
           </div>
@@ -381,9 +384,7 @@ export default function ReviewStep({
 
           {/* Services & Equipment */}
           <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12">
-              Services & Equipment
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-12">Services</h2>
 
             <div className="grid grid-cols-2 gap-6 mb-12">
               <div className="bg-gray-50 rounded-xl p-6">
@@ -414,15 +415,17 @@ export default function ReviewStep({
                 </p>
               </div>
             </div>
+          </div>
 
+          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+            <h2 className="text-3xl font-bold text-gray-900 mb-12">
+              Equipment
+            </h2>
             <div className="bg-gray-50 rounded-xl p-8 mb-8 page-break">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">
-                Equipment Provided
-              </h3>
               <div className="space-y-4">
                 {sections.map((section) => (
                   <div key={section.id}>
-                    <h4 className="text-lg font-medium text-gray-800 mb-4">
+                    <h4 className="text-lg font-bold text-gray-800 mb-4">
                       {section.name}
                     </h4>
                     <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
@@ -549,6 +552,15 @@ export default function ReviewStep({
               </ul>
             </div>
           </div>
+
+          {/* Labour section */}
+          {proposalTypeInfo.id === "buildouts" && (
+            <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
+              <h2 className="text-3xl font-bold text-gray-900 mb-12">Labour</h2>
+
+              <div className="space-y-6 text-gray-600"></div>
+            </div>
+          )}
 
           {/* Terms & Conditions */}
           <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">

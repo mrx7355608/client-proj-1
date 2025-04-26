@@ -15,6 +15,8 @@ import {
   Edit3,
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { sendSimpleMessage } from "../lib/send-email";
+import IpAddress from "./IpAddress";
 
 interface QuoteVariable {
   name: string;
@@ -290,14 +292,40 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
 
       if (error) throw error;
 
-      // TODO: Send email to the owner about confirmation of the agreement
+      // Send email to the owner about confirmation of the agreement
+      const emailReceiver = import.meta.env.VITE_EMAIL_RECEIVER;
+
+      if (!emailReceiver) {
+        throw new Error(
+          "Reciever's email is not defined, please define VITE_EMAIL_RECEIVER in .env",
+        );
+      }
+
+      const clientName = quote.variables.filter(
+        (f) => f.name === "client_name",
+      )[0].value;
+      const clientOrg = quote.variables.filter(
+        (f) => f.name === "organization",
+      )[0].value;
+
+      await sendSimpleMessage({
+        to: emailReceiver,
+        subject: "Agreement Confirmed",
+        message: `
+          An agreement has been confirmed, details are following:
+          Title: ${quote.title}
+          Status: ${quote.status}
+          Quote #: ${quote.quote_number}
+          Client: ${clientName}
+          Organization: ${clientOrg}
+        `,
+      });
       alert("Proposal has been confirmed!");
     } catch (error) {
       setError((error as Error).message);
     } finally {
       setIsConfirming(false);
     }
-    console.log(formData);
   };
 
   return (
@@ -306,7 +334,7 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
         <div className="p-8">
           <h1 className="text-3xl font-bold text-gray-800 flex items-center">
             <CheckCircle className="mr-3 text-gray-700" size={28} />
-            <span>Confirm Agreement</span>
+            <span>Sign Agreement</span>
           </h1>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-8">
@@ -813,6 +841,9 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
               )}
             </div>
 
+            {/* Fetch and Show IP address */}
+            <IpAddress />
+
             <div className="pt-6">
               <button
                 type="submit"
@@ -820,7 +851,7 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
                 disabled={isConfirming}
               >
                 <CheckCircle size={18} className="mr-2" />
-                {isConfirming ? "Confirming..." : "Confirm Agreement"}
+                {isConfirming ? "Signing..." : "Sign Agreement"}
               </button>
             </div>
           </form>

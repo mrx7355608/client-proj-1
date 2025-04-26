@@ -6,17 +6,15 @@ export async function sendSimpleMessage({
   message,
   subject,
   agreementPdf,
-  from,
   cc,
   bcc,
 }: {
-  from?: string;
-  cc: string[];
-  bcc: string[];
+  cc?: string[];
+  bcc?: string[];
   to: string;
   message: string;
   subject: string;
-  agreementPdf: File | null;
+  agreementPdf?: File;
 }) {
   // FIXME: the mailgun api key should not be public!!!
   const apiKey = import.meta.env.VITE_MAILGUN_API_KEY;
@@ -26,19 +24,31 @@ export async function sendSimpleMessage({
     );
   }
 
-  const mailgun = new Mailgun(FormData);
-  const mg = mailgun.client({
-    username: "api",
-    key: apiKey,
-  });
+  const emailSender = import.meta.env.VITE_EMAIL_SENDER;
+  if (!emailSender) {
+    throw new Error(
+      "No email sender has been defined, please add VITE_EMAIL_SENDER to your .env file. See .example.env for more info",
+    );
+  }
+
+  // Show warning if email domain is not specified
+  if (!import.meta.env.VITE_EMAIL_DOMAIN) {
+    console.log(
+      "[WARNING] No Email Domain is specified. Using mailgun domain as fallback",
+    );
+  }
+
   try {
+    const mailgun = new Mailgun(FormData);
+    const mg = mailgun.client({
+      username: "api",
+      key: apiKey,
+    });
     let mailData = {
-      from:
-        from ||
-        "Mailgun Sandbox <postmaster@sandbox9cbe43c569f34153b8efc76c9d298927.mailgun.org>",
+      from: emailSender,
       to: [to],
-      cc: cc,
-      bcc: bcc,
+      cc: cc || [],
+      bcc: bcc || [],
       subject: subject,
       text: message,
     };
@@ -47,14 +57,14 @@ export async function sendSimpleMessage({
       mailData = { ...mailData, attachment: agreementPdf };
     }
 
-    // TODO: add an email template
-    const data = await mg.messages.create(
-      "sandbox9cbe43c569f34153b8efc76c9d298927.mailgun.org",
-      mailData,
-    );
+    // Setup domain
+    const mailgunDomain = "sandbox9cbe43c569f34153b8efc76c9d298927.mailgun.org";
+    const domain = import.meta.env.VITE_EMAIL_DOMAIN || mailgunDomain;
 
-    console.log(data); // logs response data
+    // Send email
+    const data = await mg.messages.create(domain, mailData);
+    console.log(data);
   } catch (error) {
-    console.log(error); //logs any error
+    console.log(error);
   }
 }

@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import ConfirmAgreementForm from "../components/ConfirmAgreementForm";
+import { AlertTriangle, LucideAlertCircle } from "lucide-react";
 
 export default function ConfirmAgreement() {
   const { id } = useParams();
@@ -47,6 +48,18 @@ export default function ConfirmAgreement() {
   // Show error message
   if (error) {
     return <p className="text-red-500 text-center">{error}</p>;
+  }
+
+  // Show error if quote has already been signed
+  if (quote.status === "signed") {
+    return (
+      <div className="flex min-h-screen items-center gap-2 justify-center">
+        <AlertTriangle size={35} color="red" />
+        <p className="font-bold text-2xl text-red-600 text-center">
+          Quote has already been signed!
+        </p>
+      </div>
+    );
   }
 
   return (
