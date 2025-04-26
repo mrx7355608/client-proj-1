@@ -1,11 +1,11 @@
 import { supabase } from "../supabase";
-import { QuoteInput, QuoteItem, QuoteVariableInput } from "../types";
+import { QuoteInput, QuoteItemInput, QuoteVariableInput } from "../types";
 
 const updateQuote = async (
   proposalId: string,
   quoteData: Partial<QuoteInput>,
   quoteVariables: QuoteVariableInput[],
-  quoteItems: QuoteItem[],
+  quoteItems: QuoteItemInput[],
 ) => {
   // Update existing quote
   const { data, error } = await supabase
@@ -50,7 +50,7 @@ const updateQuote = async (
 const createQuote = async (
   quoteData: QuoteInput,
   quoteVariables: QuoteVariableInput[],
-  quoteItems: QuoteItem[],
+  quoteItems: QuoteItemInput[],
 ) => {
   // Generate quote number
   const { data: quoteNumber } = await supabase.rpc("generate_quote_number");
@@ -96,7 +96,7 @@ export const saveProposal = async (
   proposalId: string | null,
   quote: QuoteInput,
   quoteVars: QuoteVariableInput[],
-  quoteItems: QuoteItem[],
+  quoteItems: QuoteItemInput[],
 ) => {
   if (proposalId) {
     console.log("updating...");

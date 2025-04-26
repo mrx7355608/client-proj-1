@@ -69,7 +69,7 @@ export default function ProposalItem({ data }: Props) {
         {/* Step Content */}
         {currentStep === 1 && (
           <ClientInfoStep
-            proposalType={data.name}
+            proposalName={data.name}
             initialData={clientForm}
             onSubmit={handleClientSubmit}
           />

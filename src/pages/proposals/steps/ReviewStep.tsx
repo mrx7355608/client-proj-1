@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FileText,
   Building2,
@@ -19,6 +19,8 @@ import {
 import { supabase } from "../../../lib/supabase";
 import { Link } from "react-router-dom";
 import { useProposal } from "../../../contexts/proposals";
+import { saveProposal } from "../../../lib/data/proposals.data";
+import { QuoteInput } from "../../../lib/types";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -88,50 +90,30 @@ export default function ReviewStep({
     return `${formattedDollars}.${cents}`;
   };
 
-  const createQuote = async (status: string) => {
-    // Generate quote number
-    const { data: quoteNumber } = await supabase.rpc("generate_quote_number");
+  const saveQuote = async (status: string) => {
+    const quoteData: QuoteInput = {
+      title: `${proposalTypeInfo.name} Agreement - ${clientInfo.organization}`,
+      status: status,
+      total_mrr: fees.mrc,
+      total_nrc: calculateNRCTotal(),
+      term_months: 36,
+      notes: `Proposal for ${clientInfo.organization}`,
+    };
+    const quoteVariables = [
+      { name: "client_name", value: clientInfo.name },
+      { name: "client_title", value: clientInfo.title },
+      { name: "client_email", value: clientInfo.email },
+      { name: "client_phone", value: clientInfo.phone },
+      {
+        name: "organization",
+        value: clientInfo.organization,
+      },
+      {
+        name: "address",
+        value: `${clientInfo.streetAddress}, ${clientInfo.city}, ${clientInfo.state} ${clientInfo.zipCode}`,
+      },
+    ];
 
-    // Create the quote record
-    const { data: quote, error: quoteError } = await supabase
-      .from("quotes")
-      .insert({
-        title: `${proposalTypeInfo.name} Agreement - ${clientInfo.organization}`,
-        quote_number: quoteNumber,
-        status: status,
-        total_mrr: fees.mrc,
-        total_nrc: calculateNRCTotal(),
-        term_months: 36, // Default term length
-        notes: `Proposal for ${clientInfo.organization}`,
-      })
-      .select()
-      .single();
-
-    if (quoteError) throw quoteError;
-
-    // Create quote variables
-    const { error: variablesError } = await supabase
-      .from("quote_variables")
-      .insert([
-        { quote_id: quote.id, name: "client_name", value: clientInfo.name },
-        { quote_id: quote.id, name: "client_title", value: clientInfo.title },
-        { quote_id: quote.id, name: "client_email", value: clientInfo.email },
-        { quote_id: quote.id, name: "client_phone", value: clientInfo.phone },
-        {
-          quote_id: quote.id,
-          name: "organization",
-          value: clientInfo.organization,
-        },
-        {
-          quote_id: quote.id,
-          name: "address",
-          value: `${clientInfo.streetAddress}, ${clientInfo.city}, ${clientInfo.state} ${clientInfo.zipCode}`,
-        },
-      ]);
-
-    if (variablesError) throw variablesError;
-
-    // Create quote items
     const quoteItems = sections.flatMap((section) =>
       section.equipment.map((item) => ({
         quote_id: quote.id,
@@ -143,109 +125,34 @@ export default function ReviewStep({
       })),
     );
 
-    if (quoteItems.length > 0) {
-      const { error: itemsError } = await supabase
-        .from("quote_items")
-        .insert(quoteItems);
-
-      if (itemsError) throw itemsError;
-    }
-
-    return quote;
-  };
-
-  const updateQuote = async (quoteId: string, status: string) => {
-    // Update quote
-    const { data, error: quoteError } = await supabase
-      .from("quotes")
-      .update({
-        title: `${proposalTypeInfo.name} Agreement - ${clientInfo.organization}`,
-        status: status,
-        total_mrr: fees.mrc,
-        total_nrc: calculateNRCTotal(),
-        term_months: 36,
-        notes: `Proposal for ${clientInfo.organization}`,
-      })
-      .eq("id", quoteId)
-      .select();
-
-    if (!data) {
-      throw new Error("Quote not found!");
-    }
-
-    const quote = data[0];
-
-    if (quoteError) throw quoteError;
-
-    // Update quote variables
-    const { error: variablesError } = await supabase
-      .from("quote_variables")
-      .insert([
-        { name: "client_name", value: clientInfo.name },
-        { name: "client_title", value: clientInfo.title },
-        { name: "client_email", value: clientInfo.email },
-        { name: "client_phone", value: clientInfo.phone },
-        {
-          name: "organization",
-          value: clientInfo.organization,
-        },
-        {
-          name: "address",
-          value: `${clientInfo.streetAddress}, ${clientInfo.city}, ${clientInfo.state} ${clientInfo.zipCode}`,
-        },
-      ]);
-
-    if (variablesError) throw variablesError;
-
-    // Update quote items
-    const quoteItems = sections.flatMap((section) =>
-      section.equipment.map((item) => ({
-        quote_id: quoteId,
-        inventory_item_id: item.id,
-        description: item.name,
-        quantity: item.quantity,
-        unit_price: 0,
-        is_recurring: false,
-      })),
+    const quote = await saveProposal(
+      proposal?.id || null,
+      quoteData,
+      quoteVariables,
+      quoteItems,
     );
-
-    if (quoteItems.length > 0) {
-      const { error: itemsError } = await supabase
-        .from("quote_items")
-        .update(quoteItems)
-        .eq("quote_id", quoteId);
-
-      if (itemsError) throw itemsError;
-    }
-
-    return quote;
-  };
-
-  const saveQuote = async (status: string) => {
-    // If proposal exists, updated it
-    if (proposal) {
-      const updatedQuote = await updateQuote((proposal as any).id, status);
-      setProposal(updatedQuote);
-      return;
-    }
-
-    // Otherwise, create a new proposal
-    const newQuote = await createQuote(status);
-    setProposal(newQuote);
+    setProposal(quote);
   };
 
   const handleSaveAsDraft = async () => {
-    setIsSaving(true);
-    await saveQuote("draft");
-    alert("Proposal saved as draft");
-    setIsSaving(false);
+    try {
+      setIsSaving(true);
+      await saveQuote("draft");
+      alert("Proposal saved as draft");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleRequestSignature = async () => {
-    setIsRequesting(true);
-    await saveQuote("draft");
-    setIsRequesting(false);
-    location.href = `/request-signature/${(proposal as any).id}`;
+    try {
+      setIsRequesting(true);
+      await saveQuote("draft");
+      alert("Proposal saved as draft");
+      location.href = `/request-signature/${proposal?.id}`;
+    } finally {
+      setIsRequesting(false);
+    }
   };
 
   const renderPreview = () => {
