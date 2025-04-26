@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { sendSimpleMessage } from "../lib/send-email";
+import IpAddress from "./IpAddress";
 
 interface QuoteVariable {
   name: string;
@@ -839,6 +840,9 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
                 </div>
               )}
             </div>
+
+            {/* Fetch and Show IP address */}
+            <IpAddress />
 
             <div className="pt-6">
               <button
