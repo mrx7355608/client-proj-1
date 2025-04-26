@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Quote } from "../lib/types";
 import { getProposal } from "../lib/data/proposals.data";
 import ProposalsProvider from "../contexts/proposals";
+import EditProposalItem from "../components/EditProposalItem";
 
 export default function EditProposal() {
   const { id } = useParams();
@@ -38,7 +39,7 @@ export default function EditProposal() {
 
   return (
     <ProposalsProvider goToSelectionScreen={() => {}}>
-      <pre>{JSON.stringify(quote, null, 4)}</pre>
+      <EditProposalItem quote={quote} />
     </ProposalsProvider>
   );
 }
