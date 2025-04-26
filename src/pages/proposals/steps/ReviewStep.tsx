@@ -116,7 +116,7 @@ export default function ReviewStep({
 
     const quoteItems = sections.flatMap((section) =>
       section.equipment.map((item) => ({
-        quote_id: quote.id,
+        section_name: section.name,
         inventory_item_id: item.id,
         description: item.name,
         quantity: item.quantity,

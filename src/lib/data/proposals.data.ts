@@ -84,7 +84,7 @@ const createQuote = async (
   if (quoteItems.length > 0) {
     const { error: itemsError } = await supabase
       .from("quote_items")
-      .insert(quoteItems);
+      .insert(quoteItems.map((qi) => ({ ...qi, quote_id: data.id })));
 
     if (itemsError) throw itemsError;
   }
