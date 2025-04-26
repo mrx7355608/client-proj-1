@@ -333,7 +333,7 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
         <div className="p-8">
           <h1 className="text-3xl font-bold text-gray-800 flex items-center">
             <CheckCircle className="mr-3 text-gray-700" size={28} />
-            <span>Confirm Agreement</span>
+            <span>Sign Agreement</span>
           </h1>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-8">
@@ -847,7 +847,7 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
                 disabled={isConfirming}
               >
                 <CheckCircle size={18} className="mr-2" />
-                {isConfirming ? "Confirming..." : "Confirm Agreement"}
+                {isConfirming ? "Signing..." : "Sign Agreement"}
               </button>
             </div>
           </form>
