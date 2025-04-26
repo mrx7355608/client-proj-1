@@ -59,3 +59,17 @@ export interface QuoteItem {
   unit_price: number;
   is_recurring: boolean;
 }
+
+export interface QuoteInput {
+  title: string;
+  status: string;
+  total_mrr: number;
+  total_nrc: number;
+  term_months: number;
+  notes: string;
+}
+
+export interface QuoteVariableInput {
+  name: string;
+  value: string;
+}
