@@ -296,7 +296,19 @@ export default function ProposalsDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       ${proposal.total_value.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="flex items-center gap-2 px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() => {
+                          window.open(
+                            `/proposals/edit/${proposal.id}`,
+                            "_blank",
+                            "width=1200,height=800",
+                          );
+                        }}
+                        className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
+                      >
+                        Edit
+                      </button>
                       <button className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500">
                         Convert to Client
                       </button>

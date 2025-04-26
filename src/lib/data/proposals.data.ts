@@ -113,3 +113,29 @@ export const saveProposal = async (
   const newQuote = await createQuote(quote, quoteVars, quoteItems);
   return newQuote;
 };
+
+export const getProposal = async (id: string) => {
+  const { data: quote, error: quoteError } = await supabase
+    .from("quotes")
+    .select()
+    .eq("id", id)
+    .single();
+
+  if (quoteError) throw quoteError;
+
+  const { data: quoteVars, error: quoteVarsError } = await supabase
+    .from("quote_variables")
+    .select()
+    .eq("quote_id", id);
+
+  if (quoteVarsError) throw quoteVarsError;
+
+  const { data: quoteItems, error: quoteItemsError } = await supabase
+    .from("quote_items")
+    .select()
+    .eq("quote_id", id);
+
+  if (quoteItemsError) throw quoteItemsError;
+
+  return { ...quote, variables: quoteVars || [], items: quoteItems || [] };
+};
