@@ -1,13 +1,31 @@
 import { ArrowLeft } from "lucide-react";
-import { useState, createContext, ReactNode, useContext } from "react";
+import {
+  useState,
+  createContext,
+  ReactNode,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from "react";
+import { Quote } from "../lib/types";
 
 const initialState = {
   currentStep: 1,
-  setCurrentStep: (step: number) => {},
+  setCurrentStep: () => {},
   onBack: () => {},
+  proposal: null,
+  setProposal: () => {},
 };
 
-const ProposalContext = createContext(initialState);
+interface InitialContext {
+  currentStep: number;
+  setCurrentStep: Dispatch<SetStateAction<number>>;
+  onBack: () => void;
+  proposal: Quote | null;
+  setProposal: Dispatch<SetStateAction<Quote>>;
+}
+
+const ProposalContext = createContext<InitialContext>(initialState);
 export const useProposal = () => useContext(ProposalContext);
 
 type Props = {
@@ -21,6 +39,7 @@ export default function ProposalsProvider({
   goToSelectionScreen,
 }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [proposal, setProposal] = useState<any>(null);
 
   const onBack = () => {
     if (currentStep > 1) {
@@ -36,6 +55,8 @@ export default function ProposalsProvider({
         currentStep,
         setCurrentStep,
         onBack,
+        proposal,
+        setProposal,
       }}
     >
       <div className="no-print mx-auto py-8 px-4 bg-gray-50 sm:px-6 lg:px-8">
