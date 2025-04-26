@@ -50,14 +50,17 @@ export interface QuoteVariable {
   value: string;
 }
 
-export interface QuoteItem {
-  id: string;
+export interface QuoteItemInput {
   quote_id: string;
   inventory_item_id: string;
   description: string;
   quantity: number;
   unit_price: number;
   is_recurring: boolean;
+}
+
+export interface QuoteItem extends QuoteItemInput {
+  id: string;
 }
 
 export interface QuoteInput {
