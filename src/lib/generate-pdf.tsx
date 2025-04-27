@@ -1,40 +1,8 @@
-import { toPng } from "html-to-image";
-import { pdf } from "@react-pdf/renderer";
-import AgreementPDF from "../components/AgreementPDF";
+import MyProposalPdf from "../components/preview-pdf/AgreementPDF";
 import { supabase } from "./supabase";
+import { pdf } from "@react-pdf/renderer";
 
-const generateImages = async () => {
-  const images = [];
-  const sectionIds = [
-    "section-1",
-    "section-2",
-    "section-3",
-    "section-4",
-    "section-5",
-    "section-6",
-    "section-7",
-    "section-8",
-  ];
-
-  for (const id of sectionIds) {
-    const element = document.getElementById(id);
-    if (!element) continue;
-
-    if (element.offsetHeight === 0) {
-      console.warn(`Skipping empty element: ${id}`);
-      continue;
-    }
-
-    const dataUrl = await toPng(element, { quality: 1, pixelRatio: 1.7 });
-    images.push(dataUrl);
-  }
-
-  return images;
-};
-
-export const generatePDF = async (filename: string) => {
-  const images = await generateImages();
-  const pdfBlob = await pdf(<AgreementPDF sectionImages={images} />).toBlob();
+const uploadToSupabase = async (pdfBlob: Blob, filename: string) => {
   const { data, error } = await supabase.storage
     .from("documents")
     .upload(`unsigned-agreements/${filename}`, pdfBlob, {
@@ -44,6 +12,13 @@ export const generatePDF = async (filename: string) => {
     });
 
   if (error) throw new Error("Failed to upload PDF: " + error.message);
+  return data;
+};
 
-  return data.path;
+export const generatePDF = async (filename: string, info: any, cinfo: any) => {
+  const pdfBlob = await pdf(
+    <MyProposalPdf proposalTypeInfo={info} clientInfo={cinfo} />,
+  ).toBlob();
+  const p = await uploadToSupabase(pdfBlob, filename);
+  return p.path;
 };
