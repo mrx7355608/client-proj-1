@@ -16,11 +16,11 @@ import {
   Save,
   IconNode,
 } from "lucide-react";
-import { supabase } from "../../../lib/supabase";
 import { Link } from "react-router-dom";
 import { useProposal } from "../../../contexts/proposals";
 import { saveProposal } from "../../../lib/data/proposals.data";
-import { QuoteInput } from "../../../lib/types";
+import { Quote, QuoteInput } from "../../../lib/types";
+import { generatePDF } from "../../../lib/generate-pdf";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -74,6 +74,7 @@ export default function ReviewStep({
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const { proposal, setProposal } = useProposal();
 
   useEffect(() => {
@@ -132,6 +133,7 @@ export default function ReviewStep({
       quoteItems,
     );
     setProposal(quote);
+    return quote;
   };
 
   const handleSaveAsDraft = async () => {
@@ -146,11 +148,24 @@ export default function ReviewStep({
 
   const handleRequestSignature = async () => {
     try {
+      // Save quote
       setIsRequesting(true);
-      await saveQuote("draft");
-      location.href = `/request-signature/${proposal?.id}`;
-    } finally {
+      const quote: Quote = await saveQuote("draft");
       setIsRequesting(false);
+
+      // Generate pdf
+      setIsGeneratingPDF(true);
+      const pdfLink = await generatePDF(
+        `${quote.title}-${new Date(quote.created_at).toISOString()}`,
+      );
+      setIsGeneratingPDF(false);
+
+      location.href = `/request-signature/${proposal?.id}?pdf=${pdfLink}&name=${quote.title}`;
+    } catch (error) {
+      console.log(error);
+      setIsRequesting(false);
+      setIsGeneratingPDF(false);
+      alert("Unable to process agreement");
     }
   };
 
@@ -181,7 +196,11 @@ export default function ReviewStep({
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                {isRequesting ? "Saving proposoal..." : "Request Signature"}
+                {isRequesting
+                  ? "Saving proposoal..."
+                  : isGeneratingPDF
+                    ? "Generating PDF..."
+                    : "Request Signature"}
               </button>
             </div>
           </div>
@@ -189,7 +208,10 @@ export default function ReviewStep({
 
         <div className="print-content min-h-screen w-[8.5in] mx-auto">
           {/* Cover Page */}
-          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto relative">
+          <div
+            id="section-1"
+            className="bg-white w-[8.5in] h-[11in] mx-auto relative"
+          >
             {/* Top Half - Cover */}
             <div className="h-[5.5in] relative">
               {/* Background Image */}
@@ -289,7 +311,10 @@ export default function ReviewStep({
           </div>
 
           {/* Services & Equipment */}
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+          <div
+            id="section-2"
+            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break"
+          >
             <h2 className="text-3xl font-bold text-gray-900 mb-12">Services</h2>
 
             <div className="grid grid-cols-2 gap-6 mb-12">
@@ -323,7 +348,10 @@ export default function ReviewStep({
             </div>
           </div>
 
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+          <div
+            id="section-3"
+            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break"
+          >
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Equipment
             </h2>
@@ -374,7 +402,10 @@ export default function ReviewStep({
           </div>
 
           {/* Service Fees */}
-          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+          <div
+            id="section-4"
+            className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8"
+          >
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Service Fees
             </h2>
@@ -461,7 +492,10 @@ export default function ReviewStep({
 
           {/* Labour section */}
           {proposalTypeInfo.id === "buildouts" && (
-            <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
+            <div
+              id="section-5"
+              className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden"
+            >
               <h2 className="text-3xl font-bold text-gray-900 mb-12">Labour</h2>
 
               <div className="space-y-6 text-gray-600"></div>
@@ -469,7 +503,10 @@ export default function ReviewStep({
           )}
 
           {/* Terms & Conditions */}
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
+          <div
+            id="section-6"
+            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden"
+          >
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Terms and Conditions
             </h2>
@@ -552,7 +589,10 @@ export default function ReviewStep({
             </div>
           </div>
 
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+          <div
+            id="section-7"
+            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8"
+          >
             <div className="space-y-6 text-gray-600">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">
@@ -578,7 +618,10 @@ export default function ReviewStep({
           </div>
 
           {/* Signature Page */}
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+          <div
+            id="section-8"
+            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8"
+          >
             <div className="space-y-8">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

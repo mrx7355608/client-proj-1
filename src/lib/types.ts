@@ -54,6 +54,7 @@ export interface QuoteVariable {
 
 export interface QuoteItemInput {
   inventory_item_id: string;
+  section_name: string;
   description: string;
   quantity: number;
   unit_price: number;

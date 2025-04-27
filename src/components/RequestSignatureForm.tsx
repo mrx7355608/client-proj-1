@@ -2,12 +2,11 @@
 
 import type React from "react";
 
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   X,
   Send,
-  Upload,
-  File,
+  FileIcon,
   Mail,
   MessageSquare,
   Copy,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { sendSimpleMessage } from "../lib/send-email";
 import { supabase } from "../lib/supabase";
+import { useLocation } from "react-router-dom";
 
 export default function RequestSignatureForm({
   agreementId,
@@ -32,19 +32,38 @@ export default function RequestSignatureForm({
   const [bccEmails, setBccEmails] = useState<string[]>([]);
   const [ccInput, setCcInput] = useState("");
   const [bccInput, setBccInput] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [filename, setFilename] = useState("");
+  const loc = useLocation();
+  const searchParams = new URLSearchParams(loc.search);
+
+  useEffect(() => {
+    const fname = searchParams.get("name");
+    setFilename(fname || "Untitled");
+  }, []);
+
+  const retrievePdf = async () => {
+    const pdflink = searchParams.get("pdf");
+    const filename = searchParams.get("name");
+    if (!pdflink) return;
+
+    const { data, error } = await supabase.storage
+      .from("documents")
+      .download(pdflink);
+
+    if (error) console.log(error);
+    if (!data) return;
+
+    const file = new File([data], filename || "Untitled", {
+      type: "application/pdf",
+    });
+    return file;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) {
-      setError("Please upload agreement PDF file");
-      return;
-    }
-
     if (!formData.clientEmail || !formData.subject || !formData.message) {
       setError("Please fill the form properly");
       return;
@@ -59,7 +78,7 @@ export default function RequestSignatureForm({
         to: formData.clientEmail,
         message: formData.message,
         subject: formData.subject,
-        agreementPdf: selectedFile,
+        agreementPdf: await retrievePdf(),
       });
       setMessage("Email sent successfully!");
 
@@ -112,41 +131,12 @@ export default function RequestSignatureForm({
             />
           </div>
           <div className="relative">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              className="hidden"
-              id="fileUpload"
-            />
-
-            {!selectedFile ? (
-              <div
-                onClick={triggerFileInput}
-                className="w-full h-[52px] pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none hover:border-gray-300 transition-all duration-200 flex items-center cursor-pointer"
-              >
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <Upload size={18} />
-                </div>
-                <span className="text-gray-500">Upload Agreement PDF</span>
+            <div className="w-full h-[52px] pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg flex items-center justify-between">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <FileIcon size={18} />
               </div>
-            ) : (
-              <div className="w-full h-[52px] pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg flex items-center justify-between">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <File size={18} />
-                </div>
-                <div className="truncate text-gray-700 flex-1">
-                  {selectedFile.name}
-                </div>
-                <button
-                  type="button"
-                  onClick={removeFile}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-            )}
+              <div className="truncate text-gray-700 flex-1">{filename}</div>
+            </div>
           </div>
         </div>
 
@@ -273,25 +263,6 @@ export default function RequestSignatureForm({
       ...prev,
       [name]: value,
     }));
-  }
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
-    }
-  }
-
-  function triggerFileInput() {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  }
-
-  function removeFile() {
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
   }
 
   function handleEmailKeyDown(
