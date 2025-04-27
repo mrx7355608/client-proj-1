@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
     position: "relative",
-    overflow: "hidden",
   },
   title: {
     fontSize: 30,
@@ -134,8 +133,8 @@ const styles = StyleSheet.create({
   paragraph: {
     fontSize: 14,
     color: "#6B7280",
-    marginBottom: 24,
-    lineHeight: 22,
+    marginBottom: 14,
+    lineHeight: 29,
   },
 });
 

@@ -35,6 +35,7 @@ import Auth from "./components/Auth";
 import ConfirmAgreement from "./pages/ConfirmAgreement";
 import RequestSignature from "./pages/RequestSignature";
 import EditProposal from "./pages/EditProposal";
+import RenderPreview from "./pages/RenderPreview";
 
 interface UserProfile {
   first_name: string | null;
@@ -110,6 +111,16 @@ function App() {
       <Router>
         <Routes>
           <Route path="/confirm-agreement/:id" element={<ConfirmAgreement />} />
+        </Routes>
+      </Router>
+    );
+  }
+
+  if (window.location.pathname === "/render-preview") {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/render-preview" element={<RenderPreview />} />
         </Routes>
       </Router>
     );

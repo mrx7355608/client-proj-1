@@ -22,7 +22,7 @@ const MyProposalPdf = ({ proposalTypeInfo, clientInfo }) => {
       <EquipmentPage />
       <ServiceFeesPage />
       <TermsAndConditionsPage />
-      <SignaturePage />
+      <SignaturePage proposalId="123" />
     </Document>
   );
 };

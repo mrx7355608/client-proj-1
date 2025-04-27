@@ -1,6 +1,9 @@
 import { Page, View, Text, StyleSheet, Link } from "@react-pdf/renderer";
+import "react-pdf/dist/Page/AnnotationLayer.css";
 
-const SignaturePage = () => {
+const SignaturePage = ({ proposalId }: { proposalId: string }) => {
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+
   return (
     <Page style={styles.page}>
       <View style={styles.sectionContainer}>
@@ -24,7 +27,10 @@ const SignaturePage = () => {
           <View style={styles.line} />
         </View>
 
-        <Link src="/confirm-agreement" style={styles.button}>
+        <Link
+          src={`${baseUrl}/confirm-agreement/${proposalId}`}
+          style={styles.button}
+        >
           <Text style={styles.buttonText}>Accept Quote</Text>
         </Link>
       </View>

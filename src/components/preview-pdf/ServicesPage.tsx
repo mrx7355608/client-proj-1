@@ -12,7 +12,6 @@ const ServicesPage = () => {
           <View style={styles.serviceHeader}>
             <View style={styles.iconContainer}>
               <Shield size={20} color="#2563EB" />{" "}
-              {/* Tailwind text-blue-600 */}
             </View>
             <Text style={styles.serviceTitle}>Network Security</Text>
           </View>
