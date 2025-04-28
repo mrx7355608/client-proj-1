@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { Plus, Pencil, Trash2, Eye, Search } from 'lucide-react';
-import ClientModal from '../components/ClientModal';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react";
+import ClientModal from "../components/ClientModal";
 
 interface Client {
   id: string;
   name: string;
   company_name: string | null;
   mrr: number;
-  status: 'active' | 'disconnected' | 'suspended';
-  client_type: 'msp' | 'unm';
+  status: "active" | "disconnected" | "suspended";
+  client_type: "msp" | "unm";
   contacts: {
     id: string;
     name: string;
@@ -25,7 +25,7 @@ function Clients() {
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | undefined>();
@@ -35,16 +35,18 @@ function Clients() {
   }, []);
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
+    if (searchQuery.trim() === "") {
       setFilteredClients(clients);
     } else {
       const query = searchQuery.toLowerCase();
-      const filtered = clients.filter(client => {
-        const primaryContact = client.contacts.find(c => c.is_primary);
+      const filtered = clients.filter((client) => {
+        const primaryContact = client.contacts.find((c) => c.is_primary);
         return (
           client.name.toLowerCase().includes(query) ||
-          (client.company_name && client.company_name.toLowerCase().includes(query)) ||
-          (primaryContact?.email && primaryContact.email.toLowerCase().includes(query))
+          (client.company_name &&
+            client.company_name.toLowerCase().includes(query)) ||
+          (primaryContact?.email &&
+            primaryContact.email.toLowerCase().includes(query))
         );
       });
       setFilteredClients(filtered);
@@ -54,18 +56,20 @@ function Clients() {
   async function fetchClients() {
     try {
       const { data, error } = await supabase
-        .from('clients')
-        .select(`
+        .from("clients")
+        .select(
+          `
           *,
           contacts (*)
-        `)
-        .order('company_name', { nullsLast: true });
+        `,
+        )
+        .order("company_name", { nullsLast: true });
 
       if (error) throw error;
       setClients(data || []);
       setFilteredClients(data || []);
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      console.error("Error fetching clients:", error);
     } finally {
       setIsLoading(false);
     }
@@ -82,19 +86,16 @@ function Clients() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this client?')) return;
+    if (!confirm("Are you sure you want to delete this client?")) return;
 
     try {
-      const { error } = await supabase
-        .from('clients')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from("clients").delete().eq("id", id);
 
       if (error) throw error;
       fetchClients();
     } catch (error) {
-      console.error('Error deleting client:', error);
-      alert('Error deleting client. Please try again.');
+      console.error("Error deleting client:", error);
+      alert("Error deleting client. Please try again.");
     }
   };
 
@@ -102,34 +103,34 @@ function Clients() {
     navigate(`/clients/${clientId}`);
   };
 
-  const getStatusColor = (status: Client['status']) => {
+  const getStatusColor = (status: Client["status"]) => {
     switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'disconnected':
-        return 'bg-gray-100 text-gray-800';
-      case 'suspended':
-        return 'bg-red-100 text-red-800';
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "disconnected":
+        return "bg-gray-100 text-gray-800";
+      case "suspended":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getClientTypeColor = (type: Client['client_type']) => {
+  const getClientTypeColor = (type: Client["client_type"]) => {
     switch (type) {
-      case 'msp':
-        return 'bg-blue-100 text-blue-800';
-      case 'unm':
-        return 'bg-purple-100 text-purple-800';
+      case "msp":
+        return "bg-blue-100 text-blue-800";
+      case "unm":
+        return "bg-purple-100 text-purple-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const formatPhoneNumber = (phone: string | null) => {
-    if (!phone) return '-';
-    
-    const cleaned = phone.replace(/\D/g, '');
+    if (!phone) return "-";
+
+    const cleaned = phone.replace(/\D/g, "");
     if (cleaned.length === 10) {
       return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
     }
@@ -140,7 +141,7 @@ function Clients() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-bold text-gray-800">Clients</h1>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-500 text-white px-3 py-1.5 text-sm rounded-lg flex items-center hover:bg-blue-600 transition-colors"
         >
@@ -198,57 +199,70 @@ function Clients() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredClients.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-2 text-center text-gray-500">
-                    {searchQuery ? 'No clients found matching your search' : 'No clients yet'}
+                  <td
+                    colSpan={8}
+                    className="px-4 py-2 text-center text-gray-500"
+                  >
+                    {searchQuery
+                      ? "No clients found matching your search"
+                      : "No clients yet"}
                   </td>
                 </tr>
               ) : (
                 filteredClients.map((client) => {
-                  const primaryContact = client.contacts.find(c => c.is_primary);
+                  const primaryContact = client.contacts.find(
+                    (c) => c.is_primary,
+                  );
                   return (
                     <tr key={client.id} className="hover:bg-gray-50">
                       <td className="px-4 py-2 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {client.company_name || '-'}
+                          {client.company_name || "-"}
                         </div>
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-sm">
-                        {primaryContact?.name || '-'}
+                        {primaryContact?.name || "-"}
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-sm">
-                        {primaryContact?.email || '-'}
+                        {primaryContact?.email || "-"}
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-sm">
                         {formatPhoneNumber(primaryContact?.phone || null)}
-                        {primaryContact?.phone_ext && ` ext. ${primaryContact.phone_ext}`}
+                        {primaryContact?.phone_ext &&
+                          ` ext. ${primaryContact.phone_ext}`}
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getClientTypeColor(client.client_type)}`}>
+                        <span
+                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getClientTypeColor(client.client_type)}`}
+                        >
                           {client.client_type.toUpperCase()}
                         </span>
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(client.status)}`}>
-                          {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
+                        <span
+                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(client.status)}`}
+                        >
+                          {client.status.charAt(0).toUpperCase() +
+                            client.status.slice(1)}
                         </span>
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-sm">
                         ${client.mrr.toLocaleString()}
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-right space-x-3">
-                        <button 
+                        <button
                           onClick={() => handleView(client.id)}
                           className="text-gray-500 hover:text-gray-700 inline-block"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleEdit(client)}
                           className="text-blue-500 hover:text-blue-700 inline-block"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(client.id)}
                           className="text-red-500 hover:text-red-700 inline-block"
                         >
@@ -275,3 +289,4 @@ function Clients() {
 }
 
 export default Clients;
+

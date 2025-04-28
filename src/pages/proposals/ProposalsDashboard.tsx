@@ -11,6 +11,7 @@ import {
   FileCheck,
 } from "lucide-react";
 import { format } from "date-fns";
+import { QuoteVariable } from "../../lib/types";
 
 interface ProposalStats {
   totalProposals: number;
@@ -42,6 +43,7 @@ export default function ProposalsDashboard() {
   });
   const [recentProposals, setRecentProposals] = useState<RecentProposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isConverting, setIsConverting] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -119,6 +121,78 @@ export default function ProposalsDashboard() {
 
   const handleNewProposal = () => {
     window.open("/proposals/new", "_blank", "width=1200,height=800");
+  };
+
+  const handleConvertToClient = async (proposalId: string) => {
+    try {
+      setIsConverting(true);
+
+      // Get quote
+      const { data: quote, error: quoteErro } = await supabase
+        .from("quotes")
+        .select()
+        .eq("id", proposalId)
+        .single();
+
+      if (quoteErro) throw quoteErro;
+      if (!quote) throw new Error("No data found");
+
+      // Get quote variables
+      const { data: variables, error: variablesError } = await supabase
+        .from("quote_variables")
+        .select()
+        .eq("quote_id", proposalId);
+
+      if (variablesError) throw variablesError;
+      if (!variables) throw new Error("No data found");
+
+      const varObject = variables.reduce((acc, item: QuoteVariable) => {
+        acc[item.name] = item.value;
+        return acc;
+      }, {});
+
+      // Create new client
+      const addressParts = varObject.address.split(", ");
+      const address = addressParts[0];
+      const city = addressParts[1];
+      const [state, postalCode] = addressParts[2].split(" ");
+
+      const clientData = {
+        name: varObject.client_name,
+        company_name: varObject.organization,
+        mrr: quote.total_mrr,
+        status: "active",
+        street_address: address,
+        city: city,
+        state: state,
+        postal_code: postalCode,
+        start_date: new Date().toLocaleDateString(),
+        client_type: quote.title.split(" ")[0].toLowerCase(),
+      };
+      const { data: client, error: clientError } = await supabase
+        .from("clients")
+        .insert(clientData)
+        .select()
+        .single();
+
+      if (clientError) throw clientError;
+      if (!client) throw new Error("There was an error while creating client");
+
+      // Update proposal status
+      const { error: quoteUpdateError } = await supabase
+        .from("quotes")
+        .update({ status: "fulfilled", client_id: client.id })
+        .eq("id", proposalId);
+
+      if (quoteUpdateError) throw quoteUpdateError;
+
+      alert("Client created successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Unable to convert to client");
+    } finally {
+      setIsConverting(false);
+    }
   };
 
   const getClientDisplayName = (proposal: RecentProposal) => {
@@ -309,8 +383,12 @@ export default function ProposalsDashboard() {
                       >
                         Edit
                       </button>
-                      <button className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500">
-                        Convert to Client
+                      <button
+                        onClick={() => handleConvertToClient(proposal.id)}
+                        className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
+                        disabled={isConverting}
+                      >
+                        {isConverting ? "Converting..." : "Convert to Client"}
                       </button>
                     </td>
                   </tr>
