@@ -10,12 +10,14 @@ export interface Section {
   }[];
 }
 
-export interface Fee {
-  id: string;
+export interface FeeInput {
   description: string;
-  amount: string;
+  amount: number;
   notes: string;
   type: "nrc" | "mrc";
+}
+export interface Fee extends FeeInput {
+  id: string;
 }
 
 export interface ClientForm {

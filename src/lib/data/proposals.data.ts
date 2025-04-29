@@ -1,11 +1,17 @@
 import { supabase } from "../supabase";
-import { QuoteInput, QuoteItemInput, QuoteVariableInput } from "../types";
+import {
+  FeeInput,
+  QuoteInput,
+  QuoteItemInput,
+  QuoteVariableInput,
+} from "../types";
 
 const updateQuote = async (
   proposalId: string,
   quoteData: Partial<QuoteInput>,
   quoteVariables: QuoteVariableInput[],
   quoteItems: QuoteItemInput[],
+  quoteFees: FeeInput[],
 ) => {
   // Update existing quote
   const { data, error } = await supabase
@@ -31,7 +37,6 @@ const updateQuote = async (
         value: v.value,
       })),
     );
-
   if (variablesError) throw variablesError;
 
   // Update quote items
@@ -44,6 +49,22 @@ const updateQuote = async (
     if (itemsError) throw itemsError;
   }
 
+  // Update quote fees
+  // Delete exisiting
+  await supabase.from("quote_fees").delete().eq("quote_id", proposalId);
+
+  // Insert new quote fees
+  const { error: quoteError } = await supabase
+    .from("quote_fees")
+    .insert(
+      quoteFees.map((q) => ({
+        ...q,
+        amount: q.amount.toString(),
+        quote_id: data.id,
+      })),
+    );
+  if (quoteError) throw quoteError;
+
   return data;
 };
 
@@ -51,6 +72,7 @@ const createQuote = async (
   quoteData: QuoteInput,
   quoteVariables: QuoteVariableInput[],
   quoteItems: QuoteItemInput[],
+  quoteFees: FeeInput[],
 ) => {
   // Generate quote number
   const { data: quoteNumber } = await supabase.rpc("generate_quote_number");
@@ -89,6 +111,12 @@ const createQuote = async (
     if (itemsError) throw itemsError;
   }
 
+  // Insert quote fees
+  const { error: quoteError } = await supabase
+    .from("quote_fees")
+    .insert(quoteFees.map((q) => ({ ...q, quote_id: data.id })));
+  if (quoteError) throw quoteError;
+
   return data;
 };
 
@@ -97,6 +125,7 @@ export const saveProposal = async (
   quote: QuoteInput,
   quoteVars: QuoteVariableInput[],
   quoteItems: QuoteItemInput[] = [],
+  quoteFees: FeeInput[],
 ) => {
   if (proposalId) {
     console.log("updating...");
@@ -105,12 +134,13 @@ export const saveProposal = async (
       quote,
       quoteVars,
       quoteItems,
+      quoteFees,
     );
     return updatedQuote;
   }
 
   console.log("creating...");
-  const newQuote = await createQuote(quote, quoteVars, quoteItems);
+  const newQuote = await createQuote(quote, quoteVars, quoteItems, quoteFees);
   return newQuote;
 };
 

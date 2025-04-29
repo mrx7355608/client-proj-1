@@ -19,7 +19,7 @@ import {
 import { Link } from "react-router-dom";
 import { useProposal } from "../../../contexts/proposals";
 import { saveProposal } from "../../../lib/data/proposals.data";
-import { Quote, QuoteInput } from "../../../lib/types";
+import { FeeInput, Quote, QuoteInput } from "../../../lib/types";
 import { generatePDF } from "../../../lib/generate-pdf";
 
 interface ReviewStepProps {
@@ -126,11 +126,23 @@ export default function ReviewStep({
       })),
     );
 
+    const nrcFeesFormatted = fees.nrc.map((f) => ({
+      amount: f.amount,
+      notes: f.notes,
+      description: f.description,
+      type: "nrc",
+    }));
+    const feesFormatted = [
+      ...nrcFeesFormatted,
+      { description: "", type: "mrc", amount: fees.mrc, notes: "" },
+    ];
+
     const quote = await saveProposal(
       proposal?.id || null,
       quoteData,
       quoteVariables,
       quoteItems,
+      feesFormatted as FeeInput[],
     );
     setProposal(quote);
     return quote;
@@ -152,13 +164,19 @@ export default function ReviewStep({
       setIsRequesting(true);
       const quote: Quote = await saveQuote("draft");
       setIsRequesting(false);
+      console.log("Quote saved successfully");
 
       // Generate pdf
+      console.log("Generating pdf");
       setIsGeneratingPDF(true);
       const pdfLink = await generatePDF(
         `${quote.title}-${new Date(quote.created_at).toISOString()}`,
+        proposalTypeInfo,
+        clientInfo,
+        quote.id,
       );
       setIsGeneratingPDF(false);
+      console.log("PDF generated!");
 
       location.href = `/request-signature/${proposal?.id}?pdf=${pdfLink}&name=${quote.title}`;
     } catch (error) {
@@ -206,12 +224,12 @@ export default function ReviewStep({
           </div>
         </div>
 
-        <div className="print-content min-h-screen w-[8.5in] mx-auto">
+        <div
+          id="pdf-content"
+          className="print-content min-h-screen w-[8.5in] mx-auto"
+        >
           {/* Cover Page */}
-          <div
-            id="section-1"
-            className="bg-white w-[8.5in] h-[11in] mx-auto relative"
-          >
+          <div className="bg-white w-[8.5in] h-[11in] mx-auto relative">
             {/* Top Half - Cover */}
             <div className="h-[5.5in] relative">
               {/* Background Image */}
@@ -310,11 +328,8 @@ export default function ReviewStep({
             </div>
           </div>
 
-          {/* Services & Equipment */}
-          <div
-            id="section-2"
-            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break"
-          >
+          {/* Services page */}
+          <div className="html2pdf__page-break proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">Services</h2>
 
             <div className="grid grid-cols-2 gap-6 mb-12">
@@ -348,10 +363,8 @@ export default function ReviewStep({
             </div>
           </div>
 
-          <div
-            id="section-3"
-            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break"
-          >
+          {/* Equipment page */}
+          <div className="html2pdf__page-break proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Equipment
             </h2>
@@ -402,10 +415,7 @@ export default function ReviewStep({
           </div>
 
           {/* Service Fees */}
-          <div
-            id="section-4"
-            className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8"
-          >
+          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Service Fees
             </h2>
@@ -492,10 +502,7 @@ export default function ReviewStep({
 
           {/* Labour section */}
           {proposalTypeInfo.id === "buildouts" && (
-            <div
-              id="section-5"
-              className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden"
-            >
+            <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
               <h2 className="text-3xl font-bold text-gray-900 mb-12">Labour</h2>
 
               <div className="space-y-6 text-gray-600"></div>
@@ -503,10 +510,7 @@ export default function ReviewStep({
           )}
 
           {/* Terms & Conditions */}
-          <div
-            id="section-6"
-            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden"
-          >
+          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Terms and Conditions
             </h2>
@@ -589,10 +593,7 @@ export default function ReviewStep({
             </div>
           </div>
 
-          <div
-            id="section-7"
-            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8"
-          >
+          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <div className="space-y-6 text-gray-600">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">
@@ -618,10 +619,7 @@ export default function ReviewStep({
           </div>
 
           {/* Signature Page */}
-          <div
-            id="section-8"
-            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8"
-          >
+          <div className="html2pdf__page-break proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <div className="space-y-8">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
