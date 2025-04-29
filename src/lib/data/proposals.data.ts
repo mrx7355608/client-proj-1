@@ -54,15 +54,13 @@ const updateQuote = async (
   await supabase.from("quote_fees").delete().eq("quote_id", proposalId);
 
   // Insert new quote fees
-  const { error: quoteError } = await supabase
-    .from("quote_fees")
-    .insert(
-      quoteFees.map((q) => ({
-        ...q,
-        amount: q.amount.toString(),
-        quote_id: data.id,
-      })),
-    );
+  const { error: quoteError } = await supabase.from("quote_fees").insert(
+    quoteFees.map((q) => ({
+      ...q,
+      amount: q.amount.toString(),
+      quote_id: data.id,
+    })),
+  );
   if (quoteError) throw quoteError;
 
   return data;
@@ -145,27 +143,39 @@ export const saveProposal = async (
 };
 
 export const getProposal = async (id: string) => {
+  // Get quotes
   const { data: quote, error: quoteError } = await supabase
     .from("quotes")
     .select()
     .eq("id", id)
     .single();
-
   if (quoteError) throw quoteError;
 
+  // Get Quote variables
   const { data: quoteVars, error: quoteVarsError } = await supabase
     .from("quote_variables")
     .select()
     .eq("quote_id", id);
-
   if (quoteVarsError) throw quoteVarsError;
 
+  // Get quote items
   const { data: quoteItems, error: quoteItemsError } = await supabase
     .from("quote_items")
     .select()
     .eq("quote_id", id);
-
   if (quoteItemsError) throw quoteItemsError;
 
-  return { ...quote, variables: quoteVars || [], items: quoteItems || [] };
+  // Get quote fees
+  const { data: quoteFees, error: quoteFeesError } = await supabase
+    .from("quote_fees")
+    .select()
+    .eq("quote_id", quote.id);
+  if (quoteFeesError) throw quoteFeesError;
+
+  return {
+    ...quote,
+    variables: quoteVars || [],
+    items: quoteItems || [],
+    fees: quoteFees,
+  };
 };

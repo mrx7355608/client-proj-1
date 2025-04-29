@@ -12,7 +12,7 @@ export interface Section {
 
 export interface FeeInput {
   description: string;
-  amount: number;
+  amount: string;
   notes: string;
   type: "nrc" | "mrc";
 }

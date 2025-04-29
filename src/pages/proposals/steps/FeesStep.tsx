@@ -22,6 +22,7 @@ export default function FeesStep({
   onBack,
   onSubmit,
 }: FeesStepProps) {
+  console.log(initialNRC);
   const [fees, setFees] = useState<Fee[]>(initialNRC);
   const [mrcAmount, setMrcAmount] = useState(initialMRC);
 

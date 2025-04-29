@@ -1,9 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../../../lib/supabase';
-import { Search, Plus, Minus, ImageOff, Trash2, GripVertical, Save, FolderOpen, X } from 'lucide-react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import React, { useState, useEffect } from "react";
+import { supabase } from "../../../lib/supabase";
+import {
+  Search,
+  Plus,
+  Minus,
+  ImageOff,
+  Trash2,
+  GripVertical,
+  Save,
+  FolderOpen,
+  X,
+} from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Section {
   id: string;
@@ -54,9 +76,9 @@ function TemplateModal({
   templates: Template[];
   onLoad: (template: Template) => void;
 }) {
-  const [mode, setMode] = useState<'save' | 'load'>('save');
-  const [templateName, setTemplateName] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [mode, setMode] = useState<"save" | "load">("save");
+  const [templateName, setTemplateName] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
 
   if (!isOpen) return null;
 
@@ -66,11 +88,11 @@ function TemplateModal({
         <div className="flex justify-between items-center mb-4">
           <div className="flex gap-2">
             <button
-              onClick={() => setMode('save')}
+              onClick={() => setMode("save")}
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                mode === 'save'
-                  ? 'bg-blue-100 text-blue-700 border-2 border-blue-500'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-2 border-transparent'
+                mode === "save"
+                  ? "bg-blue-100 text-blue-700 border-2 border-blue-500"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 border-2 border-transparent"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -79,11 +101,11 @@ function TemplateModal({
               </div>
             </button>
             <button
-              onClick={() => setMode('load')}
+              onClick={() => setMode("load")}
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                mode === 'load'
-                  ? 'bg-blue-100 text-blue-700 border-2 border-blue-500'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-2 border-transparent'
+                mode === "load"
+                  ? "bg-blue-100 text-blue-700 border-2 border-blue-500"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 border-2 border-transparent"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -100,7 +122,7 @@ function TemplateModal({
           </button>
         </div>
 
-        {mode === 'save' ? (
+        {mode === "save" ? (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Template Name
@@ -148,7 +170,9 @@ function TemplateModal({
             <div className="flex justify-end mt-4">
               <button
                 onClick={() => {
-                  const template = templates.find(t => t.id === selectedTemplate);
+                  const template = templates.find(
+                    (t) => t.id === selectedTemplate,
+                  );
                   if (template) {
                     onLoad(template);
                     onClose();
@@ -170,12 +194,12 @@ function TemplateModal({
 
 function SectionSearch({
   onSelect,
-  sectionId
+  sectionId,
 }: {
   onSelect: (item: InventoryItem) => void;
   sectionId: string;
 }) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<InventoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -191,8 +215,9 @@ function SectionSearch({
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('inventory_items')
-        .select(`
+        .from("inventory_items")
+        .select(
+          `
           id,
           name,
           description,
@@ -202,14 +227,15 @@ function SectionSearch({
             name
           ),
           image_url
-        `)
-        .ilike('name', `%${query}%`)
+        `,
+        )
+        .ilike("name", `%${query}%`)
         .limit(5);
 
       if (error) throw error;
       setResults(data || []);
     } catch (error) {
-      console.error('Error searching items:', error);
+      console.error("Error searching items:", error);
     } finally {
       setIsLoading(false);
     }
@@ -217,7 +243,7 @@ function SectionSearch({
 
   const handleSelect = (item: InventoryItem) => {
     onSelect(item);
-    setQuery('');
+    setQuery("");
     setResults([]);
   };
 
@@ -237,7 +263,9 @@ function SectionSearch({
       {query.length >= 2 && (
         <div className="mt-2 space-y-2">
           {isLoading ? (
-            <div className="text-center py-2 text-sm text-gray-500">Searching...</div>
+            <div className="text-center py-2 text-sm text-gray-500">
+              Searching...
+            </div>
           ) : results.length > 0 ? (
             results.map((item) => (
               <button
@@ -280,30 +308,29 @@ function SectionSearch({
   );
 }
 
-function SortableSection({ 
-  section, 
-  onUpdate, 
+function SortableSection({
+  section,
+  onUpdate,
   onDelete,
   onAddEquipment,
   onRemoveEquipment,
   onUpdateQuantity,
-  equipment 
-}: { 
+  equipment,
+}: {
   section: Section;
   onUpdate: (id: string, name: string) => void;
   onDelete: (id: string) => void;
   onAddEquipment: (sectionId: string, item: InventoryItem) => void;
   onRemoveEquipment: (sectionId: string, itemId: string) => void;
-  onUpdateQuantity: (sectionId: string, itemId: string, quantity: number) => void;
+  onUpdateQuantity: (
+    sectionId: string,
+    itemId: string,
+    quantity: number,
+  ) => void;
   equipment: Record<string, InventoryItem>;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: section.id });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: section.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -311,11 +338,15 @@ function SortableSection({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-gray-50 rounded-lg p-4 mb-4">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-gray-50 rounded-lg p-4 mb-4"
+    >
       <div className="flex items-center gap-3 mb-4">
-        <button 
-          className="cursor-grab text-gray-400 hover:text-gray-600" 
-          {...attributes} 
+        <button
+          className="cursor-grab text-gray-400 hover:text-gray-600"
+          {...attributes}
           {...listeners}
         >
           <GripVertical className="w-5 h-5" />
@@ -343,10 +374,14 @@ function SortableSection({
       <div className="space-y-2">
         {section.equipment.map((item) => {
           const itemDetails = equipment[item.id];
+          console.log({ equipment });
           if (!itemDetails) return null;
 
           return (
-            <div key={item.id} className="flex items-center gap-4 p-3 bg-white rounded-lg">
+            <div
+              key={item.id}
+              className="flex items-center gap-4 p-3 bg-white rounded-lg"
+            >
               {itemDetails.image_url ? (
                 <img
                   src={itemDetails.image_url}
@@ -358,11 +393,15 @@ function SortableSection({
                   <ImageOff className="w-5 h-5 text-gray-400" />
                 </div>
               )}
-              
+
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900">{itemDetails.name}</h3>
+                <h3 className="text-sm font-medium text-gray-900">
+                  {itemDetails.name}
+                </h3>
                 {itemDetails.sku && (
-                  <p className="text-xs text-gray-500">SKU: {itemDetails.sku}</p>
+                  <p className="text-xs text-gray-500">
+                    SKU: {itemDetails.sku}
+                  </p>
                 )}
                 <div className="mt-1 flex items-center gap-2">
                   <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
@@ -379,7 +418,13 @@ function SortableSection({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => onUpdateQuantity(section.id, item.id, Math.max(0, item.quantity - 1))}
+                  onClick={() =>
+                    onUpdateQuantity(
+                      section.id,
+                      item.id,
+                      Math.max(0, item.quantity - 1),
+                    )
+                  }
                   className="p-1 text-gray-500 hover:text-gray-700"
                 >
                   <Minus className="w-4 h-4" />
@@ -387,7 +432,9 @@ function SortableSection({
                 <span className="w-8 text-center">{item.quantity}</span>
                 <button
                   type="button"
-                  onClick={() => onUpdateQuantity(section.id, item.id, item.quantity + 1)}
+                  onClick={() =>
+                    onUpdateQuantity(section.id, item.id, item.quantity + 1)
+                  }
                   className="p-1 text-gray-500 hover:text-gray-700"
                 >
                   <Plus className="w-4 h-4" />
@@ -411,18 +458,20 @@ function SortableSection({
 export default function EquipmentStep({
   sections: initialSections,
   onBack,
-  onSubmit
+  onSubmit,
 }: EquipmentStepProps) {
   const [sections, setSections] = useState<Section[]>(initialSections);
-  const [equipmentDetails, setEquipmentDetails] = useState<Record<string, InventoryItem>>({});
+  const [equipmentDetails, setEquipmentDetails] = useState<
+    Record<string, InventoryItem>
+  >({});
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [templates, setTemplates] = useState<Template[]>([]);
 
   useEffect(() => {
     const loadEquipmentDetails = async () => {
       const itemIds = new Set<string>();
-      initialSections.forEach(section => {
-        section.equipment.forEach(item => {
+      initialSections.forEach((section) => {
+        section.equipment.forEach((item) => {
           itemIds.add(item.id);
         });
       });
@@ -431,8 +480,9 @@ export default function EquipmentStep({
 
       try {
         const { data, error } = await supabase
-          .from('inventory_items')
-          .select(`
+          .from("inventory_items")
+          .select(
+            `
             id,
             name,
             description,
@@ -442,18 +492,19 @@ export default function EquipmentStep({
               name
             ),
             image_url
-          `)
-          .in('id', Array.from(itemIds));
+          `,
+          )
+          .in("id", Array.from(itemIds));
 
         if (error) throw error;
 
         const details: Record<string, InventoryItem> = {};
-        data?.forEach(item => {
+        data?.forEach((item) => {
           details[item.id] = item;
         });
         setEquipmentDetails(details);
       } catch (error) {
-        console.error('Error loading equipment details:', error);
+        console.error("Error loading equipment details:", error);
       }
     };
 
@@ -462,7 +513,7 @@ export default function EquipmentStep({
 
   useEffect(() => {
     const loadTemplates = () => {
-      const savedTemplates = localStorage.getItem('equipmentTemplates');
+      const savedTemplates = localStorage.getItem("equipmentTemplates");
       if (savedTemplates) {
         setTemplates(JSON.parse(savedTemplates));
       }
@@ -475,91 +526,120 @@ export default function EquipmentStep({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const addNewSection = () => {
     setSections([
       ...sections,
-      { 
+      {
         id: crypto.randomUUID(),
-        name: 'New Section',
-        equipment: []
-      }
+        name: "New Section",
+        equipment: [],
+      },
     ]);
   };
 
   const updateSectionName = (sectionId: string, name: string) => {
-    setSections(sections.map(section => 
-      section.id === sectionId ? { ...section, name } : section
-    ));
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId ? { ...section, name } : section,
+      ),
+    );
   };
 
   const deleteSection = (sectionId: string) => {
-    setSections(sections.filter(section => section.id !== sectionId));
+    setSections(sections.filter((section) => section.id !== sectionId));
   };
 
   const addEquipmentToSection = (sectionId: string, item: InventoryItem) => {
-    setSections(sections.map(section => {
-      if (section.id === sectionId) {
-        const existingItem = section.equipment.find(e => e.id === item.id);
-        if (existingItem) {
+    setSections(
+      sections.map((section) => {
+        if (section.id === sectionId) {
+          const existingItem = section.equipment.find((e) => e.id === item.id);
+          if (existingItem) {
+            return {
+              ...section,
+              equipment: section.equipment.map((e) =>
+                e.id === item.id ? { ...e, quantity: e.quantity + 1 } : e,
+              ),
+            };
+          }
           return {
             ...section,
-            equipment: section.equipment.map(e =>
-              e.id === item.id ? { ...e, quantity: e.quantity + 1 } : e
-            )
+            equipment: [
+              ...section.equipment,
+              {
+                id: item.id,
+                quantity: 1,
+                name: item.name,
+                category: item.category,
+                image_url: item.image_url,
+              },
+            ],
           };
         }
-        return {
-          ...section,
-          equipment: [...section.equipment, { id: item.id, quantity: 1, name: item.name, category: item.category, image_url: item.image_url }]
-        };
-      }
-      return section;
-    }));
+        return section;
+      }),
+    );
 
-    setEquipmentDetails(prev => ({
+    setEquipmentDetails((prev) => ({
       ...prev,
-      [item.id]: item
+      [item.id]: item,
     }));
   };
 
   const removeEquipmentFromSection = (sectionId: string, itemId: string) => {
-    setSections(sections.map(section =>
-      section.id === sectionId
-        ? { ...section, equipment: section.equipment.filter(e => e.id !== itemId) }
-        : section
-    ));
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              equipment: section.equipment.filter((e) => e.id !== itemId),
+            }
+          : section,
+      ),
+    );
   };
 
-  const updateEquipmentQuantity = (sectionId: string, itemId: string, quantity: number) => {
-    setSections(sections.map(section =>
-      section.id === sectionId
-        ? {
-            ...section,
-            equipment: quantity === 0
-              ? section.equipment.filter(e => e.id !== itemId)
-              : section.equipment.map(e =>
-                  e.id === itemId ? { ...e, quantity } : e
-                )
-          }
-        : section
-    ));
+  const updateEquipmentQuantity = (
+    sectionId: string,
+    itemId: string,
+    quantity: number,
+  ) => {
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              equipment:
+                quantity === 0
+                  ? section.equipment.filter((e) => e.id !== itemId)
+                  : section.equipment.map((e) =>
+                      e.id === itemId ? { ...e, quantity } : e,
+                    ),
+            }
+          : section,
+      ),
+    );
   };
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
-    
+
     if (active.id !== over.id) {
       setSections((sections) => {
-        const oldIndex = sections.findIndex(section => section.id === active.id);
-        const newIndex = sections.findIndex(section => section.id === over.id);
-        
+        const oldIndex = sections.findIndex(
+          (section) => section.id === active.id,
+        );
+        const newIndex = sections.findIndex(
+          (section) => section.id === over.id,
+        );
+
         const newSections = [...sections];
         const [movedSection] = newSections.splice(oldIndex, 1);
         newSections.splice(newIndex, 0, movedSection);
-        
+
         return newSections;
       });
     }
@@ -574,14 +654,17 @@ export default function EquipmentStep({
 
     const updatedTemplates = [...templates, newTemplate];
     setTemplates(updatedTemplates);
-    localStorage.setItem('equipmentTemplates', JSON.stringify(updatedTemplates));
+    localStorage.setItem(
+      "equipmentTemplates",
+      JSON.stringify(updatedTemplates),
+    );
   };
 
   const loadTemplate = async (template: Template) => {
     try {
       const itemIds = new Set<string>();
-      template.sections.forEach(section => {
-        section.equipment.forEach(item => {
+      template.sections.forEach((section) => {
+        section.equipment.forEach((item) => {
           itemIds.add(item.id);
         });
       });
@@ -592,8 +675,9 @@ export default function EquipmentStep({
       }
 
       const { data, error } = await supabase
-        .from('inventory_items')
-        .select(`
+        .from("inventory_items")
+        .select(
+          `
           id,
           name,
           description,
@@ -603,24 +687,25 @@ export default function EquipmentStep({
             name
           ),
           image_url
-        `)
-        .in('id', Array.from(itemIds));
+        `,
+        )
+        .in("id", Array.from(itemIds));
 
       if (error) throw error;
 
       const details: Record<string, InventoryItem> = {};
-      data?.forEach(item => {
+      data?.forEach((item) => {
         details[item.id] = item;
       });
-      setEquipmentDetails(prev => ({
+      setEquipmentDetails((prev) => ({
         ...prev,
-        ...details
+        ...details,
       }));
 
       setSections(template.sections);
     } catch (error) {
-      console.error('Error loading template:', error);
-      alert('Error loading template. Please try again.');
+      console.error("Error loading template:", error);
+      alert("Error loading template. Please try again.");
     }
   };
 
@@ -628,7 +713,9 @@ export default function EquipmentStep({
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex justify-between items-start mb-8">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Select Equipment</h2>
+          <h2 className="text-2xl font-semibold text-gray-900">
+            Select Equipment
+          </h2>
           <p className="mt-2 text-gray-600">
             Add equipment to each section of your proposal
           </p>
@@ -660,7 +747,7 @@ export default function EquipmentStep({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={sections.map(s => s.id)}
+            items={sections.map((s) => s.id)}
             strategy={verticalListSortingStrategy}
           >
             {sections.map((section) => (
@@ -706,3 +793,4 @@ export default function EquipmentStep({
     </div>
   );
 }
+
