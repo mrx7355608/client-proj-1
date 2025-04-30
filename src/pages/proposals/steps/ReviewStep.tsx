@@ -38,7 +38,7 @@ interface ReviewStepProps {
     id: string;
     name: string;
     equipment: {
-      id: string;
+      inventory_item_id: string;
       name: string;
       quantity: number;
       category: string;
@@ -117,9 +117,10 @@ export default function ReviewStep({
 
     const quoteItems = sections.flatMap((section) =>
       section.equipment.map((item) => ({
+        id: item.id || "",
         section_name: section.name,
-        inventory_item_id: item.id,
-        description: item.name,
+        inventory_item_id: item.inventory_item_id,
+        name: item.name,
         quantity: item.quantity,
         unit_price: 0, // You would typically get this from your inventory system
         is_recurring: false,
@@ -329,7 +330,7 @@ export default function ReviewStep({
           </div>
 
           {/* Services page */}
-          <div className="html2pdf__page-break proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">Services</h2>
 
             <div className="grid grid-cols-2 gap-6 mb-12">
@@ -364,11 +365,11 @@ export default function ReviewStep({
           </div>
 
           {/* Equipment page */}
-          <div className="html2pdf__page-break proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+          <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Equipment
             </h2>
-            <div className="bg-gray-50 rounded-xl p-8 mb-8 page-break">
+            <div className="bg-gray-50 rounded-xl p-8 mb-8">
               <div className="space-y-4">
                 {sections.map((section) => (
                   <div key={section.id}>
@@ -379,7 +380,7 @@ export default function ReviewStep({
                       <div className="divide-y divide-gray-200">
                         {section.equipment.map((item) => (
                           <div
-                            key={item.id}
+                            key={item.inventory_item_id}
                             className="flex items-center gap-4 p-4"
                           >
                             {item.image_url ? (
