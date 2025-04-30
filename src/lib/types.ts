@@ -2,7 +2,7 @@ export interface Section {
   id: string;
   name: string;
   equipment: {
-    id: string;
+    inventory_item_id: string;
     name: string;
     quantity: number;
     category: string;

@@ -76,7 +76,7 @@ export default function EditProposalItem({ proposalTypeInfo, quote }: Props) {
     const formattedSections = [];
     quote.items.forEach((item) => {
       const sectionName = item.section_name;
-      let section = formattedSections.find((g) => g.section === sectionName);
+      let section = formattedSections.find((g) => g.name === sectionName);
 
       if (!section) {
         section = {
@@ -86,7 +86,6 @@ export default function EditProposalItem({ proposalTypeInfo, quote }: Props) {
         };
         formattedSections.push(section);
       }
-
       section.equipment.push(item);
     });
     setSections(formattedSections);

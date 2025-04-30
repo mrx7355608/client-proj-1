@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ClientInfoStep from "../steps/ClientInfoStep";
 import EquipmentStep from "../steps/EquipmentStep";
 import FeesStep from "../steps/FeesStep";
@@ -41,10 +41,6 @@ export default function ProposalItem({ data }: Props) {
   });
   const { currentStep, setCurrentStep, onBack } = useProposal();
 
-  useEffect(() => {
-    console.log(sections);
-  }, [sections]);
-
   // Handle submit operations
   const handleClientSubmit = (data: ClientForm) => {
     setClientForm(data);
@@ -57,7 +53,6 @@ export default function ProposalItem({ data }: Props) {
   };
 
   const handleFeesSubmit = (submittedFees: Fee[]) => {
-    console.log("Fees:", submittedFees);
     const nrcFees = submittedFees.filter((fee) => fee.type === "nrc");
     const mrcFee = submittedFees.find((fee) => fee.type === "mrc");
 
@@ -81,6 +76,7 @@ export default function ProposalItem({ data }: Props) {
         )}
         {currentStep === 2 && (
           <EquipmentStep
+            quoteId={null}
             sections={sections}
             onBack={onBack}
             onSubmit={handleEquipmentSubmit}

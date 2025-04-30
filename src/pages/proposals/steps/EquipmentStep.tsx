@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabase";
 import {
   Search,
@@ -31,7 +31,7 @@ interface Section {
   id: string;
   name: string;
   equipment: {
-    id: string;
+    inventory_item_id: string;
     name: string;
     quantity: number;
     category: string;
@@ -373,13 +373,12 @@ function SortableSection({
 
       <div className="space-y-2">
         {section.equipment.map((item) => {
-          const itemDetails = equipment[item.id];
-          console.log({ equipment });
+          const itemDetails = equipment[item.inventory_item_id];
           if (!itemDetails) return null;
 
           return (
             <div
-              key={item.id}
+              key={item.inventory_item_id}
               className="flex items-center gap-4 p-3 bg-white rounded-lg"
             >
               {itemDetails.image_url ? (
@@ -421,7 +420,7 @@ function SortableSection({
                   onClick={() =>
                     onUpdateQuantity(
                       section.id,
-                      item.id,
+                      item.inventory_item_id,
                       Math.max(0, item.quantity - 1),
                     )
                   }
@@ -433,7 +432,11 @@ function SortableSection({
                 <button
                   type="button"
                   onClick={() =>
-                    onUpdateQuantity(section.id, item.id, item.quantity + 1)
+                    onUpdateQuantity(
+                      section.id,
+                      item.inventory_item_id,
+                      item.quantity + 1,
+                    )
                   }
                   className="p-1 text-gray-500 hover:text-gray-700"
                 >
@@ -441,7 +444,9 @@ function SortableSection({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onRemoveEquipment(section.id, item.id)}
+                  onClick={() =>
+                    onRemoveEquipment(section.id, item.inventory_item_id)
+                  }
                   className="ml-2 text-red-500 hover:text-red-700"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -472,7 +477,7 @@ export default function EquipmentStep({
       const itemIds = new Set<string>();
       initialSections.forEach((section) => {
         section.equipment.forEach((item) => {
-          itemIds.add(item.id);
+          itemIds.add(item.inventory_item_id);
         });
       });
 
@@ -534,7 +539,7 @@ export default function EquipmentStep({
       ...sections,
       {
         id: crypto.randomUUID(),
-        name: "New Section",
+        name: "",
         equipment: [],
       },
     ]);
@@ -553,26 +558,34 @@ export default function EquipmentStep({
   };
 
   const addEquipmentToSection = (sectionId: string, item: InventoryItem) => {
+    console.log("Adding...");
     setSections(
       sections.map((section) => {
         if (section.id === sectionId) {
-          const existingItem = section.equipment.find((e) => e.id === item.id);
+          const existingItem = section.equipment.find(
+            (e) => e.inventory_item_id === item.id,
+          );
           if (existingItem) {
+            console.log("adding exisiting:", section);
             return {
               ...section,
               equipment: section.equipment.map((e) =>
-                e.id === item.id ? { ...e, quantity: e.quantity + 1 } : e,
+                e.inventory_item_id === item.id
+                  ? { ...e, quantity: e.quantity + 1 }
+                  : e,
               ),
             };
           }
+
+          console.log("adding new item...", section);
           return {
             ...section,
             equipment: [
               ...section.equipment,
               {
-                id: item.id,
                 quantity: 1,
                 name: item.name,
+                inventory_item_id: item.id,
                 category: item.category,
                 image_url: item.image_url,
               },
@@ -595,7 +608,9 @@ export default function EquipmentStep({
         section.id === sectionId
           ? {
               ...section,
-              equipment: section.equipment.filter((e) => e.id !== itemId),
+              equipment: section.equipment.filter(
+                (e) => e.inventory_item_id !== itemId,
+              ),
             }
           : section,
       ),
@@ -614,9 +629,11 @@ export default function EquipmentStep({
               ...section,
               equipment:
                 quantity === 0
-                  ? section.equipment.filter((e) => e.id !== itemId)
+                  ? section.equipment.filter(
+                      (e) => e.inventory_item_id !== itemId,
+                    )
                   : section.equipment.map((e) =>
-                      e.id === itemId ? { ...e, quantity } : e,
+                      e.inventory_item_id === itemId ? { ...e, quantity } : e,
                     ),
             }
           : section,
@@ -665,7 +682,7 @@ export default function EquipmentStep({
       const itemIds = new Set<string>();
       template.sections.forEach((section) => {
         section.equipment.forEach((item) => {
-          itemIds.add(item.id);
+          itemIds.add(item.inventory_item_id);
         });
       });
 
@@ -793,4 +810,3 @@ export default function EquipmentStep({
     </div>
   );
 }
-

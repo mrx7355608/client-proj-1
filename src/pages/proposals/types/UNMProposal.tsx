@@ -62,7 +62,6 @@ export default function UNMProposal({
     color: string;
   };
 }) {
-  console.log(data);
   const [clientForm, setClientForm] = useState<ClientForm>(INITIAL_CLIENT_FORM);
   const [sections, setSections] = useState<Section[]>([
     { id: "1", name: "Network Equipment", equipment: [] },

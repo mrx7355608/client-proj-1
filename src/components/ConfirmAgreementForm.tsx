@@ -46,7 +46,13 @@ const US_STATES = [
   "Wyoming",
 ];
 
-export default function ConfirmAgreementForm({ quote }: { quote: any }) {
+export default function ConfirmAgreementForm({
+  quote,
+  manipulatePDF,
+}: {
+  quote: any;
+  manipulatePDF: () => Promise<void>;
+}) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState("");
 
@@ -273,6 +279,8 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    await manipulatePDF();
+    return;
     setIsConfirming(true);
 
     const formData = {

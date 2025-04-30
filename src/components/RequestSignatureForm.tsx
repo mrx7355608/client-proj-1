@@ -59,6 +59,7 @@ export default function RequestSignatureForm({
     const file = new File([data], filename || "Untitled", {
       type: "application/pdf",
     });
+    console.log({ file });
     return file;
   };
 

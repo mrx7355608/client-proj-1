@@ -15,7 +15,7 @@ const CoverPage = ({ proposalTypeInfo, clientInfo }) => {
       <View style={styles.cover}>
         {/* Background Image */}
         <Image
-          src="http://localhost:5173/test.png"
+          src="http://localhost:5173/proposal-unm-bg.png"
           style={styles.coverBackground}
         />
 
@@ -94,7 +94,7 @@ const CoverPage = ({ proposalTypeInfo, clientInfo }) => {
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Helvetica",
+    fontFamily: "Oswald",
     backgroundColor: "#ffffff",
     width: "815px", // 8.5in * 72dpi
     height: "1056px", // 11in * 72dpi

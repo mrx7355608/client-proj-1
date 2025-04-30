@@ -1,6 +1,6 @@
 import MyProposalPdf from "../components/preview-pdf/AgreementPDF";
 import { supabase } from "./supabase";
-import { pdf } from "@react-pdf/renderer";
+import { Font, pdf } from "@react-pdf/renderer";
 
 const uploadToSupabase = async (pdfBlob: Blob, filename: string) => {
   const { data, error } = await supabase.storage
@@ -15,9 +15,22 @@ const uploadToSupabase = async (pdfBlob: Blob, filename: string) => {
   return data;
 };
 
-export const generatePDF = async (filename: string, info: any, cinfo: any) => {
+export const generatePDF = async (
+  filename: string,
+  info: any,
+  cinfo: any,
+  proposalId: string,
+) => {
+  await Font.load({
+    fontFamily: "Helvetica",
+  });
   const pdfBlob = await pdf(
-    <MyProposalPdf proposalTypeInfo={info} clientInfo={cinfo} />,
+    <MyProposalPdf
+      proposalTypeInfo={info}
+      clientInfo={cinfo}
+      proposalId={proposalId}
+      pdfFilename={filename}
+    />,
   ).toBlob();
   const p = await uploadToSupabase(pdfBlob, filename);
   return p.path;

@@ -117,7 +117,6 @@ export default function ReviewStep({
 
     const quoteItems = sections.flatMap((section) =>
       section.equipment.map((item) => ({
-        id: item.id || "",
         section_name: section.name,
         inventory_item_id: item.inventory_item_id,
         name: item.name,
@@ -234,7 +233,7 @@ export default function ReviewStep({
             {/* Top Half - Cover */}
             <div className="h-[5.5in] relative">
               {/* Background Image */}
-              <div className="absolute inset-0 bg-[url('/proposal-unm-bg.svg')] bg-cover bg-center"></div>
+              <div className="absolute inset-0 bg-[url('/proposal-unm-bg.png')] bg-cover bg-center"></div>
 
               {/* Agreement Date */}
               <div className="absolute top-8 right-[0.75in] text-right">
