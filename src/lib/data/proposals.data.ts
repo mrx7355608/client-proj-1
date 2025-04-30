@@ -43,25 +43,26 @@ const updateQuote = async (
   if (quoteItems.length > 0) {
     const { error: itemsError } = await supabase
       .from("quote_items")
-      .update(quoteItems)
-      .eq("quote_id", data.id);
+      .upsert(quoteItems, { onConflict: "id" });
 
     if (itemsError) throw itemsError;
   }
 
-  // Update quote fees
-  // Delete exisiting
-  await supabase.from("quote_fees").delete().eq("quote_id", proposalId);
+  if (quoteFees && quoteFees.length > 0) {
+    // Update quote fees
+    // Delete exisiting
+    await supabase.from("quote_fees").delete().eq("quote_id", proposalId);
 
-  // Insert new quote fees
-  const { error: quoteError } = await supabase.from("quote_fees").insert(
-    quoteFees.map((q) => ({
-      ...q,
-      amount: q.amount.toString(),
-      quote_id: data.id,
-    })),
-  );
-  if (quoteError) throw quoteError;
+    // Insert new quote fees
+    const { error: quoteError } = await supabase.from("quote_fees").insert(
+      quoteFees.map((q) => ({
+        ...q,
+        amount: q.amount.toString(),
+        quote_id: data.id,
+      })),
+    );
+    if (quoteError) throw quoteError;
+  }
 
   return data;
 };
@@ -110,10 +111,12 @@ const createQuote = async (
   }
 
   // Insert quote fees
-  const { error: quoteError } = await supabase
-    .from("quote_fees")
-    .insert(quoteFees.map((q) => ({ ...q, quote_id: data.id })));
-  if (quoteError) throw quoteError;
+  if (quoteFees && quoteFees.length > 0) {
+    const { error: quoteError } = await supabase
+      .from("quote_fees")
+      .insert(quoteFees.map((q) => ({ ...q, quote_id: data.id })));
+    if (quoteError) throw quoteError;
+  }
 
   return data;
 };
