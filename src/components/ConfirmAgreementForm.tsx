@@ -51,7 +51,7 @@ export default function ConfirmAgreementForm({
   manipulatePDF,
 }: {
   quote: any;
-  manipulatePDF: () => Promise<void>;
+  manipulatePDF: (signUrl: string) => Promise<{ file: File; pdfname: string }>;
 }) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState("");
@@ -279,15 +279,21 @@ export default function ConfirmAgreementForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await manipulatePDF();
-    return;
+    if (!canvasRef.current) {
+      return null;
+    }
+
     setIsConfirming(true);
 
-    const formData = {
-      billing: billingForm,
-      shipping: sameAsBilling ? billingForm : shippingForm,
-      signature: signatureType === "text" ? signatureText : canvasSignature,
-    };
+    // Sign pdf
+    const signatureUrl = canvasRef.current.toDataURL("image/png");
+    const { file, pdfname } = await manipulatePDF(signatureUrl);
+
+    // const formData = {
+    //   billing: billingForm,
+    //   shipping: sameAsBilling ? billingForm : shippingForm,
+    //   signature: signatureType === "text" ? signatureText : canvasSignature,
+    // };
 
     try {
       // Update proposal status to "signed"
@@ -299,6 +305,15 @@ export default function ConfirmAgreementForm({
         .single();
 
       if (error) throw error;
+
+      const { error: uploadError } = await supabase.storage
+        .from("documents")
+        .upload(`signed/${pdfname}`, file, {
+          cacheControl: "3600",
+          upsert: true,
+          contentType: "application/pdf",
+        });
+      if (uploadError) return alert("There was an error while saving the pdf");
 
       // Send email to the owner about confirmation of the agreement
       const emailReceiver = import.meta.env.VITE_EMAIL_RECEIVER;
@@ -322,11 +337,12 @@ export default function ConfirmAgreementForm({
         message: `
           An agreement has been confirmed, details are following:
           Title: ${quote.title}
-          Status: ${quote.status}
+          Status: "Signed",
           Quote #: ${quote.quote_number}
           Client: ${clientName}
           Organization: ${clientOrg}
         `,
+        agreementPdf: file,
       });
       alert("Proposal has been confirmed!");
     } catch (error) {

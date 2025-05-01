@@ -62,7 +62,9 @@ const styles = StyleSheet.create({
     gap: 32,
     marginTop: 8,
   },
-  inputBlock: {},
+  inputBlock: {
+    marginTop: 20,
+  },
   label: {
     fontSize: 10,
     fontWeight: "500",

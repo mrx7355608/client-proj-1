@@ -61,7 +61,7 @@ export default function ConfirmAgreement() {
     setPdfFile(file);
   };
 
-  const manipulateFile = async (sign: string, name: string) => {
+  const manipulateFile = async (signImageUrl: string) => {
     if (!pdfFile) return;
 
     const pdfBuffer = await pdfFile.arrayBuffer();
@@ -69,15 +69,36 @@ export default function ConfirmAgreement() {
     const totalPages = pdf.getPages();
     const page = totalPages[totalPages.length - 1];
 
-    page.drawText("Hello", { x: 80, y: 730, size: 12 });
-    page.drawText("World", { x: 80, y: 660, size: 12 });
+    // Get signature image
+    const signatureImageBuffer = await fetch(signImageUrl).then((res) =>
+      res.arrayBuffer(),
+    );
+    const signatureImage = await pdf.embedPng(signatureImageBuffer);
+
+    // Get client name
+    const clientName = quote.variables.filter(
+      (f) => f.name === "client_name",
+    )[0].value;
+
+    // Draw on pdf
+    page.drawText(clientName, { x: 55, y: 740, size: 13 });
+    page.drawText(quote.title, { x: 55, y: 665, size: 13 });
+    page.drawText(`${new Date().toLocaleDateString()}`, {
+      x: 55,
+      y: 592,
+      size: 13,
+    });
+    page.drawImage(signatureImage, {
+      x: 80,
+      y: 500,
+      width: 400,
+      height: 60,
+    });
 
     const pdfBytes = await pdf.save();
-    const blob = new Blob([pdfBytes], { type: "application/pdf" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "updated-proposal.pdf";
-    link.click();
+    const pdfName = `Signed-${searchParams.get("pdf")}`;
+    const file = new File([pdfBytes], pdfName, { type: "application/pdf" });
+    return { file, pdfname: pdfName };
   };
 
   // Show loading state
@@ -91,16 +112,16 @@ export default function ConfirmAgreement() {
   }
 
   // Show error if quote has already been signed
-  // if (quote.status === "signed") {
-  //   return (
-  //     <div className="flex min-h-screen items-center gap-2 justify-center">
-  //       <AlertTriangle size={35} color="red" />
-  //       <p className="font-bold text-2xl text-red-600 text-center">
-  //         Quote has already been signed!
-  //       </p>
-  //     </div>
-  //   );
-  // }
+  if (quote.status === "signed") {
+    return (
+      <div className="flex min-h-screen items-center gap-2 justify-center">
+        <AlertTriangle size={35} color="red" />
+        <p className="font-bold text-2xl text-red-600 text-center">
+          Quote has already been signed!
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>

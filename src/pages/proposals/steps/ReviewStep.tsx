@@ -174,6 +174,7 @@ export default function ReviewStep({
         proposalTypeInfo,
         clientInfo,
         quote.id,
+        sections,
       );
       setIsGeneratingPDF(false);
       console.log("PDF generated!");
