@@ -76,7 +76,16 @@ const TermsAndConditionsPage = () => {
       <View style={styles.page}>
         <View style={styles.sectionContainer}>
           <View style={styles.section}>
-            <Text style={styles.heading}>7. Service Level Agreement (SLA)</Text>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "bold",
+                color: "#111827",
+                marginBottom: 8,
+              }}
+            >
+              7. Service Level Agreement (SLA)
+            </Text>
             <Text style={styles.paragraph}>
               ITX Solutions commits to a 4-hour maximum response time for
               critical system failures.
@@ -84,7 +93,16 @@ const TermsAndConditionsPage = () => {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.heading}>8. Force Majeure</Text>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "bold",
+                color: "#111827",
+                marginBottom: 8,
+              }}
+            >
+              8. Force Majeure
+            </Text>
             <Text style={styles.paragraph}>
               ITX Solutions shall not be liable for failures due to
               circumstances beyond reasonable control, including acts of God,
@@ -113,7 +131,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   title: {
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: "bold",
     color: "#111827",
     marginBottom: 48,
@@ -122,19 +140,20 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   section: {
-    marginBottom: 24,
+    marginTop: 34,
   },
   heading: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#111827",
     marginBottom: 16,
   },
   paragraph: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#6B7280",
-    marginBottom: 14,
-    lineHeight: 29,
+    marginBottom: 18,
+    marginTop: 14,
+    lineHeight: 1.4,
   },
 });
 

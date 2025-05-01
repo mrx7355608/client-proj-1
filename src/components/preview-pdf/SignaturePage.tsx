@@ -13,23 +13,23 @@ const SignaturePage = ({
     <Page style={styles.page}>
       <View style={styles.sectionContainer}>
         <View style={styles.inputBlock}>
-          <Text style={styles.label}>Sign Name</Text>
           <View style={styles.line} />
-        </View>
-
-        <View style={styles.inputBlock}>
           <Text style={styles.label}>Print Name</Text>
-          <View style={styles.line} />
         </View>
 
         <View style={styles.inputBlock}>
+          <View style={styles.line} />
           <Text style={styles.label}>Title</Text>
-          <View style={styles.line} />
         </View>
 
         <View style={styles.inputBlock}>
-          <Text style={styles.label}>Date</Text>
           <View style={styles.line} />
+          <Text style={styles.label}>Date</Text>
+        </View>
+
+        <View style={{ ...styles.inputBlock, marginTop: 35 }}>
+          <View style={styles.line} />
+          <Text style={styles.label}>Sign Name</Text>
         </View>
 
         <Link
@@ -46,8 +46,8 @@ const SignaturePage = ({
 const styles = StyleSheet.create({
   page: {
     backgroundColor: "#ffffff",
-    width: 612, // 8.5 inches
-    height: 792, // 11 inches
+    width: 816, // 8.5 inches
+    height: 1056, // 11 inches
     alignSelf: "center",
     padding: 54,
     marginTop: 32,
@@ -64,10 +64,10 @@ const styles = StyleSheet.create({
   },
   inputBlock: {},
   label: {
-    fontSize: 14,
+    fontSize: 10,
     fontWeight: "500",
     color: "#374151",
-    marginBottom: 8,
+    marginTop: 8,
   },
   line: {
     borderBottomWidth: 2,
@@ -77,15 +77,16 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#0EA5E9", // sky-500
-    paddingVertical: 16,
-    paddingHorizontal: 28,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
     marginTop: 32,
     alignSelf: "flex-start",
     borderRadius: 8,
+    textDecoration: "none",
   },
   buttonText: {
     color: "#ffffff",
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: "bold",
   },
 });

@@ -12,16 +12,13 @@ const MyProposalPdf = ({
   proposalId,
   proposalTypeInfo,
   clientInfo,
+  sections,
 }) => {
-  Font.register({
-    family: "Oswald",
-    src: "https://fonts.gstatic.com/s/oswald/v13/Y_TKV6o8WovbUd3m_X9aAA.ttf",
-  });
   return (
-    <Document style={{ fontFamily: "Oswald" }}>
+    <Document style={{ fontFamily: "Helvetica" }}>
       <CoverPage proposalTypeInfo={proposalTypeInfo} clientInfo={clientInfo} />
       <ServicesPage />
-      <EquipmentPage />
+      <EquipmentPage sections={sections} />
       <ServiceFeesPage />
       <TermsAndConditionsPage />
       <SignaturePage proposalId={proposalId} filename={pdfFilename} />

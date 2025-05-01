@@ -94,10 +94,9 @@ const CoverPage = ({ proposalTypeInfo, clientInfo }) => {
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Oswald",
     backgroundColor: "#ffffff",
-    width: "815px", // 8.5in * 72dpi
-    height: "1056px", // 11in * 72dpi
+    width: 815, // 8.5in * 72dpi
+    height: 1056, // 11in * 72dpi
     alignSelf: "center",
   },
   cover: {

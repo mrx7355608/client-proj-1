@@ -21,9 +21,6 @@ export const generatePDF = async (
   cinfo: any,
   proposalId: string,
 ) => {
-  await Font.load({
-    fontFamily: "Helvetica",
-  });
   const pdfBlob = await pdf(
     <MyProposalPdf
       proposalTypeInfo={info}

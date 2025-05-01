@@ -1,4 +1,4 @@
-import { Page, View, Text, StyleSheet } from "@react-pdf/renderer";
+import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { Shield, Server } from "lucide-react";
 
 const ServicesPage = () => {
@@ -11,7 +11,10 @@ const ServicesPage = () => {
         <View style={styles.serviceCard}>
           <View style={styles.serviceHeader}>
             <View style={styles.iconContainer}>
-              <Shield size={20} color="#2563EB" />{" "}
+              <Image
+                src={`${import.meta.env.VITE_BASE_URL}/shield.png`}
+                style={styles.icons}
+              />{" "}
             </View>
             <Text style={styles.serviceTitle}>Network Security</Text>
           </View>
@@ -25,7 +28,10 @@ const ServicesPage = () => {
         <View style={styles.serviceCard}>
           <View style={styles.serviceHeader}>
             <View style={styles.iconContainer}>
-              <Server size={20} color="#2563EB" />
+              <Image
+                src={`${import.meta.env.VITE_BASE_URL}/server.png`}
+                style={styles.icons}
+              />{" "}
             </View>
             <Text style={styles.serviceTitle}>Infrastructure Management</Text>
           </View>
@@ -40,10 +46,14 @@ const ServicesPage = () => {
 };
 
 const styles = StyleSheet.create({
+  icons: {
+    width: 18,
+    height: 18,
+  },
   page: {
     backgroundColor: "#ffffff",
-    width: 612, // 8.5in * 72dpi
-    height: 792, // 11in * 72dpi
+    width: 816, // 8.5in * 72dpi
+    height: 1056, // 11in * 72dpi
     alignSelf: "center",
     padding: 54, // 0.75in
     marginTop: 32, // mt-8
@@ -55,7 +65,7 @@ const styles = StyleSheet.create({
     elevation: 4, // for Android shadow
   },
   title: {
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: "bold",
     color: "#111827",
     marginBottom: 48,
@@ -64,7 +74,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     flexWrap: "wrap",
-    gap: 24, // gap-6 (6 * 4 = 24)
     marginBottom: 48,
   },
   serviceCard: {
@@ -76,25 +85,27 @@ const styles = StyleSheet.create({
   serviceHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 7,
     marginBottom: 16,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     backgroundColor: "#DBEAFE", // Tailwind blue-100
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
   },
   serviceTitle: {
-    fontSize: 18,
+    fontSize: 12,
     fontWeight: "600",
     color: "#111827",
+    wordBreak: "break-all",
   },
   serviceDescription: {
     color: "#4B5563", // text-gray-600
-    fontSize: 16,
+    fontSize: 12,
+    lineHeight: 1.2,
   },
 });
 

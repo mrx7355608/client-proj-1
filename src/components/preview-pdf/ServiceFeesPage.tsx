@@ -1,4 +1,4 @@
-import { Page, View, Text, StyleSheet } from "@react-pdf/renderer";
+import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { Clock, DollarSign } from "lucide-react";
 
 const fees = {
@@ -30,7 +30,10 @@ const ServiceFeesPage = () => {
         {/* MRC */}
         <View style={styles.feeBox}>
           <View style={styles.feeHeader}>
-            <Clock size={20} color="#2563EB" />
+            <Image
+              src={`${import.meta.env.VITE_BASE_URL}/clock.png`}
+              style={styles.icons}
+            />{" "}
             <Text style={styles.feeHeading}>
               Monthly Recurring Charges (MRC)
             </Text>
@@ -45,7 +48,10 @@ const ServiceFeesPage = () => {
         {/* NRC */}
         <View style={styles.feeBox}>
           <View style={styles.feeHeader}>
-            <DollarSign size={20} color="#2563EB" />
+            <Image
+              src={`${import.meta.env.VITE_BASE_URL}/dollar.png`}
+              style={styles.icons}
+            />{" "}
             <Text style={styles.feeHeading}>Non-Recurring Charges (NRC)</Text>
           </View>
           <Text style={styles.feeSubText}>One-time setup and installation</Text>
@@ -93,20 +99,19 @@ const ServiceFeesPage = () => {
 const styles = StyleSheet.create({
   page: {
     backgroundColor: "#ffffff",
-    width: 612, // 8.5in
-    minHeight: 792, // min-height 11in
+    width: 816, // 8.5in
+    minHeight: 1056, // min-height 11in
     alignSelf: "center",
-    padding: 54,
+    padding: 44,
     marginTop: 32,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 4,
     position: "relative",
   },
   title: {
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: "bold",
     color: "#111827",
     marginBottom: 48,
@@ -128,12 +133,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   feeHeading: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "600",
     color: "#111827",
   },
   feeSubText: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#6B7280",
     marginBottom: 16,
   },
@@ -147,8 +152,8 @@ const styles = StyleSheet.create({
     color: "#6B7280",
   },
   nrcList: {
-    marginTop: 24,
-    gap: 16,
+    marginTop: 14,
+    gap: 10,
   },
   nrcItem: {
     flexDirection: "row",
@@ -156,17 +161,17 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   nrcDescription: {
-    fontSize: 14,
+    fontSize: 10,
     fontWeight: "500",
     color: "#111827",
   },
   nrcNotes: {
-    fontSize: 12,
+    fontSize: 10,
     color: "#6B7280",
     marginTop: 4,
   },
   nrcAmount: {
-    fontSize: 14,
+    fontSize: 10,
     fontWeight: "500",
     color: "#111827",
   },
@@ -174,10 +179,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FAFB",
     borderRadius: 12,
     padding: 32,
-    marginTop: 32,
+    marginTop: 22,
+    paddingBottom: 25,
   },
   termsTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#111827",
     marginBottom: 24,
@@ -186,7 +192,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   bulletPoint: {
     width: 8,
@@ -195,9 +201,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#2563EB",
   },
   termText: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#6B7280",
     flexShrink: 1,
+  },
+  icons: {
+    width: 18,
+    height: 18,
   },
 });
 
