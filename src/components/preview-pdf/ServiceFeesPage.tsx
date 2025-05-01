@@ -1,27 +1,21 @@
 import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
-import { Clock, DollarSign } from "lucide-react";
+import { Fee } from "../../lib/types";
 
-const fees = {
-  mrc: 129.99, // example monthly cost
-  nrc: [
-    {
-      description: "Installation Fee",
-      amount: 199.99,
-      notes: "Includes hardware setup",
-    },
-    { description: "Configuration Fee", amount: 99.99 },
-  ],
-};
+const ServiceFeesPage = ({
+  fees,
+}: {
+  fees: {
+    nrc: Fee[];
+    mrc: string;
+  };
+}) => {
+  const formatCurrency = (value: number) => {
+    return value.toFixed(2);
+  };
 
-const formatCurrency = (value: number) => {
-  return value.toFixed(2);
-};
-
-const calculateNRCTotal = () => {
-  return fees.nrc.reduce((total, fee) => total + fee.amount, 0);
-};
-
-const ServiceFeesPage = () => {
+  const calculateNRCTotal = () => {
+    return fees.nrc.reduce((total, fee) => total + Number(fee.amount), 0);
+  };
   return (
     <Page style={styles.page}>
       <Text style={styles.title}>Service Fees</Text>
@@ -40,7 +34,7 @@ const ServiceFeesPage = () => {
           </View>
           <Text style={styles.feeSubText}>Billed monthly for 36 months</Text>
           <Text style={styles.amountText}>
-            ${formatCurrency(fees.mrc)}
+            ${formatCurrency(Number(fees.mrc))}
             <Text style={styles.amountUnit}>/month</Text>
           </Text>
         </View>
@@ -69,7 +63,7 @@ const ServiceFeesPage = () => {
                   )}
                 </View>
                 <Text style={styles.nrcAmount}>
-                  ${formatCurrency(fee.amount)}
+                  ${formatCurrency(Number(fee.amount))}
                 </Text>
               </View>
             ))}

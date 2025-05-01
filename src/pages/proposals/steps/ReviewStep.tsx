@@ -169,12 +169,14 @@ export default function ReviewStep({
       // Generate pdf
       console.log("Generating pdf");
       setIsGeneratingPDF(true);
+      console.log("Fees2: ", fees);
       const pdfLink = await generatePDF(
         `${quote.title}-${new Date(quote.created_at).toISOString()}`,
         proposalTypeInfo,
         clientInfo,
         quote.id,
         sections,
+        fees,
       );
       setIsGeneratingPDF(false);
       console.log("PDF generated!");

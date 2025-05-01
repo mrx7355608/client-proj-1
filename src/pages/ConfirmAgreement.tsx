@@ -96,7 +96,7 @@ export default function ConfirmAgreement() {
     });
 
     const pdfBytes = await pdf.save();
-    const pdfName = `Signed-${searchParams.get("pdf")}`;
+    const pdfName = `${searchParams.get("pdf")}`;
     const file = new File([pdfBytes], pdfName, { type: "application/pdf" });
     return { file, pdfname: pdfName };
   };

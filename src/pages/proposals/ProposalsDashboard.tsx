@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import {
@@ -118,6 +118,33 @@ export default function ProposalsDashboard() {
       setIsLoading(false);
     }
   };
+
+  const downloadPdf = async (proposalId: string) => {
+    const { data, error } = await supabase
+      .from("quotes")
+      .select()
+      .eq("id", proposalId)
+      .single();
+    if (error) throw error;
+    if (!data) throw new Error("Proposal not found");
+
+    const filename = data.agreement_name;
+    const { data: fileBlob, error: fileError } = await supabase.storage
+      .from("documents")
+      .download(`signed/${filename}`);
+    if (!fileError) throw fileError;
+    if (!fileBlob) throw new Error("Agreement file not found");
+
+    const url = URL.createObjectURL(fileBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  const showStatus = async () => {};
 
   const handleNewProposal = () => {
     window.open("/proposals/new", "_blank", "width=1200,height=800");
@@ -371,25 +398,47 @@ export default function ProposalsDashboard() {
                       ${proposal.total_value.toLocaleString()}
                     </td>
                     <td className="flex items-center gap-2 px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => {
-                          window.open(
-                            `/proposals/edit/${proposal.id}`,
-                            "_blank",
-                            "width=1200,height=800",
-                          );
-                        }}
-                        className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleConvertToClient(proposal.id)}
-                        className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
-                        disabled={isConverting}
-                      >
-                        {isConverting ? "Converting..." : "Convert to Client"}
-                      </button>
+                      {proposal.status === "sent" && (
+                        <button
+                          onClick={showStatus}
+                          className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
+                        >
+                          Status
+                        </button>
+                      )}
+                      {(proposal.status === "draft" ||
+                        proposal.status === "sent") && (
+                        <button
+                          onClick={() => {
+                            window.open(
+                              `/proposals/edit/${proposal.id}`,
+                              "_blank",
+                              "width=1200,height=800",
+                            );
+                          }}
+                          className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
+                        >
+                          Edit
+                        </button>
+                      )}
+                      {proposal.status === "signed" && (
+                        <button
+                          onClick={() => handleConvertToClient(proposal.id)}
+                          className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
+                          disabled={isConverting}
+                        >
+                          {isConverting ? "Converting..." : "Convert to Client"}
+                        </button>
+                      )}
+                      {proposal.status === "signed" && (
+                        <button
+                          onClick={() => downloadPdf(proposal.id)}
+                          className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
+                          disabled={isConverting}
+                        >
+                          {isConverting ? "Downloading..." : "Download PDF"}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))

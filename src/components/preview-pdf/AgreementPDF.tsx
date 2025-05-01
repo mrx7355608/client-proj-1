@@ -13,13 +13,14 @@ const MyProposalPdf = ({
   proposalTypeInfo,
   clientInfo,
   sections,
+  fees,
 }) => {
   return (
     <Document style={{ fontFamily: "Helvetica" }}>
       <CoverPage proposalTypeInfo={proposalTypeInfo} clientInfo={clientInfo} />
       <ServicesPage />
       <EquipmentPage sections={sections} />
-      <ServiceFeesPage />
+      <ServiceFeesPage fees={fees} />
       <TermsAndConditionsPage />
       <SignaturePage proposalId={proposalId} filename={pdfFilename} />
     </Document>
