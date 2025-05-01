@@ -132,7 +132,7 @@ export default function ProposalsDashboard() {
     const { data: fileBlob, error: fileError } = await supabase.storage
       .from("documents")
       .download(`signed/${filename}`);
-    if (!fileError) throw fileError;
+    if (fileError) throw fileError;
     if (!fileBlob) throw new Error("Agreement file not found");
 
     const url = URL.createObjectURL(fileBlob);
@@ -436,7 +436,7 @@ export default function ProposalsDashboard() {
                           className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
                           disabled={isConverting}
                         >
-                          {isConverting ? "Downloading..." : "Download PDF"}
+                          Download PDF
                         </button>
                       )}
                     </td>
