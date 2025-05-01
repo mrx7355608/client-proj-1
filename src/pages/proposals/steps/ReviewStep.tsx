@@ -625,31 +625,31 @@ export default function ReviewStep({
           <div className="html2pdf__page-break proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Sign Name
-                </label>
                 <div className="border-b-2 border-gray-300 w-full"></div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 my-1">
                   Print Name
                 </label>
-                <div className="border-b-2 border-gray-300 w-full"></div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="border-b-2 border-gray-300 w-full"></div>
+                <label className="block text-sm font-medium text-gray-700 my-1">
                   Title
                 </label>
-                <div className="border-b-2 border-gray-300 w-full"></div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="border-b-2 border-gray-300 w-full"></div>
+                <label className="block text-sm font-medium text-gray-700 my-1">
                   Date
                 </label>
+              </div>
+
+              <div className="pt-12">
                 <div className="border-b-2 border-gray-300 w-full"></div>
+                <label className="block text-sm font-medium text-gray-700 my-1">
+                  Sign Name
+                </label>
               </div>
 
               <Link

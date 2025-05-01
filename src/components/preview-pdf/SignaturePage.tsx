@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     marginTop: 32,
     alignSelf: "flex-start",
-    borderRadius: 8,
+    borderRadius: 2,
     textDecoration: "none",
   },
   buttonText: {

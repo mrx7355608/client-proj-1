@@ -8,7 +8,7 @@ import {
 
 const updateQuote = async (
   proposalId: string,
-  quoteData: Partial<QuoteInput>,
+  quoteData: QuoteInput,
   quoteVariables: QuoteVariableInput[],
   quoteItems: QuoteItemInput[],
   quoteFees: FeeInput[],
