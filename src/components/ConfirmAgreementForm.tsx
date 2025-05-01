@@ -51,7 +51,10 @@ export default function ConfirmAgreementForm({
   manipulatePDF,
 }: {
   quote: any;
-  manipulatePDF: (signUrl: string) => Promise<{ file: File; pdfname: string }>;
+  manipulatePDF: (
+    signText: string | null,
+    signUrl: string | null,
+  ) => Promise<{ file: File; pdfname: string }>;
 }) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState("");
@@ -279,15 +282,25 @@ export default function ConfirmAgreementForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canvasRef.current) {
-      return null;
-    }
+    let file, pdfname;
 
     setIsConfirming(true);
 
-    // Sign pdf
-    const signatureUrl = canvasRef.current.toDataURL("image/png");
-    const { file, pdfname } = await manipulatePDF(signatureUrl);
+    // Sign pdf (drawing)
+    if (canvasRef.current) {
+      const signatureUrl = canvasRef.current.toDataURL("image/png");
+      const { file: f, pdfname: p } = await manipulatePDF(null, signatureUrl);
+      file = f;
+      pdfname = p;
+    } else if (signatureText) {
+      const { file: f, pdfname: p } = await manipulatePDF(signatureText, null);
+      file = f;
+      pdfname = p;
+    }
+
+    if (!file || !pdfname) {
+      return alert("There was an error while signing the agreement");
+    }
 
     // const formData = {
     //   billing: billingForm,

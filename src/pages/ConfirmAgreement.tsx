@@ -61,7 +61,10 @@ export default function ConfirmAgreement() {
     setPdfFile(file);
   };
 
-  const manipulateFile = async (signImageUrl: string) => {
+  const manipulateFile = async (
+    signatureText: string | null,
+    signImageUrl: string | null,
+  ) => {
     if (!pdfFile) return;
 
     const pdfBuffer = await pdfFile.arrayBuffer();
@@ -70,10 +73,20 @@ export default function ConfirmAgreement() {
     const page = totalPages[totalPages.length - 1];
 
     // Get signature image
-    const signatureImageBuffer = await fetch(signImageUrl).then((res) =>
-      res.arrayBuffer(),
-    );
-    const signatureImage = await pdf.embedPng(signatureImageBuffer);
+    if (signImageUrl) {
+      const signatureImageBuffer = await fetch(signImageUrl).then((res) =>
+        res.arrayBuffer(),
+      );
+      const signatureImage = await pdf.embedPng(signatureImageBuffer);
+      page.drawImage(signatureImage, {
+        x: 80,
+        y: 500,
+        width: 400,
+        height: 60,
+      });
+    } else if (signatureText) {
+      page.drawText(signatureText, { x: 55, y: 500, size: 13 });
+    }
 
     // Get client name
     const clientName = quote.variables.filter(
@@ -87,12 +100,6 @@ export default function ConfirmAgreement() {
       x: 55,
       y: 592,
       size: 13,
-    });
-    page.drawImage(signatureImage, {
-      x: 80,
-      y: 500,
-      width: 400,
-      height: 60,
     });
 
     const pdfBytes = await pdf.save();

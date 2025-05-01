@@ -51,6 +51,7 @@ interface ReviewStepProps {
       description: string;
       amount: number;
       notes: string;
+      type: "nrc" | "mrc";
     }[];
     mrc: number;
   };
@@ -169,7 +170,6 @@ export default function ReviewStep({
       // Generate pdf
       console.log("Generating pdf");
       setIsGeneratingPDF(true);
-      console.log("Fees2: ", fees);
       const pdfLink = await generatePDF(
         `${quote.title}-${new Date(quote.created_at).toISOString()}`,
         proposalTypeInfo,
@@ -754,7 +754,7 @@ export default function ReviewStep({
                 <div className="space-y-3">
                   {section.equipment.map((item) => (
                     <div
-                      key={item.id}
+                      key={item.inventory_item_id}
                       className="flex items-center gap-4 bg-white p-3 rounded-lg"
                     >
                       {item.image_url ? (

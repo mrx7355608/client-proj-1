@@ -12,7 +12,7 @@ export interface Section {
 
 export interface FeeInput {
   description: string;
-  amount: string;
+  amount: number;
   notes: string;
   type: "nrc" | "mrc";
 }
@@ -57,7 +57,7 @@ export interface QuoteVariable {
 export interface QuoteItemInput {
   inventory_item_id: string;
   section_name: string;
-  description: string;
+  name: string;
   quantity: number;
   unit_price: number;
   is_recurring: boolean;
