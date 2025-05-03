@@ -8,4 +8,5 @@ export default defineConfig({
     exclude: ["lucide-react"],
     include: ["pdfjs-dist/build/pdf.worker.entry"],
   },
+  base: process.env.VITE_BASE_PATH || "/",
 });
