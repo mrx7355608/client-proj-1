@@ -34,6 +34,8 @@ import NewProposal from "./pages/proposals/NewProposal";
 import Auth from "./components/Auth";
 import ConfirmAgreement from "./pages/ConfirmAgreement";
 import RequestSignature from "./pages/RequestSignature";
+import EditProposal from "./pages/EditProposal";
+import RenderPreview from "./pages/RenderPreview";
 
 interface UserProfile {
   first_name: string | null;
@@ -89,6 +91,18 @@ function App() {
     return "Set up profile";
   };
 
+  // Check if we're on the edit proposal page
+  const isEditProposalPage =
+    window.location.pathname.startsWith("/proposals/edit/");
+  if (isEditProposalPage) {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/proposals/edit/:id" element={<EditProposal />} />
+        </Routes>
+      </Router>
+    );
+  }
   // Check if we're on the confirm agreement page
   const isConfirmAgreementPage =
     window.location.pathname.startsWith("/confirm-agreement");
@@ -97,6 +111,16 @@ function App() {
       <Router>
         <Routes>
           <Route path="/confirm-agreement/:id" element={<ConfirmAgreement />} />
+        </Routes>
+      </Router>
+    );
+  }
+
+  if (window.location.pathname === "/render-preview") {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/render-preview" element={<RenderPreview />} />
         </Routes>
       </Router>
     );

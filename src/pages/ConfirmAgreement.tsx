@@ -1,14 +1,25 @@
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import ConfirmAgreementForm from "../components/ConfirmAgreementForm";
-import { AlertTriangle, LucideAlertCircle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
+import { PDFDocument } from "pdf-lib";
 
 export default function ConfirmAgreement() {
   const { id } = useParams();
   const [quote, setQuote] = useState<any | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const loc = useLocation();
+  const searchParams = new URLSearchParams(loc.search);
+
+  useEffect(() => {
+    const pdfname = searchParams.get("pdf");
+    if (!pdfname) return;
+
+    fetchPdfFile(pdfname);
+  }, []);
 
   useEffect(() => {
     getQuote()
@@ -40,6 +51,63 @@ export default function ConfirmAgreement() {
     return { ...data, variables: data2 };
   };
 
+  const fetchPdfFile = async (pdfname: string) => {
+    const { data, error } = await supabase.storage
+      .from("documents")
+      .download(`unsigned-agreements/${pdfname}`);
+    if (error) return;
+
+    const file = new File([data], pdfname, { type: "application/pdf" });
+    setPdfFile(file);
+  };
+
+  const manipulateFile = async (
+    signatureText: string | null,
+    signImageUrl: string | null,
+  ) => {
+    if (!pdfFile) return;
+
+    const pdfBuffer = await pdfFile.arrayBuffer();
+    const pdf = await PDFDocument.load(pdfBuffer);
+    const totalPages = pdf.getPages();
+    const page = totalPages[totalPages.length - 1];
+
+    // Get signature image
+    if (signImageUrl) {
+      const signatureImageBuffer = await fetch(signImageUrl).then((res) =>
+        res.arrayBuffer(),
+      );
+      const signatureImage = await pdf.embedPng(signatureImageBuffer);
+      page.drawImage(signatureImage, {
+        x: 80,
+        y: 500,
+        width: 400,
+        height: 60,
+      });
+    } else if (signatureText) {
+      page.drawText(signatureText, { x: 55, y: 500, size: 13 });
+    }
+
+    // Get client name
+    const clientName = quote.variables.filter(
+      (f) => f.name === "client_name",
+    )[0].value;
+
+    // Draw on pdf
+    page.drawText(clientName, { x: 55, y: 740, size: 13 });
+    page.drawText(quote.title, { x: 55, y: 665, size: 13 });
+    page.drawText(`${new Date().toLocaleDateString()}`, {
+      x: 55,
+      y: 592,
+      size: 13,
+    });
+
+    const pdfBytes = await pdf.save();
+    const pdfName = `${searchParams.get("pdf")}`;
+    const file = new File([pdfBytes], pdfName, { type: "application/pdf" });
+    return { file, pdfname: pdfName };
+  };
+
   // Show loading state
   if (loading) {
     return <p className="text-center">Loading...</p>;
@@ -64,7 +132,7 @@ export default function ConfirmAgreement() {
 
   return (
     <div>
-      <ConfirmAgreementForm quote={quote} />
+      <ConfirmAgreementForm manipulatePDF={manipulateFile} quote={quote} />
     </div>
   );
 }

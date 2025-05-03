@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FileText,
   Building2,
@@ -16,9 +16,11 @@ import {
   Save,
   IconNode,
 } from "lucide-react";
-import { supabase } from "../../../lib/supabase";
 import { Link } from "react-router-dom";
 import { useProposal } from "../../../contexts/proposals";
+import { saveProposal } from "../../../lib/data/proposals.data";
+import { FeeInput, Quote, QuoteInput } from "../../../lib/types";
+import { generatePDF } from "../../../lib/generate-pdf";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -36,7 +38,7 @@ interface ReviewStepProps {
     id: string;
     name: string;
     equipment: {
-      id: string;
+      inventory_item_id: string;
       name: string;
       quantity: number;
       category: string;
@@ -49,6 +51,7 @@ interface ReviewStepProps {
       description: string;
       amount: number;
       notes: string;
+      type: "nrc" | "mrc";
     }[];
     mrc: number;
   };
@@ -72,6 +75,7 @@ export default function ReviewStep({
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const { proposal, setProposal } = useProposal();
 
   useEffect(() => {
@@ -88,164 +92,108 @@ export default function ReviewStep({
     return `${formattedDollars}.${cents}`;
   };
 
-  const createQuote = async (status: string) => {
-    // Generate quote number
-    const { data: quoteNumber } = await supabase.rpc("generate_quote_number");
+  const saveQuote = async (status: string) => {
+    const quoteData: QuoteInput = {
+      title: `${proposalTypeInfo.name} Agreement - ${clientInfo.organization}`,
+      status: status,
+      total_mrr: fees.mrc,
+      total_nrc: calculateNRCTotal(),
+      term_months: 36,
+      notes: `Proposal for ${clientInfo.organization}`,
+    };
+    const quoteVariables = [
+      { name: "client_name", value: clientInfo.name },
+      { name: "client_title", value: clientInfo.title },
+      { name: "client_email", value: clientInfo.email },
+      { name: "client_phone", value: clientInfo.phone },
+      {
+        name: "organization",
+        value: clientInfo.organization,
+      },
+      {
+        name: "address",
+        value: `${clientInfo.streetAddress}, ${clientInfo.city}, ${clientInfo.state} ${clientInfo.zipCode}`,
+      },
+    ];
 
-    // Create the quote record
-    const { data: quote, error: quoteError } = await supabase
-      .from("quotes")
-      .insert({
-        title: `${proposalTypeInfo.name} Agreement - ${clientInfo.organization}`,
-        quote_number: quoteNumber,
-        status: status,
-        total_mrr: fees.mrc,
-        total_nrc: calculateNRCTotal(),
-        term_months: 36, // Default term length
-        notes: `Proposal for ${clientInfo.organization}`,
-      })
-      .select()
-      .single();
-
-    if (quoteError) throw quoteError;
-
-    // Create quote variables
-    const { error: variablesError } = await supabase
-      .from("quote_variables")
-      .insert([
-        { quote_id: quote.id, name: "client_name", value: clientInfo.name },
-        { quote_id: quote.id, name: "client_title", value: clientInfo.title },
-        { quote_id: quote.id, name: "client_email", value: clientInfo.email },
-        { quote_id: quote.id, name: "client_phone", value: clientInfo.phone },
-        {
-          quote_id: quote.id,
-          name: "organization",
-          value: clientInfo.organization,
-        },
-        {
-          quote_id: quote.id,
-          name: "address",
-          value: `${clientInfo.streetAddress}, ${clientInfo.city}, ${clientInfo.state} ${clientInfo.zipCode}`,
-        },
-      ]);
-
-    if (variablesError) throw variablesError;
-
-    // Create quote items
     const quoteItems = sections.flatMap((section) =>
       section.equipment.map((item) => ({
-        quote_id: quote.id,
-        inventory_item_id: item.id,
-        description: item.name,
+        section_name: section.name,
+        inventory_item_id: item.inventory_item_id,
+        name: item.name,
         quantity: item.quantity,
         unit_price: 0, // You would typically get this from your inventory system
         is_recurring: false,
       })),
     );
 
-    if (quoteItems.length > 0) {
-      const { error: itemsError } = await supabase
-        .from("quote_items")
-        .insert(quoteItems);
+    const nrcFeesFormatted = fees.nrc.map((f) => ({
+      amount: f.amount,
+      notes: f.notes,
+      description: f.description,
+      type: "nrc",
+    }));
+    const feesFormatted = [
+      ...nrcFeesFormatted,
+      { description: "", type: "mrc", amount: fees.mrc, notes: "" },
+    ];
 
-      if (itemsError) throw itemsError;
-    }
-
-    return quote;
-  };
-
-  const updateQuote = async (quoteId: string, status: string) => {
-    // Update quote
-    const { data, error: quoteError } = await supabase
-      .from("quotes")
-      .update({
-        title: `${proposalTypeInfo.name} Agreement - ${clientInfo.organization}`,
-        status: status,
-        total_mrr: fees.mrc,
-        total_nrc: calculateNRCTotal(),
-        term_months: 36,
-        notes: `Proposal for ${clientInfo.organization}`,
-      })
-      .eq("id", quoteId)
-      .select();
-
-    if (!data) {
-      throw new Error("Quote not found!");
-    }
-
-    const quote = data[0];
-
-    if (quoteError) throw quoteError;
-
-    // Update quote variables
-    const { error: variablesError } = await supabase
-      .from("quote_variables")
-      .insert([
-        { name: "client_name", value: clientInfo.name },
-        { name: "client_title", value: clientInfo.title },
-        { name: "client_email", value: clientInfo.email },
-        { name: "client_phone", value: clientInfo.phone },
-        {
-          name: "organization",
-          value: clientInfo.organization,
-        },
-        {
-          name: "address",
-          value: `${clientInfo.streetAddress}, ${clientInfo.city}, ${clientInfo.state} ${clientInfo.zipCode}`,
-        },
-      ]);
-
-    if (variablesError) throw variablesError;
-
-    // Update quote items
-    const quoteItems = sections.flatMap((section) =>
-      section.equipment.map((item) => ({
-        quote_id: quoteId,
-        inventory_item_id: item.id,
-        description: item.name,
-        quantity: item.quantity,
-        unit_price: 0,
-        is_recurring: false,
-      })),
+    const quote = await saveProposal(
+      proposal?.id || null,
+      quoteData,
+      quoteVariables,
+      quoteItems,
+      feesFormatted as FeeInput[],
     );
-
-    if (quoteItems.length > 0) {
-      const { error: itemsError } = await supabase
-        .from("quote_items")
-        .update(quoteItems)
-        .eq("quote_id", quoteId);
-
-      if (itemsError) throw itemsError;
-    }
-
+    setProposal(quote);
     return quote;
-  };
-
-  const saveQuote = async (status: string) => {
-    // If proposal exists, updated it
-    if (proposal) {
-      const updatedQuote = await updateQuote((proposal as any).id, status);
-      setProposal(updatedQuote);
-      return;
-    }
-
-    // Otherwise, create a new proposal
-    const newQuote = await createQuote(status);
-    setProposal(newQuote);
   };
 
   const handleSaveAsDraft = async () => {
-    setIsSaving(true);
-    await saveQuote("draft");
-    alert("Proposal saved as draft");
-    setIsSaving(false);
+    try {
+      setIsSaving(true);
+      await saveQuote("draft");
+      alert("Proposal saved as draft");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleRequestSignature = async () => {
-    setIsRequesting(true);
-    await saveQuote("draft");
-    setIsRequesting(false);
-    location.href = `/request-signature/${(proposal as any).id}`;
+    try {
+      // Save quote
+      setIsRequesting(true);
+      const quote: Quote = await saveQuote("draft");
+      setIsRequesting(false);
+      console.log("Quote saved successfully");
+
+      // Generate pdf
+      console.log("Generating pdf");
+      const time = new Date()
+        .toLocaleString([], { hour12: false })
+        .replace(", ", "")
+        .replaceAll(":", "")
+        .replaceAll("/", "");
+
+      setIsGeneratingPDF(true);
+      const pdfLink = await generatePDF(
+        `${quote.title}-${time}.pdf`,
+        proposalTypeInfo,
+        clientInfo,
+        quote.id,
+        sections,
+        fees,
+      );
+      setIsGeneratingPDF(false);
+      console.log("PDF generated!");
+
+      location.href = `/request-signature/${proposal?.id}?pdf=${pdfLink}&name=${quote.title}`;
+    } catch (error) {
+      console.log(error);
+      setIsRequesting(false);
+      setIsGeneratingPDF(false);
+      alert("Unable to process agreement");
+    }
   };
 
   const renderPreview = () => {
@@ -275,19 +223,26 @@ export default function ReviewStep({
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                {isRequesting ? "Saving proposoal..." : "Request Signature"}
+                {isRequesting
+                  ? "Saving proposoal..."
+                  : isGeneratingPDF
+                    ? "Generating PDF..."
+                    : "Request Signature"}
               </button>
             </div>
           </div>
         </div>
 
-        <div className="print-content min-h-screen w-[8.5in] mx-auto">
+        <div
+          id="pdf-content"
+          className="print-content min-h-screen w-[8.5in] mx-auto"
+        >
           {/* Cover Page */}
-          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto relative">
+          <div className="bg-white w-[8.5in] h-[11in] mx-auto relative">
             {/* Top Half - Cover */}
             <div className="h-[5.5in] relative">
               {/* Background Image */}
-              <div className="absolute inset-0 bg-[url('/proposal-unm-bg.svg')] bg-cover bg-center"></div>
+              <div className="absolute inset-0 bg-[url('/proposal-unm-bg.png')] bg-cover bg-center"></div>
 
               {/* Agreement Date */}
               <div className="absolute top-8 right-[0.75in] text-right">
@@ -382,7 +337,7 @@ export default function ReviewStep({
             </div>
           </div>
 
-          {/* Services & Equipment */}
+          {/* Services page */}
           <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">Services</h2>
 
@@ -417,11 +372,12 @@ export default function ReviewStep({
             </div>
           </div>
 
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+          {/* Equipment page */}
+          <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Equipment
             </h2>
-            <div className="bg-gray-50 rounded-xl p-8 mb-8 page-break">
+            <div className="bg-gray-50 rounded-xl p-8 mb-8">
               <div className="space-y-4">
                 {sections.map((section) => (
                   <div key={section.id}>
@@ -432,7 +388,7 @@ export default function ReviewStep({
                       <div className="divide-y divide-gray-200">
                         {section.equipment.map((item) => (
                           <div
-                            key={item.id}
+                            key={item.inventory_item_id}
                             className="flex items-center gap-4 p-4"
                           >
                             {item.image_url ? (
@@ -672,34 +628,34 @@ export default function ReviewStep({
           </div>
 
           {/* Signature Page */}
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+          <div className="html2pdf__page-break proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Sign Name
-                </label>
                 <div className="border-b-2 border-gray-300 w-full"></div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 my-1">
                   Print Name
                 </label>
-                <div className="border-b-2 border-gray-300 w-full"></div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="border-b-2 border-gray-300 w-full"></div>
+                <label className="block text-sm font-medium text-gray-700 my-1">
                   Title
                 </label>
-                <div className="border-b-2 border-gray-300 w-full"></div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="border-b-2 border-gray-300 w-full"></div>
+                <label className="block text-sm font-medium text-gray-700 my-1">
                   Date
                 </label>
+              </div>
+
+              <div className="pt-12">
                 <div className="border-b-2 border-gray-300 w-full"></div>
+                <label className="block text-sm font-medium text-gray-700 my-1">
+                  Sign Name
+                </label>
               </div>
 
               <Link
@@ -804,7 +760,7 @@ export default function ReviewStep({
                 <div className="space-y-3">
                   {section.equipment.map((item) => (
                     <div
-                      key={item.id}
+                      key={item.inventory_item_id}
                       className="flex items-center gap-4 bg-white p-3 rounded-lg"
                     >
                       {item.image_url ? (

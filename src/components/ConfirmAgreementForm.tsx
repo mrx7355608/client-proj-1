@@ -46,7 +46,16 @@ const US_STATES = [
   "Wyoming",
 ];
 
-export default function ConfirmAgreementForm({ quote }: { quote: any }) {
+export default function ConfirmAgreementForm({
+  quote,
+  manipulatePDF,
+}: {
+  quote: any;
+  manipulatePDF: (
+    signText: string | null,
+    signUrl: string | null,
+  ) => Promise<{ file: File; pdfname: string }>;
+}) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState("");
 
@@ -273,13 +282,31 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let file, pdfname;
+
     setIsConfirming(true);
 
-    const formData = {
-      billing: billingForm,
-      shipping: sameAsBilling ? billingForm : shippingForm,
-      signature: signatureType === "text" ? signatureText : canvasSignature,
-    };
+    // Sign pdf (drawing)
+    if (canvasRef.current) {
+      const signatureUrl = canvasRef.current.toDataURL("image/png");
+      const { file: f, pdfname: p } = await manipulatePDF(null, signatureUrl);
+      file = f;
+      pdfname = p;
+    } else if (signatureText) {
+      const { file: f, pdfname: p } = await manipulatePDF(signatureText, null);
+      file = f;
+      pdfname = p;
+    }
+
+    if (!file || !pdfname) {
+      return alert("There was an error while signing the agreement");
+    }
+
+    // const formData = {
+    //   billing: billingForm,
+    //   shipping: sameAsBilling ? billingForm : shippingForm,
+    //   signature: signatureType === "text" ? signatureText : canvasSignature,
+    // };
 
     try {
       // Update proposal status to "signed"
@@ -291,6 +318,15 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
         .single();
 
       if (error) throw error;
+
+      const { error: uploadError } = await supabase.storage
+        .from("documents")
+        .upload(`signed/${pdfname}`, file, {
+          cacheControl: "3600",
+          upsert: true,
+          contentType: "application/pdf",
+        });
+      if (uploadError) return alert("There was an error while saving the pdf");
 
       // Send email to the owner about confirmation of the agreement
       const emailReceiver = import.meta.env.VITE_EMAIL_RECEIVER;
@@ -314,11 +350,12 @@ export default function ConfirmAgreementForm({ quote }: { quote: any }) {
         message: `
           An agreement has been confirmed, details are following:
           Title: ${quote.title}
-          Status: ${quote.status}
+          Status: "Signed",
           Quote #: ${quote.quote_number}
           Client: ${clientName}
           Organization: ${clientOrg}
         `,
+        agreementPdf: file,
       });
       alert("Proposal has been confirmed!");
     } catch (error) {

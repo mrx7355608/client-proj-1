@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Plus, Minus, Trash2, DollarSign } from 'lucide-react';
+import React, { useState } from "react";
+import { Plus, Trash2, DollarSign } from "lucide-react";
 
 interface Fee {
   id: string;
   description: string;
   amount: string;
   notes: string;
-  type: 'nrc' | 'mrc';
+  type: "nrc" | "mrc";
 }
 
 interface FeesStepProps {
@@ -16,7 +16,13 @@ interface FeesStepProps {
   onSubmit: (fees: Fee[]) => void;
 }
 
-export default function FeesStep({ initialNRC, initialMRC, onBack, onSubmit }: FeesStepProps) {
+export default function FeesStep({
+  initialNRC,
+  initialMRC,
+  onBack,
+  onSubmit,
+}: FeesStepProps) {
+  console.log(initialNRC);
   const [fees, setFees] = useState<Fee[]>(initialNRC);
   const [mrcAmount, setMrcAmount] = useState(initialMRC);
 
@@ -25,22 +31,22 @@ export default function FeesStep({ initialNRC, initialMRC, onBack, onSubmit }: F
       ...fees,
       {
         id: crypto.randomUUID(),
-        description: '',
-        amount: '',
-        notes: '',
-        type: 'nrc'
-      }
+        description: "",
+        amount: "",
+        notes: "",
+        type: "nrc",
+      },
     ]);
   };
 
   const updateFee = (id: string, field: keyof Fee, value: string) => {
-    setFees(fees.map(fee => 
-      fee.id === id ? { ...fee, [field]: value } : fee
-    ));
+    setFees(
+      fees.map((fee) => (fee.id === id ? { ...fee, [field]: value } : fee)),
+    );
   };
 
   const removeFee = (id: string) => {
-    setFees(fees.filter(fee => fee.id !== id));
+    setFees(fees.filter((fee) => fee.id !== id));
   };
 
   const calculateNRCTotal = () => {
@@ -49,19 +55,19 @@ export default function FeesStep({ initialNRC, initialMRC, onBack, onSubmit }: F
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Create an MRC fee if amount is set
     const allFees = [...fees];
     if (mrcAmount) {
       allFees.push({
         id: crypto.randomUUID(),
-        description: 'Monthly Service Fee',
+        description: "Monthly Service Fee",
         amount: mrcAmount,
-        notes: '',
-        type: 'mrc'
+        notes: "",
+        type: "mrc",
       });
     }
-    
+
     onSubmit(allFees);
   };
 
@@ -79,8 +85,12 @@ export default function FeesStep({ initialNRC, initialMRC, onBack, onSubmit }: F
         <div>
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h3 className="text-lg font-medium text-gray-800">One-Time Charges (NRC)</h3>
-              <p className="text-sm text-gray-500">Non-recurring charges for initial setup and equipment</p>
+              <h3 className="text-lg font-medium text-gray-800">
+                One-Time Charges (NRC)
+              </h3>
+              <p className="text-sm text-gray-500">
+                Non-recurring charges for initial setup and equipment
+              </p>
             </div>
             <button
               type="button"
@@ -104,7 +114,9 @@ export default function FeesStep({ initialNRC, initialMRC, onBack, onSubmit }: F
                       type="text"
                       required
                       value={fee.description}
-                      onChange={(e) => updateFee(fee.id, 'description', e.target.value)}
+                      onChange={(e) =>
+                        updateFee(fee.id, "description", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="e.g., Installation Fee"
                     />
@@ -121,7 +133,9 @@ export default function FeesStep({ initialNRC, initialMRC, onBack, onSubmit }: F
                         min="0"
                         step="0.01"
                         value={fee.amount}
-                        onChange={(e) => updateFee(fee.id, 'amount', e.target.value)}
+                        onChange={(e) =>
+                          updateFee(fee.id, "amount", e.target.value)
+                        }
                         className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="0.00"
                       />
@@ -134,7 +148,7 @@ export default function FeesStep({ initialNRC, initialMRC, onBack, onSubmit }: F
                   </label>
                   <textarea
                     value={fee.notes}
-                    onChange={(e) => updateFee(fee.id, 'notes', e.target.value)}
+                    onChange={(e) => updateFee(fee.id, "notes", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={2}
                     placeholder="Add any additional details about this charge..."
@@ -171,8 +185,12 @@ export default function FeesStep({ initialNRC, initialMRC, onBack, onSubmit }: F
         {/* MRC Section */}
         <div>
           <div className="mb-4">
-            <h3 className="text-lg font-medium text-gray-800">Monthly Fee (MRC)</h3>
-            <p className="text-sm text-gray-500">Monthly recurring charge for services</p>
+            <h3 className="text-lg font-medium text-gray-800">
+              Monthly Fee (MRC)
+            </h3>
+            <p className="text-sm text-gray-500">
+              Monthly recurring charge for services
+            </p>
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4">
@@ -215,3 +233,4 @@ export default function FeesStep({ initialNRC, initialMRC, onBack, onSubmit }: F
     </div>
   );
 }
+

@@ -4,6 +4,7 @@ import EquipmentStep from "../steps/EquipmentStep";
 import FeesStep from "../steps/FeesStep";
 import ReviewStep from "../steps/ReviewStep";
 import { useProposal } from "../../../contexts/proposals";
+import { ClientForm, Section, Fee } from "../../../lib/types";
 
 type Props = {
   data: {
@@ -14,38 +15,6 @@ type Props = {
     color: string;
   };
 };
-
-interface Section {
-  id: string;
-  name: string;
-  equipment: {
-    id: string;
-    name: string;
-    quantity: number;
-    category: string;
-    image_url: string | null;
-  }[];
-}
-
-interface Fee {
-  id: string;
-  description: string;
-  amount: string;
-  notes: string;
-  type: "nrc" | "mrc";
-}
-
-interface ClientForm {
-  name: string;
-  title: string;
-  email: string;
-  phone: string;
-  organization: string;
-  streetAddress: string;
-  city: string;
-  state: string;
-  zipCode: string;
-}
 
 const INITIAL_CLIENT_FORM: ClientForm = {
   name: "",
@@ -100,13 +69,14 @@ export default function ProposalItem({ data }: Props) {
         {/* Step Content */}
         {currentStep === 1 && (
           <ClientInfoStep
-            proposalType={data.name}
+            proposalName={data.name}
             initialData={clientForm}
             onSubmit={handleClientSubmit}
           />
         )}
         {currentStep === 2 && (
           <EquipmentStep
+            quoteId={null}
             sections={sections}
             onBack={onBack}
             onSubmit={handleEquipmentSubmit}
