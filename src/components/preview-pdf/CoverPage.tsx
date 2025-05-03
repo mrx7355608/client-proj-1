@@ -15,7 +15,7 @@ const CoverPage = ({ proposalTypeInfo, clientInfo }) => {
       <View style={styles.cover}>
         {/* Background Image */}
         <Image
-          src="http://localhost:5173/proposal-unm-bg.png"
+          src={`${import.meta.env.VITE_BASE_URL}/proposal-unm-bg.png`}
           style={styles.coverBackground}
         />
 
