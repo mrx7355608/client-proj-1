@@ -196,6 +196,14 @@ export default function ReviewStep({
     }
   };
 
+  const downloadPDF = () => {
+    const pdfname = `${proposal?.title}`;
+    const originalTitle = document.title;
+    document.title = pdfname;
+    window.print();
+    document.title = originalTitle;
+  };
+
   const renderPreview = () => {
     return (
       <div className="bg-gray-100">
@@ -206,7 +214,7 @@ export default function ReviewStep({
             </h3>
             <div className="flex gap-3">
               <button
-                onClick={() => window.print()}
+                onClick={downloadPDF}
                 className="px-4 py-2 text-gray-600 hover:text-gray-800 flex items-center gap-2"
               >
                 <Download className="w-4 h-4" />
