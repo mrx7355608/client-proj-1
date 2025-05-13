@@ -66,7 +66,7 @@ export default function ProposalsDashboard() {
             name,
             company_name
           )
-        `,
+        `
         )
         .order("created_at", { ascending: false });
 
@@ -110,7 +110,7 @@ export default function ProposalsDashboard() {
           client: quote.client,
           created_at: quote.created_at,
           total_value: (quote.total_mrr || 0) * 12 + (quote.total_nrc || 0),
-        })),
+        }))
       );
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -386,8 +386,8 @@ export default function ProposalsDashboard() {
                           proposal.status === "signed"
                             ? "bg-green-100 text-green-800"
                             : proposal.status === "sent"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-yellow-100 text-yellow-800"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
                         {proposal.status.charAt(0).toUpperCase() +
@@ -413,7 +413,7 @@ export default function ProposalsDashboard() {
                             window.open(
                               `/proposals/edit/${proposal.id}`,
                               "_blank",
-                              "width=1200,height=800",
+                              "width=1200,height=800"
                             );
                           }}
                           className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
@@ -421,7 +421,7 @@ export default function ProposalsDashboard() {
                           Edit
                         </button>
                       )}
-                      {proposal.status === "signed" && (
+                      {proposal.status === "signed" && !proposal.client && (
                         <button
                           onClick={() => handleConvertToClient(proposal.id)}
                           className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
