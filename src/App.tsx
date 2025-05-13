@@ -12,6 +12,7 @@ import {
   UserCog,
   Package,
   FolderOpen,
+  FileText,
 } from "lucide-react";
 import { supabase } from "./lib/supabase";
 import Dashboard from "./pages/Dashboard";
@@ -36,6 +37,7 @@ import ConfirmAgreement from "./pages/ConfirmAgreement";
 import RequestSignature from "./pages/RequestSignature";
 import EditProposal from "./pages/EditProposal";
 import RenderPreview from "./pages/RenderPreview";
+import TermsOfService from "./pages/terms/TermsOfService";
 
 interface UserProfile {
   first_name: string | null;
@@ -175,6 +177,11 @@ function App() {
                 text="Proposals"
               />
               <NavLink
+                to="/proposals/terms"
+                icon={<FileText size={18} />}
+                text="Terms of Service"
+              />
+              <NavLink
                 to="/inventory"
                 icon={<Package size={18} />}
                 text="Inventory"
@@ -243,6 +250,7 @@ function App() {
             <Route path="/proposals" element={<ProposalsDashboard />} />
             <Route path="/proposals/list" element={<ProposalsList />} />
             <Route path="/proposals/settings" element={<ProposalSettings />} />
+            <Route path="/proposals/terms" element={<TermsOfService />} />
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/inventory/sites/:id" element={<SiteDetails />} />
             <Route path="/documents" element={<Documents />} />
