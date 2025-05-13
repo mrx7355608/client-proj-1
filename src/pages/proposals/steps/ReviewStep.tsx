@@ -21,6 +21,9 @@ import { useProposal } from "../../../contexts/proposals";
 import { saveProposal } from "../../../lib/data/proposals.data";
 import { FeeInput, Quote, QuoteInput } from "../../../lib/types";
 import { generatePDF } from "../../../lib/generate-pdf";
+import MSPTermsOfService from "../../../components/terms-of-service/msp-tos";
+import VulscanTermsOfService from "../../../components/terms-of-service/vulscan-tos";
+import UNMTermsOfService from "../../../components/terms-of-service/unm-tos";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -124,7 +127,7 @@ export default function ReviewStep({
         quantity: item.quantity,
         unit_price: 0, // You would typically get this from your inventory system
         is_recurring: false,
-      })),
+      }))
     );
 
     const nrcFeesFormatted = fees.nrc.map((f) => ({
@@ -143,7 +146,7 @@ export default function ReviewStep({
       quoteData,
       quoteVariables,
       quoteItems,
-      feesFormatted as FeeInput[],
+      feesFormatted as FeeInput[]
     );
     setProposal(quote);
     return quote;
@@ -182,7 +185,7 @@ export default function ReviewStep({
         clientInfo,
         quote.id,
         sections,
-        fees,
+        fees
       );
       setIsGeneratingPDF(false);
       console.log("PDF generated!");
@@ -205,6 +208,12 @@ export default function ReviewStep({
   };
 
   const renderPreview = () => {
+    const vulscanText =
+      "By signing this Service Order Form, NSB Board of Realtors is acknowledging to have read and understood the Terms and Conditions which are incorporated in this Service Order Form. Please sign and date below and return it to ITX Solutions, Inc.";
+    const unmText = "";
+    const mspText =
+      "By signing this Service Order Form, Milestone Title Services is acknowledging to have read and understood the Terms and Conditions which are incorporated in this Service Order Form. Please sign and date below and return it to ITX Solutions, Inc.";
+
     return (
       <div className="bg-gray-100">
         <div className="bg-white border-b sticky top-0 z-10 no-print">
@@ -234,8 +243,8 @@ export default function ReviewStep({
                 {isRequesting
                   ? "Saving proposoal..."
                   : isGeneratingPDF
-                    ? "Generating PDF..."
-                    : "Request Signature"}
+                  ? "Generating PDF..."
+                  : "Request Signature"}
               </button>
             </div>
           </div>
@@ -527,117 +536,18 @@ export default function ReviewStep({
           )}
 
           {/* Terms & Conditions */}
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12">
-              Terms and Conditions
-            </h2>
-
-            <div className="space-y-6 text-gray-600">
-              <p className="mb-8">
-                These Terms of Service constitute the agreement ("Agreement")
-                between ITX Solutions ("Provider", "we", "us", or "ITX
-                Solutions") and the End User ("You", "Your" or "Client") of ITX
-                Solutions' Business Network and IT Support Services ("Service",
-                "Services"). This Agreement governs the Services, as well as the
-                use of any ITX Solutions-supplied hardware and software.
-              </p>
-
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  1. Term and Termination
-                </h3>
-                <p>
-                  This Agreement is effective for 48 months from the date of
-                  installation, with automatic renewal for successive 48-month
-                  terms unless terminated with 30 days written notice. Early
-                  termination fees apply.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  2. Support Hours and Fees
-                </h3>
-                <p>
-                  Standard support hours are Monday through Friday, 9AM - 6PM
-                  Eastern Time. Emergency support outside these hours will be
-                  billed at $150 per hour.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  3. Payment Terms
-                </h3>
-                <p>
-                  Client will pay Service Provider within 25 days of receipt of
-                  invoice. Late payments subject to 3.5% monthly charge.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  4. Limitation of Liability
-                </h3>
-                <p>
-                  Neither party will be liable for special, indirect,
-                  incidental, consequential, exemplary, or punitive damages,
-                  except in cases of gross negligence or willful misconduct.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  5. Property Rights
-                </h3>
-                <p>
-                  ITX Solutions retains ownership rights to all intellectual
-                  property, hardware, and equipment installed or utilized under
-                  this Agreement.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  6. Dispute Resolution
-                </h3>
-                <p>
-                  This Agreement shall be governed by Florida law. Disputes
-                  shall be resolved by binding arbitration in Orange County,
-                  Florida.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
-            <div className="space-y-6 text-gray-600">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  7. Service Level Agreement (SLA)
-                </h3>
-                <p>
-                  ITX Solutions commits to a 4-hour maximum response time for
-                  critical system failures.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  8. Force Majeure
-                </h3>
-                <p>
-                  ITX Solutions shall not be liable for failures due to
-                  circumstances beyond reasonable control, including acts of
-                  God, governmental actions, or natural disasters.
-                </p>
-              </div>
-            </div>
-          </div>
+          {proposalTypeInfo.id === "unm" && <UNMTermsOfService />}
+          {proposalTypeInfo.id === "msp" && <MSPTermsOfService />}
+          {proposalTypeInfo.id === "vulscan" && <VulscanTermsOfService />}
 
           {/* Signature Page */}
           <div className="html2pdf__page-break proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
-            <div className="space-y-8">
+            <span className="text-sm text-gray-600">
+              {proposalTypeInfo.id === "vulscan" && vulscanText}
+              {proposalTypeInfo.id === "unm" && unmText}
+              {proposalTypeInfo.id === "msp" && mspText}
+            </span>
+            <div className="space-y-8 mt-12">
               <div>
                 <div className="border-b-2 border-gray-300 w-full"></div>
                 <label className="block text-sm font-medium text-gray-700 my-1">
@@ -667,7 +577,9 @@ export default function ReviewStep({
               </div>
 
               <Link
-                to={`${import.meta.env.VITE_BASE_URL}/confirm-agreement/${proposal?.id}`}
+                to={`${import.meta.env.VITE_BASE_URL}/confirm-agreement/${
+                  proposal?.id
+                }`}
               >
                 <button className="bg-sky-500 text-white text-xl font-bold px-7 py-4 mt-8">
                   Accept Quote
