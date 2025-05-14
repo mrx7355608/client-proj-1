@@ -10,6 +10,7 @@ interface Fee {
 }
 
 interface FeesStepProps {
+  proposalType: string;
   initialNRC: Fee[];
   initialMRC: string;
   onBack: () => void;
@@ -17,6 +18,7 @@ interface FeesStepProps {
 }
 
 export default function FeesStep({
+  proposalType,
   initialNRC,
   initialMRC,
   onBack,
@@ -41,7 +43,7 @@ export default function FeesStep({
 
   const updateFee = (id: string, field: keyof Fee, value: string) => {
     setFees(
-      fees.map((fee) => (fee.id === id ? { ...fee, [field]: value } : fee)),
+      fees.map((fee) => (fee.id === id ? { ...fee, [field]: value } : fee))
     );
   };
 
@@ -76,7 +78,9 @@ export default function FeesStep({
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900">Fees & Charges</h2>
         <p className="mt-2 text-gray-600">
-          Add one-time and recurring charges for your proposal
+          Add{" "}
+          {proposalType === "buildouts" ? "one-time" : "one-time and recurring"}{" "}
+          charges for your proposal
         </p>
       </div>
 
@@ -182,37 +186,39 @@ export default function FeesStep({
           </div>
         </div>
 
-        {/* MRC Section */}
-        <div>
-          <div className="mb-4">
-            <h3 className="text-lg font-medium text-gray-800">
-              Monthly Fee (MRC)
-            </h3>
-            <p className="text-sm text-gray-500">
-              Monthly recurring charge for services
-            </p>
-          </div>
+        {/* MRC Section - Only show if not buildouts */}
+        {proposalType !== "buildouts" && (
+          <div>
+            <div className="mb-4">
+              <h3 className="text-lg font-medium text-gray-800">
+                Monthly Fee (MRC)
+              </h3>
+              <p className="text-sm text-gray-500">
+                Monthly recurring charge for services
+              </p>
+            </div>
 
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Monthly Fee Amount *
-              </label>
-              <div className="relative max-w-xs">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={mrcAmount}
-                  onChange={(e) => setMrcAmount(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="0.00"
-                />
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Monthly Fee Amount *
+                </label>
+                <div className="relative max-w-xs">
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={mrcAmount}
+                    onChange={(e) => setMrcAmount(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="0.00"
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="flex justify-end space-x-3 pt-6 border-t">
           <button
@@ -233,4 +239,3 @@ export default function FeesStep({
     </div>
   );
 }
-

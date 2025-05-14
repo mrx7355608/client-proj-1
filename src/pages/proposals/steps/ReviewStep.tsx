@@ -447,21 +447,23 @@ export default function ReviewStep({
             </h2>
 
             <div className="space-y-6 max-w-2xl">
-              <div className="bg-gray-50 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold">
-                    Monthly Recurring Charges (MRC)
-                  </h3>
+              {proposalTypeInfo.id !== "buildouts" && (
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Clock className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-lg font-semibold">
+                      Monthly Recurring Charges (MRC)
+                    </h3>
+                  </div>
+                  <p className="text-gray-600 mb-4">
+                    Billed monthly for 36 months
+                  </p>
+                  <p className="text-4xl font-bold text-blue-600">
+                    ${formatCurrency(fees.mrc)}
+                    <span className="text-lg text-gray-500">/month</span>
+                  </p>
                 </div>
-                <p className="text-gray-600 mb-4">
-                  Billed monthly for 36 months
-                </p>
-                <p className="text-4xl font-bold text-blue-600">
-                  ${formatCurrency(fees.mrc)}
-                  <span className="text-lg text-gray-500">/month</span>
-                </p>
-              </div>
+              )}
 
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-6">
@@ -510,10 +512,12 @@ export default function ReviewStep({
                   <div className="w-2 h-2 rounded-full bg-blue-600"></div>
                   First payment due upon agreement signing
                 </li>
-                <li className="flex items-center gap-3 text-gray-600">
-                  <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                  Monthly payments due on the 1st of each month
-                </li>
+                {proposalTypeInfo.id !== "buildouts" && (
+                  <li className="flex items-center gap-3 text-gray-600">
+                    <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                    Monthly payments due on the 1st of each month
+                  </li>
+                )}
                 <li className="flex items-center gap-3 text-gray-600">
                   <div className="w-2 h-2 rounded-full bg-blue-600"></div>
                   Net 30 payment terms
@@ -749,20 +753,22 @@ export default function ReviewStep({
             </div>
           </div>
 
-          {/* MRC */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">
-              Monthly Fee (MRC)
-            </h4>
-            <div className="flex justify-between items-center bg-white p-3 rounded-lg">
-              <h5 className="text-sm font-medium text-gray-900">
-                Monthly Service Fee
-              </h5>
-              <div className="text-sm font-medium text-gray-900">
-                ${formatCurrency(fees.mrc)}/month
+          {/* MRC - Only show if not buildouts */}
+          {proposalTypeInfo.id !== "buildouts" && (
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
+                Monthly Fee (MRC)
+              </h4>
+              <div className="flex justify-between items-center bg-white p-3 rounded-lg">
+                <h5 className="text-sm font-medium text-gray-900">
+                  Monthly Service Fee
+                </h5>
+                <div className="text-sm font-medium text-gray-900">
+                  ${formatCurrency(fees.mrc)}/month
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="flex justify-end space-x-3 pt-6 border-t">

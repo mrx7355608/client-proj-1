@@ -84,6 +84,7 @@ export default function ProposalItem({ data }: Props) {
         )}
         {currentStep === 3 && (
           <FeesStep
+            proposalType={data.name.toLocaleLowerCase()}
             initialNRC={fees.nrc}
             initialMRC={fees.mrc}
             onBack={onBack}
