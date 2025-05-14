@@ -55,6 +55,7 @@ interface InventoryItem {
     name: string;
   };
   image_url: string | null;
+  unit_price: number | null;
 }
 
 interface Template {
@@ -226,7 +227,8 @@ function SectionSearch({
           vendor:inventory_vendors (
             name
           ),
-          image_url
+          image_url,
+          unit_price
         `
         )
         .ilike("name", `%${query}%`)
@@ -419,7 +421,14 @@ function SortableSection({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
+                {itemDetails.unit_price !== null && (
+                  <div className="flex items-center px-3 py-1.5 bg-green-50 border border-green-100 rounded-lg">
+                    <span className="text-sm font-medium text-green-700">
+                      ${itemDetails.unit_price.toLocaleString()}
+                    </span>
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() =>
@@ -501,7 +510,8 @@ export default function EquipmentStep({
             vendor:inventory_vendors (
               name
             ),
-            image_url
+            image_url,
+            unit_price
           `
           )
           .in("id", Array.from(itemIds));
@@ -708,7 +718,8 @@ export default function EquipmentStep({
           vendor:inventory_vendors (
             name
           ),
-          image_url
+          image_url,
+          unit_price
         `
         )
         .in("id", Array.from(itemIds));
