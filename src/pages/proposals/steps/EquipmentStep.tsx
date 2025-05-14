@@ -171,7 +171,7 @@ function TemplateModal({
               <button
                 onClick={() => {
                   const template = templates.find(
-                    (t) => t.id === selectedTemplate,
+                    (t) => t.id === selectedTemplate
                   );
                   if (template) {
                     onLoad(template);
@@ -227,7 +227,7 @@ function SectionSearch({
             name
           ),
           image_url
-        `,
+        `
         )
         .ilike("name", `%${query}%`)
         .limit(5);
@@ -325,7 +325,7 @@ function SortableSection({
   onUpdateQuantity: (
     sectionId: string,
     itemId: string,
-    quantity: number,
+    quantity: number
   ) => void;
   equipment: Record<string, InventoryItem>;
 }) {
@@ -379,7 +379,7 @@ function SortableSection({
           return (
             <div
               key={item.inventory_item_id}
-              className="flex items-center gap-4 p-3 bg-white rounded-lg"
+              className="flex items-center gap-4 p-4 bg-white rounded-lg"
             >
               {itemDetails.image_url ? (
                 <img
@@ -397,8 +397,13 @@ function SortableSection({
                 <h3 className="text-sm font-medium text-gray-900">
                   {itemDetails.name}
                 </h3>
+                {itemDetails.description && (
+                  <p className="text-sm text-gray-600 mt-0.5 mb-2 line-clamp-2">
+                    {itemDetails.description}
+                  </p>
+                )}
                 {itemDetails.sku && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 mt-1">
                     SKU: {itemDetails.sku}
                   </p>
                 )}
@@ -421,7 +426,7 @@ function SortableSection({
                     onUpdateQuantity(
                       section.id,
                       item.inventory_item_id,
-                      Math.max(0, item.quantity - 1),
+                      Math.max(0, item.quantity - 1)
                     )
                   }
                   className="p-1 text-gray-500 hover:text-gray-700"
@@ -435,7 +440,7 @@ function SortableSection({
                     onUpdateQuantity(
                       section.id,
                       item.inventory_item_id,
-                      item.quantity + 1,
+                      item.quantity + 1
                     )
                   }
                   className="p-1 text-gray-500 hover:text-gray-700"
@@ -497,7 +502,7 @@ export default function EquipmentStep({
               name
             ),
             image_url
-          `,
+          `
           )
           .in("id", Array.from(itemIds));
 
@@ -531,7 +536,7 @@ export default function EquipmentStep({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   const addNewSection = () => {
@@ -548,8 +553,8 @@ export default function EquipmentStep({
   const updateSectionName = (sectionId: string, name: string) => {
     setSections(
       sections.map((section) =>
-        section.id === sectionId ? { ...section, name } : section,
-      ),
+        section.id === sectionId ? { ...section, name } : section
+      )
     );
   };
 
@@ -563,7 +568,7 @@ export default function EquipmentStep({
       sections.map((section) => {
         if (section.id === sectionId) {
           const existingItem = section.equipment.find(
-            (e) => e.inventory_item_id === item.id,
+            (e) => e.inventory_item_id === item.id
           );
           if (existingItem) {
             console.log("adding exisiting:", section);
@@ -572,7 +577,7 @@ export default function EquipmentStep({
               equipment: section.equipment.map((e) =>
                 e.inventory_item_id === item.id
                   ? { ...e, quantity: e.quantity + 1 }
-                  : e,
+                  : e
               ),
             };
           }
@@ -593,7 +598,7 @@ export default function EquipmentStep({
           };
         }
         return section;
-      }),
+      })
     );
 
     setEquipmentDetails((prev) => ({
@@ -609,18 +614,18 @@ export default function EquipmentStep({
           ? {
               ...section,
               equipment: section.equipment.filter(
-                (e) => e.inventory_item_id !== itemId,
+                (e) => e.inventory_item_id !== itemId
               ),
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
   const updateEquipmentQuantity = (
     sectionId: string,
     itemId: string,
-    quantity: number,
+    quantity: number
   ) => {
     setSections(
       sections.map((section) =>
@@ -630,14 +635,14 @@ export default function EquipmentStep({
               equipment:
                 quantity === 0
                   ? section.equipment.filter(
-                      (e) => e.inventory_item_id !== itemId,
+                      (e) => e.inventory_item_id !== itemId
                     )
                   : section.equipment.map((e) =>
-                      e.inventory_item_id === itemId ? { ...e, quantity } : e,
+                      e.inventory_item_id === itemId ? { ...e, quantity } : e
                     ),
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
@@ -647,10 +652,10 @@ export default function EquipmentStep({
     if (active.id !== over.id) {
       setSections((sections) => {
         const oldIndex = sections.findIndex(
-          (section) => section.id === active.id,
+          (section) => section.id === active.id
         );
         const newIndex = sections.findIndex(
-          (section) => section.id === over.id,
+          (section) => section.id === over.id
         );
 
         const newSections = [...sections];
@@ -673,7 +678,7 @@ export default function EquipmentStep({
     setTemplates(updatedTemplates);
     localStorage.setItem(
       "equipmentTemplates",
-      JSON.stringify(updatedTemplates),
+      JSON.stringify(updatedTemplates)
     );
   };
 
@@ -704,7 +709,7 @@ export default function EquipmentStep({
             name
           ),
           image_url
-        `,
+        `
         )
         .in("id", Array.from(itemIds));
 
