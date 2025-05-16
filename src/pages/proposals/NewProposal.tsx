@@ -16,6 +16,7 @@ export default function NewProposal() {
       description: "Unified Network Management",
       icon: <Network className="w-6 h-6" />,
       color: "bg-purple-500",
+      bgImage: "/proposal-unm-bg.png",
     },
     {
       id: "msp",
@@ -23,6 +24,7 @@ export default function NewProposal() {
       description: "Managed Service Provider",
       icon: <Settings className="w-6 h-6" />,
       color: "bg-blue-500",
+      bgImage: "/proposal-unm-bg.png",
     },
     {
       id: "cybersecurity",
@@ -30,6 +32,7 @@ export default function NewProposal() {
       description: "Security Solutions",
       icon: <Shield className="w-6 h-6" />,
       color: "bg-green-500",
+      bgImage: "/proposal-cyber-bg.png",
     },
     {
       id: "buildouts",
@@ -37,6 +40,7 @@ export default function NewProposal() {
       description: "Network & Infrastructure",
       icon: <Building2 className="w-6 h-6" />,
       color: "bg-orange-500",
+      bgImage: "/proposal-unm-bg.png",
     },
   ];
 
