@@ -24,6 +24,8 @@ import { generatePDF } from "../../../lib/generate-pdf";
 import MSPTermsOfService from "../../../components/terms-of-service/msp-tos";
 import VulscanTermsOfService from "../../../components/terms-of-service/vulscan-tos";
 import UNMTermsOfService from "../../../components/terms-of-service/unm-tos";
+import UNMServices from "../../../components/proposals/services/unm-services";
+import MSPServices from "../../../components/proposals/services/msp-services";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -64,6 +66,7 @@ interface ReviewStepProps {
     description: string;
     icon: IconNode;
     color: string;
+    bgImage: string;
   };
   onBack: () => void;
 }
@@ -259,7 +262,12 @@ export default function ReviewStep({
             {/* Top Half - Cover */}
             <div className="h-[5.5in] relative">
               {/* Background Image */}
-              <div className="absolute inset-0 bg-[url('/proposal-unm-bg.png')] bg-cover bg-center"></div>
+              <div
+                style={{
+                  backgroundImage: `url('${proposalTypeInfo.bgImage}')`,
+                }}
+                className={`absolute inset-0 bg-[url('${proposalTypeInfo.bgImage}')] bg-cover bg-center`}
+              ></div>
 
               {/* Agreement Date */}
               <div className="absolute top-8 right-[0.75in] text-right">
@@ -355,7 +363,7 @@ export default function ReviewStep({
           </div>
 
           {/* Services page */}
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+          {/* <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">Services</h2>
 
             <div className="grid grid-cols-2 gap-6 mb-12">
@@ -387,7 +395,9 @@ export default function ReviewStep({
                 </p>
               </div>
             </div>
-          </div>
+          </div> */}
+          {proposalTypeInfo.id === "unm" && <UNMServices />}
+          {proposalTypeInfo.id === "msp" && <MSPServices />}
 
           {/* Equipment page */}
           <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
