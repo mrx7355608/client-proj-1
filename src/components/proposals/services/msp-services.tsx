@@ -97,7 +97,7 @@ export default function MSPServices() {
   const disasterRecovery = {
     type: "paragraph",
     content:
-      "Hardware Failure – Manufacturer Warranty is covered by ITX’s partner group. One year Manufacturer Warranty on all Unified Access Points. The UI Care – 5 year Priority Manufacturer Warranty, RMA Service, and Replacement Services on all Unified Switches and UDM Appliance. In case of any emergency hardware failures, all UI covered hardware is available for overnight delivery. Any equipment under UI Care will not be charged, this includes the Unified Firewall, and the Unified 48 Port and 24 Port Switches. Any equipment outside of warranty will include an equipment charge and overnight cost. All labor to re-program and install faulty equipment is included in the Unified Network / Cloud Management Services (SLA) – at no cost to you!",
+      "Hardware Failure – Manufacturer Warranty is covered by ITX's partner group. One year Manufacturer Warranty on all Unified Access Points. The UI Care – 5 year Priority Manufacturer Warranty, RMA Service, and Replacement Services on all Unified Switches and UDM Appliance. In case of any emergency hardware failures, all UI covered hardware is available for overnight delivery. Any equipment under UI Care will not be charged, this includes the Unified Firewall, and the Unified 48 Port and 24 Port Switches. Any equipment outside of warranty will include an equipment charge and overnight cost. All labor to re-program and install faulty equipment is included in the Unified Network / Cloud Management Services (SLA) – at no cost to you!",
   };
 
   const BulletPointSection = ({
@@ -230,6 +230,63 @@ export default function MSPServices() {
         <ParagraphSection
           title="Disaster Recovery Coverage"
           content={disasterRecovery.content}
+        />
+      </div>
+
+      <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+        <BulletPointSection
+          title="Qualifications"
+          items={[
+            "A Network Rack or Cabinet must be available for all Unified Equipment",
+            "Proper ventilation and temperature controls inside the Network environment.",
+            "Uninterrupted Power Supply units with the proper voltage and available battery for any sudden surges",
+            "Full Access to the network equipment for any equipment changes or updates.",
+            "All Unified network appliances and switches is ONLY administered by Bluefire IT Solutions personnel.",
+            "Under this coverage, during a major outage, Bluefire IT Solutions will restore any operational Unified appliances or switch to the point of the last successful backup if required.",
+          ]}
+          description="In order to qualify for the Bluefire IT Solutions Unified Management Coverage, your environment must comply with the
+following requirements."
+        />
+      </div>
+
+      <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">
+          DNS Filtering & Virus Protection Solution
+        </h2>
+
+        <BulletPointSection
+          title="Advanced machine learning and cloud-based protection"
+          items={[
+            "Multi-vector protection against malicious files, scripts, exploits and URLs",
+            "Remote policy definition and management",
+            "Precision monitoring and roll-back capabilities for auto-restoring and infected files",
+          ]}
+        />
+
+        <BulletPointSection
+          title="Collective threat intelligence"
+          items={[
+            "Powered by advanced machine learning",
+            "Predictive analytics provides automated protection against zero-day threats",
+            "Requires minimal human interaction",
+          ]}
+        />
+
+        <BulletPointSection
+          title="Superior speed and efficiency"
+          items={[
+            "Nimble agent designed for minimal footprint and system performance impact",
+            "Easy to deploy and installs in seconds",
+            "Ultra-fast scans",
+          ]}
+        />
+
+        <BulletPointSection
+          title="Cloud-based architecture"
+          items={[
+            "Continuously correlates and analyzes data",
+            "Access to advanced computing power",
+          ]}
         />
       </div>
     </>
