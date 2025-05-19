@@ -10,8 +10,6 @@ import {
   Send,
   Download,
   DollarSign,
-  Shield,
-  Server,
   Clock,
   Save,
   IconNode,
@@ -19,7 +17,7 @@ import {
 import { Link } from "react-router-dom";
 import { useProposal } from "../../../contexts/proposals";
 import { saveProposal } from "../../../lib/data/proposals.data";
-import { FeeInput, Quote, QuoteInput } from "../../../lib/types";
+import { Fee, FeeInput, Quote, QuoteInput } from "../../../lib/types";
 import { generatePDF } from "../../../lib/generate-pdf";
 import MSPTermsOfService from "../../../components/terms-of-service/msp-tos";
 import VulscanTermsOfService from "../../../components/terms-of-service/vulscan-tos";
@@ -50,16 +48,7 @@ interface ReviewStepProps {
       image_url: string | null;
     }[];
   }[];
-  fees: {
-    nrc: {
-      id: string;
-      description: string;
-      amount: number;
-      notes: string;
-      type: "nrc" | "mrc";
-    }[];
-    mrc: number;
-  };
+  fees: Fee[];
   proposalTypeInfo: {
     id: string;
     name: string;
@@ -88,34 +77,48 @@ export default function ReviewStep({
     saveQuote("draft");
   }, []);
 
-  const calculateNRCTotal = () => {
-    return fees.nrc.reduce((sum, fee) => sum + fee.amount, 0);
+  const calculateNRCTotal = (): number => {
+    return fees
+      .filter((fee: Fee) => fee.type === "nrc")
+      .reduce((sum: number, fee: Fee) => sum + parseFloat(fee.amount), 0);
   };
 
-  const formatCurrency = (amount: number) => {
-    const [dollars, cents] = amount.toFixed(2).split(".");
-    const formattedDollars = dollars.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return `${formattedDollars}.${cents}`;
+  const calculateMRCTotal = (): number => {
+    return fees
+      .filter((fee: Fee) => fee.type === "mrc")
+      .reduce((sum: number, fee: Fee) => sum + parseFloat(fee.amount), 0);
+  };
+
+  const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
   };
 
   const saveQuote = async (status: string) => {
     const quoteData: QuoteInput = {
       title: `${proposalTypeInfo.name} Agreement - ${clientInfo.organization}`,
       status: status,
-      total_mrr: fees.mrc,
+      total_mrr: calculateMRCTotal(),
       total_nrc: calculateNRCTotal(),
       term_months: 36,
       notes: `Proposal for ${clientInfo.organization}`,
+      total_users:
+        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0].totalUser) || 0,
+      amount_per_user:
+        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0].feesPerUser) ||
+        0,
     };
+
     const quoteVariables = [
       { name: "client_name", value: clientInfo.name },
       { name: "client_title", value: clientInfo.title },
       { name: "client_email", value: clientInfo.email },
       { name: "client_phone", value: clientInfo.phone },
-      {
-        name: "organization",
-        value: clientInfo.organization,
-      },
+      { name: "organization", value: clientInfo.organization },
       {
         name: "address",
         value: `${clientInfo.streetAddress}, ${clientInfo.city}, ${clientInfo.state} ${clientInfo.zipCode}`,
@@ -128,28 +131,25 @@ export default function ReviewStep({
         inventory_item_id: item.inventory_item_id,
         name: item.name,
         quantity: item.quantity,
-        unit_price: 0, // You would typically get this from your inventory system
+        unit_price: 0,
         is_recurring: false,
       }))
     );
 
-    const nrcFeesFormatted = fees.nrc.map((f) => ({
-      amount: f.amount,
-      notes: f.notes,
-      description: f.description,
-      type: "nrc",
+    // Convert fees to FeeInput[] format
+    const quoteFees: FeeInput[] = fees.map((fee: Fee) => ({
+      description: fee.description,
+      amount: fee.amount,
+      notes: fee.notes,
+      type: fee.type,
     }));
-    const feesFormatted = [
-      ...nrcFeesFormatted,
-      { description: "", type: "mrc", amount: fees.mrc, notes: "" },
-    ];
 
     const quote = await saveProposal(
       proposal?.id || null,
       quoteData,
       quoteVariables,
       quoteItems,
-      feesFormatted as FeeInput[]
+      quoteFees
     );
     setProposal(quote);
     return quote;
@@ -178,8 +178,8 @@ export default function ReviewStep({
       const time = new Date()
         .toLocaleString([], { hour12: false })
         .replace(", ", "")
-        .replaceAll(":", "")
-        .replaceAll("/", "");
+        .replace(/:/g, "")
+        .replace(/\//g, "");
 
       setIsGeneratingPDF(true);
       const pdfLink = await generatePDF(
@@ -188,7 +188,10 @@ export default function ReviewStep({
         clientInfo,
         quote.id,
         sections,
-        fees
+        {
+          nrc: fees.filter((fee: Fee) => fee.type === "nrc"),
+          mrc: calculateMRCTotal().toString(),
+        }
       );
       setIsGeneratingPDF(false);
       console.log("PDF generated!");
@@ -363,39 +366,6 @@ export default function ReviewStep({
           </div>
 
           {/* Services page */}
-          {/* <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12">Services</h2>
-
-            <div className="grid grid-cols-2 gap-6 mb-12">
-              <div className="bg-gray-50 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold">Network Security</h3>
-                </div>
-                <p className="text-gray-600">
-                  24/7 monitoring, threat detection, and immediate response to
-                  security incidents
-                </p>
-              </div>
-
-              <div className="bg-gray-50 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Server className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold">
-                    Infrastructure Management
-                  </h3>
-                </div>
-                <p className="text-gray-600">
-                  Proactive maintenance and optimization of your network
-                  infrastructure
-                </p>
-              </div>
-            </div>
-          </div> */}
           {proposalTypeInfo.id === "unm" && <UNMServices />}
           {proposalTypeInfo.id === "msp" && <MSPServices />}
 
@@ -465,13 +435,41 @@ export default function ReviewStep({
                       Monthly Recurring Charges (MRC)
                     </h3>
                   </div>
-                  <p className="text-gray-600 mb-4">
-                    Billed monthly for 36 months
-                  </p>
-                  <p className="text-4xl font-bold text-blue-600">
-                    ${formatCurrency(fees.mrc)}
-                    <span className="text-lg text-gray-500">/month</span>
-                  </p>
+                  {proposalTypeInfo.id === "msp" ? (
+                    <div className="space-y-4">
+                      {fees
+                        .filter((fee: Fee) => fee.type === "mrc")
+                        .map((fee: Fee) => (
+                          <div
+                            key={fee.id}
+                            className="flex items-center justify-between"
+                          >
+                            <p className="text-gray-600">{fee.description}</p>
+                            <p className="text-3xl font-bold text-blue-600">
+                              {formatCurrency(
+                                parseFloat(fee.feesPerUser || "0")
+                              )}
+                              /user x {fee.totalUser} Users
+                            </p>
+                          </div>
+                        ))}
+                      <div className="pt-4 border-t border-gray-200">
+                        <p className="text-gray-600">Total Monthly Fee</p>
+                        <p className="text-4xl font-bold text-blue-600">
+                          {formatCurrency(calculateMRCTotal())}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-gray-600 mb-4">
+                        Billed monthly for 36 months
+                      </p>
+                      <p className="text-4xl font-bold text-blue-600">
+                        {formatCurrency(calculateMRCTotal())}
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -486,29 +484,31 @@ export default function ReviewStep({
                   One-time setup and installation
                 </p>
                 <p className="text-4xl font-bold text-blue-600">
-                  ${formatCurrency(calculateNRCTotal())}
+                  {formatCurrency(calculateNRCTotal())}
                 </p>
                 <div className="mt-6 space-y-4">
-                  {fees.nrc.map((fee, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between items-start text-sm"
-                    >
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {fee.description}
-                        </p>
-                        {fee.notes && (
-                          <p className="text-xs text-gray-600 mt-1">
-                            {fee.notes}
+                  {fees
+                    .filter((fee: Fee) => fee.type === "nrc")
+                    .map((fee: Fee) => (
+                      <div
+                        key={fee.id}
+                        className="flex justify-between items-start text-sm"
+                      >
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {fee.description}
                           </p>
-                        )}
+                          {fee.notes && (
+                            <p className="text-xs text-gray-600 mt-1">
+                              {fee.notes}
+                            </p>
+                          )}
+                        </div>
+                        <p className="font-medium text-gray-900">
+                          {formatCurrency(parseFloat(fee.amount))}
+                        </p>
                       </div>
-                      <p className="font-medium text-gray-900">
-                        ${formatCurrency(fee.amount)}
-                      </p>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             </div>
@@ -737,27 +737,31 @@ export default function ReviewStep({
               One-Time Charges (NRC)
             </h4>
             <div className="space-y-3">
-              {fees.nrc.map((fee) => (
-                <div
-                  key={fee.id}
-                  className="flex items-start justify-between bg-white p-3 rounded-lg"
-                >
-                  <div>
-                    <h5 className="text-sm font-medium text-gray-900">
-                      {fee.description}
-                    </h5>
-                    {fee.notes && (
-                      <p className="text-xs text-gray-500 mt-1">{fee.notes}</p>
-                    )}
+              {fees
+                .filter((fee: Fee) => fee.type === "nrc")
+                .map((fee: Fee) => (
+                  <div
+                    key={fee.id}
+                    className="flex items-start justify-between bg-white p-3 rounded-lg"
+                  >
+                    <div>
+                      <h5 className="text-sm font-medium text-gray-900">
+                        {fee.description}
+                      </h5>
+                      {fee.notes && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {fee.notes}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {formatCurrency(parseFloat(fee.amount))}
+                    </div>
                   </div>
-                  <div className="text-sm font-medium text-gray-900">
-                    ${formatCurrency(fee.amount)}
-                  </div>
-                </div>
-              ))}
+                ))}
               <div className="flex justify-end pt-3 border-t border-gray-200">
                 <div className="text-sm font-medium text-gray-900">
-                  Total NRC: ${formatCurrency(calculateNRCTotal())}
+                  Total NRC: {formatCurrency(calculateNRCTotal())}
                 </div>
               </div>
             </div>
@@ -765,18 +769,46 @@ export default function ReviewStep({
 
           {/* MRC - Only show if not buildouts */}
           {proposalTypeInfo.id !== "buildouts" && (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">
-                Monthly Fee (MRC)
-              </h4>
-              <div className="flex justify-between items-center bg-white p-3 rounded-lg">
-                <h5 className="text-sm font-medium text-gray-900">
-                  Monthly Service Fee
-                </h5>
-                <div className="text-sm font-medium text-gray-900">
-                  ${formatCurrency(fees.mrc)}/month
-                </div>
+            <div className="bg-gray-50 rounded-lg p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Clock className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-semibold">
+                  Monthly Recurring Charges (MRC)
+                </h3>
               </div>
+              {proposalTypeInfo.id === "msp" ? (
+                <div className="space-y-4">
+                  {fees
+                    .filter((fee: Fee) => fee.type === "mrc")
+                    .map((fee: Fee) => (
+                      <div
+                        key={fee.id}
+                        className="flex items-center justify-between"
+                      >
+                        <p className="text-gray-600">{fee.description}</p>
+                        <p className="text-3xl text-blue-600 font-bold">
+                          {formatCurrency(parseFloat(fee.feesPerUser || "0"))}
+                          /user x {fee.totalUser} Users
+                        </p>
+                      </div>
+                    ))}
+                  <div className="pt-4 border-t border-gray-200">
+                    <p className="text-gray-600">Total Monthly Fee</p>
+                    <p className="text-4xl font-bold text-blue-600">
+                      {formatCurrency(calculateMRCTotal())}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-gray-600 mb-4">
+                    Billed monthly for 36 months
+                  </p>
+                  <p className="text-4xl font-bold text-blue-600">
+                    {formatCurrency(calculateMRCTotal())}
+                  </p>
+                </>
+              )}
             </div>
           )}
         </div>
