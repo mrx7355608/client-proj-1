@@ -110,10 +110,12 @@ export default function MSPServices() {
     description?: string;
   }) => (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4 bg-gray-100 p-2">
-        {title}
-      </h2>
-      {description && <p className="text-gray-700 mb-4">{description}</p>}
+      {title && (
+        <h2 className="text-xl font-semibold text-gray-900 bg-gray-100 p-2">
+          {title}
+        </h2>
+      )}
+      {description && <p className="text-gray-700 my-4">{description}</p>}
       <div className="space-y-2">
         {items.map((item, index) => (
           <div
@@ -234,8 +236,9 @@ export default function MSPServices() {
       </div>
 
       <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+        <h2 className="text-3xl font-bold text-gray-900">Qualifications</h2>
         <BulletPointSection
-          title="Qualifications"
+          title=""
           items={[
             "A Network Rack or Cabinet must be available for all Unified Equipment",
             "Proper ventilation and temperature controls inside the Network environment.",
