@@ -46,6 +46,7 @@ interface ReviewStepProps {
       quantity: number;
       category: string;
       image_url: string | null;
+      unit_price?: number;
     }[];
   }[];
   fees: Fee[];
@@ -72,6 +73,8 @@ export default function ReviewStep({
   const [isRequesting, setIsRequesting] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const { proposal, setProposal } = useProposal();
+
+  console.log(sections);
 
   useEffect(() => {
     saveQuote("draft");
@@ -131,7 +134,7 @@ export default function ReviewStep({
         inventory_item_id: item.inventory_item_id,
         name: item.name,
         quantity: item.quantity,
-        unit_price: 0,
+        unit_price: item.unit_price || 0,
         is_recurring: false,
       }))
     );
@@ -407,8 +410,18 @@ export default function ReviewStep({
                                 {item.category}
                               </p>
                             </div>
-                            <div className="text-sm font-medium text-gray-900">
-                              Quantity: {item.quantity}
+                            <div className="flex items-center gap-6">
+                              {proposalTypeInfo.id === "buildouts" &&
+                                item.unit_price !== undefined && (
+                                  <div className="px-4 py-2 rounded-lg">
+                                    <span className="text-base font-semibold text-green-700">
+                                      ${item.unit_price.toLocaleString()} / unit
+                                    </span>
+                                  </div>
+                                )}
+                              <div className="text-sm font-medium text-gray-900">
+                                Quantity: {item.quantity}
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -541,13 +554,13 @@ export default function ReviewStep({
           </div>
 
           {/* Labour section */}
-          {proposalTypeInfo.id === "buildouts" && (
+          {/* {proposalTypeInfo.id === "buildouts" && (
             <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
               <h2 className="text-3xl font-bold text-gray-900 mb-12">Labour</h2>
 
               <div className="space-y-6 text-gray-600"></div>
             </div>
-          )}
+          )} */}
 
           {/* Terms & Conditions */}
           {proposalTypeInfo.id === "unm" && <UNMTermsOfService />}
@@ -714,8 +727,18 @@ export default function ReviewStep({
                         </h5>
                         <p className="text-xs text-gray-500">{item.category}</p>
                       </div>
-                      <div className="text-sm font-medium text-gray-900">
-                        Qty: {item.quantity}
+                      <div className="flex items-center gap-4">
+                        {proposalTypeInfo.id === "buildouts" &&
+                          item.unit_price !== undefined && (
+                            <div className="px-3 py-1.5 rounded-lg">
+                              <span className="text-sm font-bold text-green-700">
+                                ${item.unit_price.toLocaleString()} / unit
+                              </span>
+                            </div>
+                          )}
+                        <div className="text-sm font-medium text-gray-900">
+                          Qty: {item.quantity}
+                        </div>
                       </div>
                     </div>
                   ))}

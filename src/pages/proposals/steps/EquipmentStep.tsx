@@ -36,6 +36,7 @@ interface Section {
     quantity: number;
     category: string;
     image_url: string | null;
+    unit_price?: number;
   }[];
 }
 
@@ -43,6 +44,7 @@ interface EquipmentStepProps {
   sections: Section[];
   onBack: () => void;
   onSubmit: (sections: Section[]) => void;
+  proposalType: string;
 }
 
 interface InventoryItem {
@@ -317,7 +319,9 @@ function SortableSection({
   onAddEquipment,
   onRemoveEquipment,
   onUpdateQuantity,
+  onPriceChange,
   equipment,
+  proposalType,
 }: {
   section: Section;
   onUpdate: (id: string, name: string) => void;
@@ -329,7 +333,9 @@ function SortableSection({
     itemId: string,
     quantity: number
   ) => void;
+  onPriceChange: (sectionId: string, itemId: string, price: number) => void;
   equipment: Record<string, InventoryItem>;
+  proposalType: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: section.id });
@@ -378,6 +384,8 @@ function SortableSection({
           const itemDetails = equipment[item.inventory_item_id];
           if (!itemDetails) return null;
 
+          const displayPrice = item.unit_price ?? itemDetails.unit_price;
+
           return (
             <div
               key={item.inventory_item_id}
@@ -399,7 +407,7 @@ function SortableSection({
                 <h3 className="text-sm font-medium text-gray-900">
                   {itemDetails.name}
                 </h3>
-                {itemDetails.description && (
+                {proposalType === "buildouts" && itemDetails.description && (
                   <p className="text-sm text-gray-600 mt-0.5 mb-2 line-clamp-2">
                     {itemDetails.description}
                   </p>
@@ -422,11 +430,32 @@ function SortableSection({
               </div>
 
               <div className="flex items-center gap-4">
-                {itemDetails.unit_price !== null && (
-                  <div className="flex items-center px-3 py-1.5 bg-green-50 border border-green-100 rounded-lg">
-                    <span className="text-sm font-medium text-green-700">
-                      ${itemDetails.unit_price.toLocaleString()}
-                    </span>
+                {proposalType === "buildouts" && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">$</span>
+                    <input
+                      type="number"
+                      value={displayPrice ?? ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          onPriceChange(section.id, item.inventory_item_id, 0);
+                        } else {
+                          const price = parseFloat(value);
+                          if (!isNaN(price)) {
+                            onPriceChange(
+                              section.id,
+                              item.inventory_item_id,
+                              price
+                            );
+                          }
+                        }
+                      }}
+                      className="w-24 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
                   </div>
                 )}
                 <button
@@ -478,6 +507,7 @@ export default function EquipmentStep({
   sections: initialSections,
   onBack,
   onSubmit,
+  proposalType,
 }: EquipmentStepProps) {
   const [sections, setSections] = useState<Section[]>(initialSections);
   const [equipmentDetails, setEquipmentDetails] = useState<
@@ -603,6 +633,7 @@ export default function EquipmentStep({
                 inventory_item_id: item.id,
                 category: item.category,
                 image_url: item.image_url,
+                unit_price: item.unit_price || undefined,
               },
             ],
           };
@@ -742,6 +773,27 @@ export default function EquipmentStep({
     }
   };
 
+  const handlePriceChange = (
+    sectionId: string,
+    itemId: string,
+    price: number
+  ) => {
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              equipment: section.equipment.map((item) =>
+                item.inventory_item_id === itemId
+                  ? { ...item, unit_price: price }
+                  : item
+              ),
+            }
+          : section
+      )
+    );
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex justify-between items-start mb-8">
@@ -792,7 +844,9 @@ export default function EquipmentStep({
                 onAddEquipment={addEquipmentToSection}
                 onRemoveEquipment={removeEquipmentFromSection}
                 onUpdateQuantity={updateEquipmentQuantity}
+                onPriceChange={handlePriceChange}
                 equipment={equipmentDetails}
+                proposalType={proposalType}
               />
             ))}
           </SortableContext>

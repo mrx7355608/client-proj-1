@@ -68,6 +68,7 @@ export default function ProposalItem({ data }: Props) {
             sections={sections}
             onBack={onBack}
             onSubmit={handleEquipmentSubmit}
+            proposalType={data.name.toLocaleLowerCase()}
           />
         )}
         {currentStep === 3 && (
