@@ -2,19 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Save } from "lucide-react";
 import { useProposal } from "../../../contexts/proposals";
 import { saveProposal } from "../../../lib/data/proposals.data";
-import { QuoteInput } from "../../../lib/types";
-
-interface ClientForm {
-  name: string;
-  title: string;
-  email: string;
-  phone: string;
-  organization: string;
-  streetAddress: string;
-  city: string;
-  state: string;
-  zipCode: string;
-}
+import { QuoteInput, ClientForm } from "../../../lib/types";
 
 interface ClientInfoStepProps {
   proposalName: string;
@@ -100,7 +88,9 @@ export default function ClientInfoStep({
       const quote = await saveProposal(
         proposal?.id || null,
         quoteData,
-        quoteVariables
+        quoteVariables,
+        [],
+        []
       );
       setProposal(quote); // Update the quote in context
       alert("Proposal saved as draft");

@@ -23,7 +23,7 @@ export const generatePDF = async (
   cinfo: any,
   proposalId: string,
   sections: Section[],
-  fees: { nrc: Fee[]; mrc: string },
+  fees: { nrc: Fee[]; mrc: string }
 ) => {
   const pdfBlob = await pdf(
     <MyProposalPdf
@@ -33,16 +33,30 @@ export const generatePDF = async (
       pdfFilename={filename}
       fees={fees}
       sections={sections}
-    />,
+    />
   ).toBlob();
 
   // Update pdfname in quotes table
-  const { error } = await supabase
-    .from("quotes")
-    .update({ agreement_name: filename })
-    .eq("id", proposalId);
-  if (error) return alert("There was an error while generating pdf");
+  // const { error } = await supabase
+  //   .from("quotes")
+  //   .update({ agreement_name: filename })
+  //   .eq("id", proposalId);
+  // if (error) return alert("There was an error while generating pdf");
 
-  const p = await uploadToSupabase(pdfBlob, filename);
-  return p.path;
+  // const p = await uploadToSupabase(pdfBlob, filename);
+  // return p.path;
+
+  // Download pdf
+  const url = URL.createObjectURL(pdfBlob);
+  // Create a temporary anchor element
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${filename}.pdf`; // Name of the downloaded file
+  document.body.appendChild(link);
+
+  // Programmatically click the link to trigger the download
+  link.click();
+
+  // Clean up
+  document.body.removeChild(link);
 };

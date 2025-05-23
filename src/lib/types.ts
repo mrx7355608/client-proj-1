@@ -1,27 +1,3 @@
-export interface Section {
-  id: string;
-  name: string;
-  equipment: {
-    inventory_item_id: string;
-    name: string;
-    quantity: number;
-    category: string;
-    image_url: string | null;
-  }[];
-}
-
-export interface FeeInput {
-  description: string;
-  amount: string;
-  notes: string;
-  type: "nrc" | "mrc";
-  totalUser?: string;
-  feesPerUser?: string;
-}
-export interface Fee extends FeeInput {
-  id: string;
-}
-
 export interface ClientForm {
   name: string;
   title: string;
@@ -32,6 +8,30 @@ export interface ClientForm {
   city: string;
   state: string;
   zipCode: string;
+}
+
+export interface Section {
+  id: string;
+  name: string;
+  equipment: {
+    inventory_item_id: string;
+    name: string;
+    quantity: number;
+    category: string;
+    image_url: string | null;
+    description?: string;
+  }[];
+}
+export interface FeeInput {
+  description: string;
+  amount: string;
+  notes: string;
+  type: "nrc" | "mrc";
+  totalUser?: string;
+  feesPerUser?: string;
+}
+export interface Fee extends FeeInput {
+  id: string;
 }
 
 export interface Quote {

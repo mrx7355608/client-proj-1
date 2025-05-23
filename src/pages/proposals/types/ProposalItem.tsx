@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ClientInfoStep from "../steps/ClientInfoStep";
 import EquipmentStep from "../steps/EquipmentStep";
 import FeesStep from "../steps/FeesStep";
 import ReviewStep from "../steps/ReviewStep";
 import { useProposal } from "../../../contexts/proposals";
-import { ClientForm, Section, Fee } from "../../../lib/types";
+import { Fee, ClientForm, Section } from "../../../lib/types";
 
 type Props = {
   data: {
@@ -28,6 +28,7 @@ const INITIAL_CLIENT_FORM: ClientForm = {
   state: "",
   zipCode: "",
 };
+
 export default function ProposalItem({ data }: Props) {
   const [clientForm, setClientForm] = useState<ClientForm>(INITIAL_CLIENT_FORM);
   const [sections, setSections] = useState<Section[]>([

@@ -111,9 +111,10 @@ export default function ReviewStep({
       term_months: 36,
       notes: `Proposal for ${clientInfo.organization}`,
       total_users:
-        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0].totalUser) || 0,
+        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0]?.totalUser) ||
+        0,
       amount_per_user:
-        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0].feesPerUser) ||
+        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0]?.feesPerUser) ||
         0,
     };
 
@@ -200,7 +201,7 @@ export default function ReviewStep({
       setIsGeneratingPDF(false);
       console.log("PDF generated!");
 
-      location.href = `/request-signature/${proposal?.id}?pdf=${pdfLink}&name=${quote.title}`;
+      // location.href = `/request-signature/${proposal?.id}?pdf=${pdfLink}&name=${quote.title}`;
     } catch (error) {
       console.log(error);
       setIsRequesting(false);

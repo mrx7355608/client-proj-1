@@ -39,6 +39,7 @@ const mockSections = [
 
 export default function RenderPreview() {
   const proposalTypeInfo = {
+    id: "unm",
     name: "Managed IT Services",
     description: "Managed Service Provider",
   };
