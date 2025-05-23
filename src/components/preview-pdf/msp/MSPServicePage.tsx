@@ -11,7 +11,13 @@ const BulletPointSection = ({
   description?: string;
 }) => (
   <View style={styles.paragraphContainer}>
-    {title && <Text style={styles.sectionTitle}>{title}</Text>}
+    {title && (
+      <Text
+        style={{ ...styles.sectionTitle, backgroundColor: "#eee", padding: 6 }}
+      >
+        {title}
+      </Text>
+    )}
     {description && <Text style={styles.paragraph}>{description}</Text>}
     {items.map((item, index) => (
       <View key={index} style={styles.listItem}>
@@ -30,7 +36,11 @@ const ParagraphSection = ({
   content: string;
 }) => (
   <View style={styles.paragraphContainer}>
-    <Text style={styles.sectionTitle}>{title}</Text>
+    <Text
+      style={{ ...styles.sectionTitle, backgroundColor: "#eee", padding: 6 }}
+    >
+      {title}
+    </Text>
     <Text style={styles.paragraph}>{content}</Text>
   </View>
 );
@@ -162,6 +172,9 @@ export default function MSPServicePage() {
           title="User Support Access"
           content={userSupportAccess.content}
         />
+      </View>
+
+      <View style={styles.page}>
         <ParagraphSection
           title="Ticketing System Features"
           content={ticketingSystem.content}
@@ -172,9 +185,8 @@ export default function MSPServicePage() {
           description="Onsite services will be included on an as-Needed basis. ITX Solutions will supply onsite support to fulfill end user IT related issues and questions."
         />
       </View>
-
       <View style={styles.page}>
-        <Text style={styles.title}>
+        <Text style={{ ...styles.title, fontSize: 22 }}>
           Unified Network / Cloud Management Services (SLA)
         </Text>
         <Text style={styles.paragraph}>
@@ -182,7 +194,15 @@ export default function MSPServicePage() {
           cloud management support service for the unified network systems.
         </Text>
 
-        <Text style={styles.subtitle}>Network System Administration</Text>
+        <Text
+          style={{
+            ...styles.sectionTitle,
+            backgroundColor: "#eee",
+            padding: 6,
+          }}
+        >
+          Network System Administration
+        </Text>
         <Text style={styles.paragraph}>
           The SLA is bundled with discretionary onsite system administration
           hours that you can use whenever you need our engineers to perform
@@ -197,14 +217,14 @@ export default function MSPServicePage() {
           title="Unified Features & Benefits"
           items={unifiedFeatures}
         />
+      </View>
+
+      <View style={styles.page}>
         <BulletPointSection
           title="Unified Comprehensive Services"
           items={unifiedServices}
           description="On-site engineer can perform any of these tasks:"
         />
-      </View>
-
-      <View style={styles.page}>
         <BulletPointSection
           title="Unified Troubleshooting Benefits with Third Party Vendors"
           items={unifiedTroubleshooting}
