@@ -1,7 +1,13 @@
 import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { Fee } from "../../lib/types";
 
-const ServiceFeesPage = ({ fees }: { fees: Fee[] }) => {
+const ServiceFeesPage = ({
+  fees,
+  proposalType,
+}: {
+  fees: Fee[];
+  proposalType?: string;
+}) => {
   const formatCurrency = (value: number) => {
     return value.toFixed(2);
   };
@@ -12,12 +18,20 @@ const ServiceFeesPage = ({ fees }: { fees: Fee[] }) => {
       .reduce((total: number, fee: Fee) => total + Number(fee.amount), 0);
   };
 
+  const getMRCFee = () => fees.find((fee) => fee.type === "mrc");
   const getMRCAmount = () => {
-    const mrcFee = fees.find((fee) => fee.type === "mrc");
+    const mrcFee = getMRCFee();
     return mrcFee ? Number(mrcFee.amount) : 0;
   };
 
   const nrcFees = fees.filter((fee) => fee.type === "nrc");
+  const mrcFee = getMRCFee();
+
+  // For MSP: extract per user and user count if available
+  const perUser =
+    mrcFee && mrcFee.feesPerUser ? Number(mrcFee.feesPerUser) : undefined;
+  const totalUsers =
+    mrcFee && mrcFee.totalUser ? Number(mrcFee.totalUser) : undefined;
 
   return (
     <Page style={styles.page}>
@@ -38,12 +52,39 @@ const ServiceFeesPage = ({ fees }: { fees: Fee[] }) => {
             </View>
           </View>
 
-          <Text style={styles.feeSubText}>Billed Monthly for 36 months</Text>
-
-          <Text style={styles.amountText}>
-            ${formatCurrency(getMRCAmount())}
-            <Text style={styles.amountUnit}>/month</Text>
-          </Text>
+          {proposalType === "msp" && perUser && totalUsers ? (
+            <>
+              <View
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  width: "100%",
+                }}
+              >
+                <Text style={styles.feeSubText}>Monthly Service Fee</Text>
+                <Text style={styles.mspPerUserText}>
+                  ${formatCurrency(perUser)}/user x {totalUsers} Users
+                </Text>
+              </View>
+              <View style={styles.divider} />
+              <Text style={styles.feeSubText}>Total Monthly Fee</Text>
+              <Text style={styles.totalAmount}>
+                ${formatCurrency(getMRCAmount())}
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.feeSubText}>
+                Billed Monthly for 36 months
+              </Text>
+              <Text style={styles.amountText}>
+                ${formatCurrency(getMRCAmount())}
+                <Text style={styles.amountUnit}>/month</Text>
+              </Text>
+            </>
+          )}
         </View>
 
         {/* NRC Section */}
@@ -146,6 +187,20 @@ const styles = StyleSheet.create({
   feeSubText: {
     fontSize: 11,
     color: "#6B7280",
+    marginBottom: 0,
+    marginTop: 4,
+  },
+  mspPerUserText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#2563EB",
+    marginBottom: 8,
+  },
+  divider: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#D1D5DB",
+    marginVertical: 5,
+    width: "100%",
   },
   nrcList: {
     marginTop: 16,
@@ -174,25 +229,12 @@ const styles = StyleSheet.create({
   nrcAmount: {
     fontSize: 9,
   },
-  totalBox: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    backgroundColor: "#F3F4F6",
-    padding: 8,
-    borderRadius: 6,
-    marginTop: 16,
-  },
-  totalLabel: {
-    fontSize: 10,
-    color: "#6B7280",
-  },
   totalAmount: {
     fontSize: 20,
     fontWeight: "600",
     color: "#2563EB",
     marginLeft: 4,
-    marginTop: 12,
+    marginTop: 8,
   },
   amountText: {
     fontSize: 24,
@@ -220,7 +262,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   bulletPoint: {
     width: 6,
@@ -229,7 +271,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#2563EB",
   },
   termText: {
-    fontSize: 10,
+    fontSize: 11,
     color: "#6B7280",
   },
   icons: {

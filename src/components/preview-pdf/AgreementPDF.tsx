@@ -29,7 +29,7 @@ const MyProposalPdf = ({
 
       <EquipmentPage sections={sections} proposalType={proposalTypeInfo.id} />
 
-      <ServiceFeesPage fees={fees} />
+      <ServiceFeesPage fees={fees} proposalType={proposalTypeInfo.id} />
 
       {proposalTypeInfo.id === "unm" && <UNMTermsPage />}
       {proposalTypeInfo.id === "msp" && <MSPTermsPage />}
