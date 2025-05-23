@@ -12,9 +12,11 @@ export interface Section {
 
 export interface FeeInput {
   description: string;
-  amount: number;
+  amount: string;
   notes: string;
   type: "nrc" | "mrc";
+  totalUser?: string;
+  feesPerUser?: string;
 }
 export interface Fee extends FeeInput {
   id: string;
@@ -74,6 +76,8 @@ export interface QuoteInput {
   total_nrc: number;
   term_months: number;
   notes: string;
+  total_users?: number;
+  amount_per_user?: number;
 }
 
 export interface QuoteVariableInput {

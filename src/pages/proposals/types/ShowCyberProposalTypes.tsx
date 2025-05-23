@@ -19,6 +19,7 @@ export default function ShowCyberProposalTypes({
       description: "Vulnerability scans for your whole system",
       icon: <ShieldAlert className="w-6 h-6" />,
       color: "bg-red-500",
+      bgImage: "/proposal-cyber-bg.png",
     },
     {
       id: "pentest",
@@ -26,6 +27,7 @@ export default function ShowCyberProposalTypes({
       description: "Pen Testing Solutions",
       icon: <Bug className="w-6 h-6" />,
       color: "bg-red-500",
+      bgImage: "/proposal-cyber-bg.png",
     },
     {
       id: "compliancy",
@@ -33,6 +35,7 @@ export default function ShowCyberProposalTypes({
       description: "Compliancy Service",
       icon: <BadgeCheck className="w-6 h-6" />,
       color: "bg-red-500",
+      bgImage: "/proposal-cyber-bg.png",
     },
     {
       id: "fullsuite",
@@ -40,6 +43,7 @@ export default function ShowCyberProposalTypes({
       description: "Complete Cybersecurity Package",
       icon: <Layers className="w-6 h-6" />,
       color: "bg-red-500",
+      bgImage: "/proposal-cyber-bg.png",
     },
   ];
 

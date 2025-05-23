@@ -1,74 +1,90 @@
-import React, { useState } from "react";
-import { Plus, Trash2, DollarSign } from "lucide-react";
-
-interface Fee {
-  id: string;
-  description: string;
-  amount: string;
-  notes: string;
-  type: "nrc" | "mrc";
-}
+import React, { useState, useCallback } from "react";
+import { Plus } from "lucide-react";
+import MSPMRCInputs from "./MRCMSPInput";
+import NRCFeeItem from "./NRCFeeItem";
+import MRCInput from "./MRCInput";
+import { Fee } from "../../../lib/types";
 
 interface FeesStepProps {
-  initialNRC: Fee[];
-  initialMRC: string;
+  proposalType: string;
+  fees: Fee[];
   onBack: () => void;
   onSubmit: (fees: Fee[]) => void;
 }
 
 export default function FeesStep({
-  initialNRC,
-  initialMRC,
+  proposalType,
+  fees,
   onBack,
   onSubmit,
 }: FeesStepProps) {
-  console.log(initialNRC);
-  const [fees, setFees] = useState<Fee[]>(initialNRC);
-  const [mrcAmount, setMrcAmount] = useState(initialMRC);
+  const [proposalFees, setProposalFees] = useState<Fee[]>(fees);
+  const [perUserAmount, setPerUserAmount] = useState("");
+  const [totalUsers, setTotalUsers] = useState("");
 
-  const addFee = () => {
-    setFees([
-      ...fees,
+  // Calculate total MRC for MSP proposals
+  const calculateTotalMRC = useCallback(() => {
+    if (proposalType === "msp") {
+      const perUser = parseFloat(perUserAmount) || 0;
+      const users = parseInt(totalUsers) || 0;
+      return (perUser * users).toString();
+    }
+    const mrcFee = proposalFees.find((fee) => fee.type === "mrc");
+    return mrcFee ? mrcFee.amount : "";
+  }, [proposalType, perUserAmount, totalUsers, proposalFees]);
+
+  const addFee = useCallback((type: string) => {
+    setProposalFees((prev) => [
+      ...prev,
       {
         id: crypto.randomUUID(),
         description: "",
         amount: "",
         notes: "",
-        type: "nrc",
+        type: type as "nrc" | "mrc",
       },
     ]);
-  };
+  }, []);
 
-  const updateFee = (id: string, field: keyof Fee, value: string) => {
-    setFees(
-      fees.map((fee) => (fee.id === id ? { ...fee, [field]: value } : fee)),
-    );
-  };
+  const updateFee = useCallback(
+    (id: string, field: keyof Fee, value: string) => {
+      setProposalFees((prev) =>
+        prev.map((fee) => (fee.id === id ? { ...fee, [field]: value } : fee))
+      );
+    },
+    []
+  );
 
-  const removeFee = (id: string) => {
-    setFees(fees.filter((fee) => fee.id !== id));
-  };
+  const removeFee = useCallback((id: string) => {
+    setProposalFees((prev) => prev.filter((fee) => fee.id !== id));
+  }, []);
 
-  const calculateNRCTotal = () => {
-    return fees.reduce((sum, fee) => sum + (parseFloat(fee.amount) || 0), 0);
-  };
+  const calculateNRCTotal = useCallback(() => {
+    return proposalFees
+      .filter((fee) => fee.type === "nrc")
+      .reduce((sum, fee) => sum + (parseFloat(fee.amount) || 0), 0);
+  }, [proposalFees]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Create an MRC fee if amount is set
-    const allFees = [...fees];
-    if (mrcAmount) {
-      allFees.push({
+    const allFees = proposalFees.filter((fee) => fee.type === "nrc");
+    const totalMRC = calculateTotalMRC();
+    const resultFees = [...allFees];
+    if (proposalType === "msp" && totalMRC) {
+      resultFees.push({
         id: crypto.randomUUID(),
         description: "Monthly Service Fee",
-        amount: mrcAmount,
-        notes: "",
+        amount: totalMRC,
+        notes: `Based on ${totalUsers} users at $${perUserAmount} per user`,
+        totalUser: totalUsers,
+        feesPerUser: perUserAmount,
         type: "mrc",
       });
+    } else if (proposalType !== "msp") {
+      const mrcFee = proposalFees.find((fee) => fee.type === "mrc");
+      if (mrcFee) resultFees.push(mrcFee);
     }
-
-    onSubmit(allFees);
+    onSubmit(resultFees);
   };
 
   return (
@@ -76,10 +92,11 @@ export default function FeesStep({
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900">Fees & Charges</h2>
         <p className="mt-2 text-gray-600">
-          Add one-time and recurring charges for your proposal
+          Add{" "}
+          {proposalType === "buildouts" ? "one-time" : "one-time and recurring"}{" "}
+          charges for your proposal
         </p>
       </div>
-
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* NRC Section */}
         <div>
@@ -94,84 +111,30 @@ export default function FeesStep({
             </div>
             <button
               type="button"
-              onClick={addFee}
+              onClick={() => addFee("nrc")}
               className="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors flex items-center"
             >
               <Plus className="w-4 h-4 mr-1.5" />
               Add Charge
             </button>
           </div>
-
           <div className="space-y-4">
-            {fees.map((fee) => (
-              <div key={fee.id} className="bg-gray-50 rounded-lg p-4 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={fee.description}
-                      onChange={(e) =>
-                        updateFee(fee.id, "description", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g., Installation Fee"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Amount *
-                    </label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <input
-                        type="number"
-                        required
-                        min="0"
-                        step="0.01"
-                        value={fee.amount}
-                        onChange={(e) =>
-                          updateFee(fee.id, "amount", e.target.value)
-                        }
-                        className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Notes
-                  </label>
-                  <textarea
-                    value={fee.notes}
-                    onChange={(e) => updateFee(fee.id, "notes", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={2}
-                    placeholder="Add any additional details about this charge..."
-                  />
-                </div>
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => removeFee(fee.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-            {fees.length === 0 && (
+            {proposalFees
+              .filter((fee) => fee.type === "nrc")
+              .map((fee) => (
+                <NRCFeeItem
+                  key={fee.id}
+                  fee={fee}
+                  updateFee={updateFee}
+                  removeFee={removeFee}
+                />
+              ))}
+            {proposalFees.filter((fee) => fee.type === "nrc").length === 0 && (
               <p className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg">
                 No one-time charges added yet
               </p>
             )}
           </div>
-
           <div className="mt-4 flex justify-end">
             <div className="bg-gray-100 px-4 py-2 rounded-lg">
               <span className="text-sm text-gray-600">Total NRC:</span>
@@ -181,39 +144,67 @@ export default function FeesStep({
             </div>
           </div>
         </div>
-
-        {/* MRC Section */}
-        <div>
-          <div className="mb-4">
-            <h3 className="text-lg font-medium text-gray-800">
-              Monthly Fee (MRC)
-            </h3>
-            <p className="text-sm text-gray-500">
-              Monthly recurring charge for services
-            </p>
-          </div>
-
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Monthly Fee Amount *
-              </label>
-              <div className="relative max-w-xs">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={mrcAmount}
-                  onChange={(e) => setMrcAmount(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="0.00"
+        {/* MRC Section - Only show if not buildouts */}
+        {proposalType !== "buildouts" && (
+          <div>
+            <div className="mb-4">
+              <h3 className="text-lg font-medium text-gray-800">
+                Monthly Fee (MRC)
+              </h3>
+              <p className="text-sm text-gray-500">
+                Monthly recurring charge for services
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4">
+              {proposalType === "msp" ? (
+                <MSPMRCInputs
+                  perUserAmount={perUserAmount}
+                  setPerUserAmount={setPerUserAmount}
+                  totalUsers={totalUsers}
+                  setTotalUsers={setTotalUsers}
                 />
-              </div>
+              ) : (
+                <MRCInput
+                  value={
+                    proposalFees.find((fee) => fee.type === "mrc")?.amount || ""
+                  }
+                  onChange={(v) => {
+                    const mrcFee = proposalFees.find(
+                      (fee) => fee.type === "mrc"
+                    );
+                    if (mrcFee) {
+                      updateFee(mrcFee.id, "amount", v);
+                    } else {
+                      setProposalFees([
+                        ...proposalFees,
+                        {
+                          id: crypto.randomUUID(),
+                          description: "Monthly Service Fee",
+                          amount: v,
+                          notes: "",
+                          type: "mrc",
+                        },
+                      ]);
+                    }
+                  }}
+                />
+              )}
+              {/* Show calculated total for MSP */}
+              {proposalType === "msp" && (
+                <div className="mt-4 flex justify-end">
+                  <div className="bg-gray-100 px-4 py-2 rounded-lg">
+                    <span className="text-sm text-gray-600">
+                      Total Monthly Fee:
+                    </span>
+                    <span className="ml-2 text-lg font-semibold text-gray-900">
+                      ${(parseFloat(calculateTotalMRC()) || 0).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-
+        )}
         <div className="flex justify-end space-x-3 pt-6 border-t">
           <button
             type="button"
@@ -233,4 +224,3 @@ export default function FeesStep({
     </div>
   );
 }
-

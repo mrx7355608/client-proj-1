@@ -44,6 +44,7 @@ export default function ProposalsDashboard() {
   const [recentProposals, setRecentProposals] = useState<RecentProposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isConverting, setIsConverting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -66,7 +67,7 @@ export default function ProposalsDashboard() {
             name,
             company_name
           )
-        `,
+        `
         )
         .order("created_at", { ascending: false });
 
@@ -110,7 +111,7 @@ export default function ProposalsDashboard() {
           client: quote.client,
           created_at: quote.created_at,
           total_value: (quote.total_mrr || 0) * 12 + (quote.total_nrc || 0),
-        })),
+        }))
       );
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -214,6 +215,9 @@ export default function ProposalsDashboard() {
       if (quoteUpdateError) throw quoteUpdateError;
 
       alert("Client created successfully");
+
+      // Refresh the dashboard data
+      await fetchDashboardData();
     } catch (err) {
       console.error(err);
       alert("Unable to convert to client");
@@ -225,6 +229,75 @@ export default function ProposalsDashboard() {
   const getClientDisplayName = (proposal: RecentProposal) => {
     if (!proposal.client) return "N/A";
     return proposal.client.company_name || proposal.client.name || "N/A";
+  };
+
+  const handleDeleteProposal = async (proposalId: string) => {
+    if (!window.confirm("Are you sure you want to delete this proposal?")) {
+      return;
+    }
+
+    try {
+      setDeletingId(proposalId);
+
+      // First get the quote to check its status and client_id
+      const { data: quote, error: quoteError } = await supabase
+        .from("quotes")
+        .select("status, client_id")
+        .eq("id", proposalId)
+        .single();
+
+      if (quoteError) throw quoteError;
+
+      // First delete the quote_items
+      const { error: itemsError } = await supabase
+        .from("quote_items")
+        .delete()
+        .eq("quote_id", proposalId);
+
+      if (itemsError) throw itemsError;
+
+      // Delete the quote fees
+      const { error: feesError } = await supabase
+        .from("quote_fees")
+        .delete()
+        .eq("quote_id", proposalId);
+
+      if (feesError) throw feesError;
+
+      // Then delete the quote variables
+      const { error: variablesError } = await supabase
+        .from("quote_variables")
+        .delete()
+        .eq("quote_id", proposalId);
+
+      if (variablesError) throw variablesError;
+
+      // If quote is fulfilled and has a client, delete the client
+      if (quote && quote.status === "fulfilled" && quote.client_id) {
+        const { error: clientError } = await supabase
+          .from("clients")
+          .delete()
+          .eq("id", quote.client_id);
+
+        if (clientError) throw clientError;
+      }
+
+      // Finally delete the proposal
+      const { error: deleteQuoteError } = await supabase
+        .from("quotes")
+        .delete()
+        .eq("id", proposalId);
+
+      if (deleteQuoteError) throw deleteQuoteError;
+
+      // Refresh the dashboard data
+      await fetchDashboardData();
+    } catch (err) {
+      console.error("Error deleting proposal:", err);
+      alert("Unable to delete proposal and its associated items");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   if (isLoading) {
@@ -386,8 +459,8 @@ export default function ProposalsDashboard() {
                           proposal.status === "signed"
                             ? "bg-green-100 text-green-800"
                             : proposal.status === "sent"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-yellow-100 text-yellow-800"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
                         {proposal.status.charAt(0).toUpperCase() +
@@ -413,7 +486,7 @@ export default function ProposalsDashboard() {
                             window.open(
                               `/proposals/edit/${proposal.id}`,
                               "_blank",
-                              "width=1200,height=800",
+                              "width=1200,height=800"
                             );
                           }}
                           className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
@@ -421,7 +494,7 @@ export default function ProposalsDashboard() {
                           Edit
                         </button>
                       )}
-                      {proposal.status === "signed" && (
+                      {proposal.status === "signed" && !proposal.client && (
                         <button
                           onClick={() => handleConvertToClient(proposal.id)}
                           className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
@@ -439,6 +512,13 @@ export default function ProposalsDashboard() {
                           Download PDF
                         </button>
                       )}
+                      <button
+                        onClick={() => handleDeleteProposal(proposal.id)}
+                        className="border border-red-500 text-red-600 px-3 py-1 rounded-full hover:text-white hover:bg-red-500"
+                        disabled={deletingId === proposal.id}
+                      >
+                        {deletingId === proposal.id ? "Deleting..." : "Delete"}
+                      </button>
                     </td>
                   </tr>
                 ))

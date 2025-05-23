@@ -36,6 +36,7 @@ interface Section {
     quantity: number;
     category: string;
     image_url: string | null;
+    unit_price?: number;
   }[];
 }
 
@@ -43,6 +44,7 @@ interface EquipmentStepProps {
   sections: Section[];
   onBack: () => void;
   onSubmit: (sections: Section[]) => void;
+  proposalType: string;
 }
 
 interface InventoryItem {
@@ -55,6 +57,7 @@ interface InventoryItem {
     name: string;
   };
   image_url: string | null;
+  unit_price: number | null;
 }
 
 interface Template {
@@ -171,7 +174,7 @@ function TemplateModal({
               <button
                 onClick={() => {
                   const template = templates.find(
-                    (t) => t.id === selectedTemplate,
+                    (t) => t.id === selectedTemplate
                   );
                   if (template) {
                     onLoad(template);
@@ -226,8 +229,9 @@ function SectionSearch({
           vendor:inventory_vendors (
             name
           ),
-          image_url
-        `,
+          image_url,
+          unit_price
+        `
         )
         .ilike("name", `%${query}%`)
         .limit(5);
@@ -315,7 +319,9 @@ function SortableSection({
   onAddEquipment,
   onRemoveEquipment,
   onUpdateQuantity,
+  onPriceChange,
   equipment,
+  proposalType,
 }: {
   section: Section;
   onUpdate: (id: string, name: string) => void;
@@ -325,9 +331,11 @@ function SortableSection({
   onUpdateQuantity: (
     sectionId: string,
     itemId: string,
-    quantity: number,
+    quantity: number
   ) => void;
+  onPriceChange: (sectionId: string, itemId: string, price: number) => void;
   equipment: Record<string, InventoryItem>;
+  proposalType: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: section.id });
@@ -376,10 +384,12 @@ function SortableSection({
           const itemDetails = equipment[item.inventory_item_id];
           if (!itemDetails) return null;
 
+          const displayPrice = item.unit_price ?? itemDetails.unit_price;
+
           return (
             <div
               key={item.inventory_item_id}
-              className="flex items-center gap-4 p-3 bg-white rounded-lg"
+              className="flex items-center gap-4 p-4 bg-white rounded-lg"
             >
               {itemDetails.image_url ? (
                 <img
@@ -397,8 +407,13 @@ function SortableSection({
                 <h3 className="text-sm font-medium text-gray-900">
                   {itemDetails.name}
                 </h3>
+                {proposalType === "buildouts" && itemDetails.description && (
+                  <p className="text-sm text-gray-600 mt-0.5 mb-2 line-clamp-2">
+                    {itemDetails.description}
+                  </p>
+                )}
                 {itemDetails.sku && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 mt-1">
                     SKU: {itemDetails.sku}
                   </p>
                 )}
@@ -414,14 +429,42 @@ function SortableSection({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
+                {proposalType === "buildouts" && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">$</span>
+                    <input
+                      type="number"
+                      value={displayPrice ?? ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          onPriceChange(section.id, item.inventory_item_id, 0);
+                        } else {
+                          const price = parseFloat(value);
+                          if (!isNaN(price)) {
+                            onPriceChange(
+                              section.id,
+                              item.inventory_item_id,
+                              price
+                            );
+                          }
+                        }
+                      }}
+                      className="w-24 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() =>
                     onUpdateQuantity(
                       section.id,
                       item.inventory_item_id,
-                      Math.max(0, item.quantity - 1),
+                      Math.max(0, item.quantity - 1)
                     )
                   }
                   className="p-1 text-gray-500 hover:text-gray-700"
@@ -435,7 +478,7 @@ function SortableSection({
                     onUpdateQuantity(
                       section.id,
                       item.inventory_item_id,
-                      item.quantity + 1,
+                      item.quantity + 1
                     )
                   }
                   className="p-1 text-gray-500 hover:text-gray-700"
@@ -464,6 +507,7 @@ export default function EquipmentStep({
   sections: initialSections,
   onBack,
   onSubmit,
+  proposalType,
 }: EquipmentStepProps) {
   const [sections, setSections] = useState<Section[]>(initialSections);
   const [equipmentDetails, setEquipmentDetails] = useState<
@@ -496,8 +540,9 @@ export default function EquipmentStep({
             vendor:inventory_vendors (
               name
             ),
-            image_url
-          `,
+            image_url,
+            unit_price
+          `
           )
           .in("id", Array.from(itemIds));
 
@@ -531,7 +576,7 @@ export default function EquipmentStep({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   const addNewSection = () => {
@@ -548,8 +593,8 @@ export default function EquipmentStep({
   const updateSectionName = (sectionId: string, name: string) => {
     setSections(
       sections.map((section) =>
-        section.id === sectionId ? { ...section, name } : section,
-      ),
+        section.id === sectionId ? { ...section, name } : section
+      )
     );
   };
 
@@ -563,7 +608,7 @@ export default function EquipmentStep({
       sections.map((section) => {
         if (section.id === sectionId) {
           const existingItem = section.equipment.find(
-            (e) => e.inventory_item_id === item.id,
+            (e) => e.inventory_item_id === item.id
           );
           if (existingItem) {
             console.log("adding exisiting:", section);
@@ -572,7 +617,7 @@ export default function EquipmentStep({
               equipment: section.equipment.map((e) =>
                 e.inventory_item_id === item.id
                   ? { ...e, quantity: e.quantity + 1 }
-                  : e,
+                  : e
               ),
             };
           }
@@ -588,12 +633,14 @@ export default function EquipmentStep({
                 inventory_item_id: item.id,
                 category: item.category,
                 image_url: item.image_url,
+                unit_price: item.unit_price || undefined,
+                description: item.description,
               },
             ],
           };
         }
         return section;
-      }),
+      })
     );
 
     setEquipmentDetails((prev) => ({
@@ -609,18 +656,18 @@ export default function EquipmentStep({
           ? {
               ...section,
               equipment: section.equipment.filter(
-                (e) => e.inventory_item_id !== itemId,
+                (e) => e.inventory_item_id !== itemId
               ),
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
   const updateEquipmentQuantity = (
     sectionId: string,
     itemId: string,
-    quantity: number,
+    quantity: number
   ) => {
     setSections(
       sections.map((section) =>
@@ -630,14 +677,14 @@ export default function EquipmentStep({
               equipment:
                 quantity === 0
                   ? section.equipment.filter(
-                      (e) => e.inventory_item_id !== itemId,
+                      (e) => e.inventory_item_id !== itemId
                     )
                   : section.equipment.map((e) =>
-                      e.inventory_item_id === itemId ? { ...e, quantity } : e,
+                      e.inventory_item_id === itemId ? { ...e, quantity } : e
                     ),
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
@@ -647,10 +694,10 @@ export default function EquipmentStep({
     if (active.id !== over.id) {
       setSections((sections) => {
         const oldIndex = sections.findIndex(
-          (section) => section.id === active.id,
+          (section) => section.id === active.id
         );
         const newIndex = sections.findIndex(
-          (section) => section.id === over.id,
+          (section) => section.id === over.id
         );
 
         const newSections = [...sections];
@@ -673,7 +720,7 @@ export default function EquipmentStep({
     setTemplates(updatedTemplates);
     localStorage.setItem(
       "equipmentTemplates",
-      JSON.stringify(updatedTemplates),
+      JSON.stringify(updatedTemplates)
     );
   };
 
@@ -703,8 +750,9 @@ export default function EquipmentStep({
           vendor:inventory_vendors (
             name
           ),
-          image_url
-        `,
+          image_url,
+          unit_price
+        `
         )
         .in("id", Array.from(itemIds));
 
@@ -724,6 +772,27 @@ export default function EquipmentStep({
       console.error("Error loading template:", error);
       alert("Error loading template. Please try again.");
     }
+  };
+
+  const handlePriceChange = (
+    sectionId: string,
+    itemId: string,
+    price: number
+  ) => {
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              equipment: section.equipment.map((item) =>
+                item.inventory_item_id === itemId
+                  ? { ...item, unit_price: price }
+                  : item
+              ),
+            }
+          : section
+      )
+    );
   };
 
   return (
@@ -776,7 +845,9 @@ export default function EquipmentStep({
                 onAddEquipment={addEquipmentToSection}
                 onRemoveEquipment={removeEquipmentFromSection}
                 onUpdateQuantity={updateEquipmentQuantity}
+                onPriceChange={handlePriceChange}
                 equipment={equipmentDetails}
+                proposalType={proposalType}
               />
             ))}
           </SortableContext>

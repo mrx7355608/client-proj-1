@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ClientInfoStep from "../steps/ClientInfoStep";
 import EquipmentStep from "../steps/EquipmentStep";
 import FeesStep from "../steps/FeesStep";
@@ -13,6 +13,7 @@ type Props = {
     description: string;
     icon: any;
     color: string;
+    bgImage: string;
   };
 };
 
@@ -32,13 +33,7 @@ export default function ProposalItem({ data }: Props) {
   const [sections, setSections] = useState<Section[]>([
     { id: "1", name: "Network Equipment", equipment: [] },
   ]);
-  const [fees, setFees] = useState<{
-    nrc: Fee[];
-    mrc: string;
-  }>({
-    nrc: [],
-    mrc: "",
-  });
+  const [fees, setFees] = useState<Fee[]>([]);
   const { currentStep, setCurrentStep, onBack } = useProposal();
 
   // Handle submit operations
@@ -53,13 +48,7 @@ export default function ProposalItem({ data }: Props) {
   };
 
   const handleFeesSubmit = (submittedFees: Fee[]) => {
-    const nrcFees = submittedFees.filter((fee) => fee.type === "nrc");
-    const mrcFee = submittedFees.find((fee) => fee.type === "mrc");
-
-    setFees({
-      nrc: nrcFees,
-      mrc: mrcFee?.amount || "",
-    });
+    setFees(submittedFees);
     setCurrentStep(4);
   };
 
@@ -76,16 +65,16 @@ export default function ProposalItem({ data }: Props) {
         )}
         {currentStep === 2 && (
           <EquipmentStep
-            quoteId={null}
             sections={sections}
             onBack={onBack}
             onSubmit={handleEquipmentSubmit}
+            proposalType={data.name.toLocaleLowerCase()}
           />
         )}
         {currentStep === 3 && (
           <FeesStep
-            initialNRC={fees.nrc}
-            initialMRC={fees.mrc}
+            proposalType={data.name.toLocaleLowerCase()}
+            fees={fees}
             onBack={onBack}
             onSubmit={handleFeesSubmit}
           />
@@ -95,13 +84,7 @@ export default function ProposalItem({ data }: Props) {
             clientInfo={clientForm}
             sections={sections}
             proposalTypeInfo={data}
-            fees={{
-              nrc: fees.nrc.map((fee) => ({
-                ...fee,
-                amount: parseFloat(fee.amount),
-              })),
-              mrc: parseFloat(fees.mrc) || 0,
-            }}
+            fees={fees}
             onBack={onBack}
           />
         )}

@@ -36,7 +36,9 @@ interface CyberSecurityType {
 
 export default function TermsOfService() {
   const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [selectedCyberType, setSelectedCyberType] = useState<string | null>(null);
+  const [selectedCyberType, setSelectedCyberType] = useState<string | null>(
+    null
+  );
   const [terms, setTerms] = useState<Term[]>([
     { id: "1", title: "", description: "" },
     { id: "2", title: "", description: "" },
@@ -141,7 +143,7 @@ export default function TermsOfService() {
       .map((t) => ({
         title: t.title,
         description: t.description,
-        proposal_type: selectedCyberType || selectedType as string, // this order is important DO NOT CHANGE!!!
+        proposal_type: selectedCyberType || (selectedType as string), // this order is important DO NOT CHANGE!!!
       }))
       .filter((t) => t.title && t.description);
     console.log(termsData);
@@ -153,6 +155,12 @@ export default function TermsOfService() {
   if (selectedType === "cybersecurity" && !selectedCyberType) {
     return (
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-700">
+          <p className="font-medium">
+            ⚠️ Warning: This page is currently under development and not fully
+            functional.
+          </p>
+        </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-6">
@@ -199,6 +207,12 @@ export default function TermsOfService() {
   if (!selectedType) {
     return (
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-700">
+          <p className="font-medium">
+            ⚠️ Warning: This page is currently under development and not fully
+            functional.
+          </p>
+        </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900">
@@ -241,6 +255,12 @@ export default function TermsOfService() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-700">
+        <p className="font-medium">
+          ⚠️ Warning: This page is currently under development and not fully
+          functional.
+        </p>
+      </div>
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-4 mb-8">
           <button
@@ -257,7 +277,8 @@ export default function TermsOfService() {
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">
               {selectedProposalType.name}
-              {selectedCyberSecurityType && ` - ${selectedCyberSecurityType.name}`}{" "}
+              {selectedCyberSecurityType &&
+                ` - ${selectedCyberSecurityType.name}`}{" "}
               Terms
             </h2>
             <p className="text-gray-600">

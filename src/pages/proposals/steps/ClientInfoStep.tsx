@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Save } from "lucide-react";
 import { useProposal } from "../../../contexts/proposals";
 import { saveProposal } from "../../../lib/data/proposals.data";
@@ -31,6 +31,10 @@ export default function ClientInfoStep({
   const [isSaving, setIsSaving] = useState(false);
   const { proposal, setProposal } = useProposal();
 
+  useEffect(() => {
+    document.title = `${proposalName} Proposal - ${formData.organization}`;
+  }, [proposalName, formData.organization]);
+
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, "");
     if (cleaned.length <= 10) {
@@ -39,7 +43,10 @@ export default function ClientInfoStep({
         formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
       }
       if (cleaned.length > 6) {
-        formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+        formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(
+          3,
+          6
+        )}-${cleaned.slice(6)}`;
       }
       return formatted;
     }
@@ -93,7 +100,7 @@ export default function ClientInfoStep({
       const quote = await saveProposal(
         proposal?.id || null,
         quoteData,
-        quoteVariables,
+        quoteVariables
       );
       setProposal(quote); // Update the quote in context
       alert("Proposal saved as draft");
