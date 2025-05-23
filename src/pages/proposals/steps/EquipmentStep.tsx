@@ -634,6 +634,7 @@ export default function EquipmentStep({
                 category: item.category,
                 image_url: item.image_url,
                 unit_price: item.unit_price || undefined,
+                description: item.description,
               },
             ],
           };

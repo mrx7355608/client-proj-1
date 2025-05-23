@@ -13,7 +13,7 @@ export default function UNMServices() {
 
   return (
     <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
-      <h2 className="text-3xl font-bold text-gray-900">Service Fees</h2>
+      <h2 className="text-3xl font-bold text-gray-900">Services</h2>
       <div className="max-w-4xl mx-auto p-6">
         <div className="space-y-4">
           {services.map((service, index) => (

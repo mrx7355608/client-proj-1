@@ -47,6 +47,7 @@ interface ReviewStepProps {
       category: string;
       image_url: string | null;
       unit_price?: number;
+      description?: string;
     }[];
   }[];
   fees: Fee[];
@@ -73,8 +74,6 @@ export default function ReviewStep({
   const [isRequesting, setIsRequesting] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const { proposal, setProposal } = useProposal();
-
-  console.log(sections);
 
   useEffect(() => {
     saveQuote("draft");
@@ -217,6 +216,7 @@ export default function ReviewStep({
   };
 
   const renderPreview = () => {
+    console.log({ sections });
     const vulscanText =
       "By signing this Service Order Form, NSB Board of Realtors is acknowledging to have read and understood the Terms and Conditions which are incorporated in this Service Order Form. Please sign and date below and return it to ITX Solutions, Inc.";
     const unmText = "";
@@ -377,7 +377,7 @@ export default function ReviewStep({
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Equipment
             </h2>
-            <div className="bg-gray-50 rounded-xl p-8 mb-8">
+            <div className="bg-gray-50 rounded-xl p-6 mb-8">
               <div className="space-y-4">
                 {sections.map((section) => (
                   <div key={section.id}>
@@ -389,7 +389,7 @@ export default function ReviewStep({
                         {section.equipment.map((item) => (
                           <div
                             key={item.inventory_item_id}
-                            className="flex items-center gap-4 p-4"
+                            className="flex items-center gap-3 p-4"
                           >
                             {item.image_url ? (
                               <img
@@ -406,6 +406,12 @@ export default function ReviewStep({
                               <h5 className="text-base font-medium text-gray-900">
                                 {item.name}
                               </h5>
+                              {proposalTypeInfo.id === "buildouts" &&
+                                item.description && (
+                                  <p className="text-sm text-gray-600 mt-0.5 mb-2">
+                                    {item.description}
+                                  </p>
+                                )}
                               <p className="text-sm text-gray-500">
                                 {item.category}
                               </p>
@@ -485,7 +491,6 @@ export default function ReviewStep({
                   )}
                 </div>
               )}
-
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <DollarSign className="w-5 h-5 text-blue-600" />
@@ -496,33 +501,71 @@ export default function ReviewStep({
                 <p className="text-gray-600 mb-4">
                   One-time setup and installation
                 </p>
-                <p className="text-4xl font-bold text-blue-600">
-                  {formatCurrency(calculateNRCTotal())}
-                </p>
-                <div className="mt-6 space-y-4">
-                  {fees
-                    .filter((fee: Fee) => fee.type === "nrc")
-                    .map((fee: Fee) => (
-                      <div
-                        key={fee.id}
-                        className="flex justify-between items-start text-sm"
-                      >
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {fee.description}
-                          </p>
-                          {fee.notes && (
-                            <p className="text-xs text-gray-600 mt-1">
-                              {fee.notes}
+                {proposalTypeInfo.id !== "buildouts" ? (
+                  <>
+                    <p className="text-4xl font-bold text-blue-600">
+                      {formatCurrency(calculateNRCTotal())}
+                    </p>
+                    <div className="mt-6 space-y-4">
+                      {fees
+                        .filter((fee: Fee) => fee.type === "nrc")
+                        .map((fee: Fee) => (
+                          <div
+                            key={fee.id}
+                            className="flex justify-between items-start text-sm"
+                          >
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {fee.description}
+                              </p>
+                              {fee.notes && (
+                                <p className="text-xs text-gray-600 mt-1">
+                                  {fee.notes}
+                                </p>
+                              )}
+                            </div>
+                            <p className="font-medium text-gray-900">
+                              {formatCurrency(parseFloat(fee.amount))}
                             </p>
-                          )}
-                        </div>
-                        <p className="font-medium text-gray-900">
-                          {formatCurrency(parseFloat(fee.amount))}
-                        </p>
+                          </div>
+                        ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <div className="p-3 rounded-lg bg-white">
+                      <p className="text-gray-600">Total Equipment</p>
+                      <p className="text-gray-600">Tax</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-white">
+                      <p className="text-gray-600">Total Labor</p>
+                      <div className="mt-6 space-y-4">
+                        {fees
+                          .filter((fee: Fee) => fee.type === "nrc")
+                          .map((fee: Fee) => (
+                            <div
+                              key={fee.id}
+                              className="flex justify-between items-start text-sm"
+                            >
+                              <div>
+                                <p className="font-medium text-gray-900">
+                                  {fee.description}
+                                </p>
+                                {fee.notes && (
+                                  <p className="text-xs text-gray-600 mt-1">
+                                    {fee.notes}
+                                  </p>
+                                )}
+                              </div>
+                              <p className="font-medium text-gray-900">
+                                {formatCurrency(parseFloat(fee.amount) / 2)}
+                              </p>
+                            </div>
+                          ))}
                       </div>
-                    ))}
-                </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -543,24 +586,26 @@ export default function ReviewStep({
                 )}
                 <li className="flex items-center gap-3 text-gray-600">
                   <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                  Net 30 payment terms
+                  {proposalTypeInfo.id === "buildouts"
+                    ? "Net 14 days"
+                    : "Net 30 payment terms"}
                 </li>
                 <li className="flex items-center gap-3 text-gray-600">
                   <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                  Late payments subject to 1.5% monthly fee
+                  {proposalTypeInfo.id === "buildouts"
+                    ? "100% Equipment and 50% of Labor upfront"
+                    : "Late payments subject to 1.5% monthly fee"}
                 </li>
+
+                {proposalTypeInfo.id === "buildouts" && (
+                  <li className="flex items-center gap-3 text-gray-600">
+                    <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                    50% Labor remainder paid upon job completion
+                  </li>
+                )}
               </ul>
             </div>
           </div>
-
-          {/* Labour section */}
-          {/* {proposalTypeInfo.id === "buildouts" && (
-            <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
-              <h2 className="text-3xl font-bold text-gray-900 mb-12">Labour</h2>
-
-              <div className="space-y-6 text-gray-600"></div>
-            </div>
-          )} */}
 
           {/* Terms & Conditions */}
           {proposalTypeInfo.id === "unm" && <UNMTermsOfService />}
