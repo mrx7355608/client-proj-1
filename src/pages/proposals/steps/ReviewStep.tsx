@@ -218,7 +218,6 @@ export default function ReviewStep({
   };
 
   const renderPreview = () => {
-    console.log({ sections });
     const vulscanText =
       "By signing this Service Order Form, NSB Board of Realtors is acknowledging to have read and understood the Terms and Conditions which are incorporated in this Service Order Form. Please sign and date below and return it to ITX Solutions, Inc.";
     const unmText = "";
@@ -239,7 +238,10 @@ export default function ReviewStep({
 
     const calculateTotalEquipmentsFee = () => {
       const totalEquipments = sections.map((s) => s.equipment).flat();
-      return totalEquipments.reduce((acc, curr) => acc + curr.unit_price, 0);
+      return totalEquipments.reduce(
+        (acc, curr) => acc + (curr.unit_price || 0) * curr.quantity,
+        0
+      );
     };
 
     return (

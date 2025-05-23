@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ClientInfoStep from "../steps/ClientInfoStep";
 import EquipmentStep from "../steps/EquipmentStep";
 import FeesStep from "../steps/FeesStep";
