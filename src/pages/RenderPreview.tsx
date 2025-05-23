@@ -1,5 +1,6 @@
 import { PDFViewer } from "@react-pdf/renderer";
 import AgreementPDF from "../components/preview-pdf/AgreementPDF";
+import { Fee } from "../lib/types";
 
 const mockSections = [
   {
@@ -46,9 +47,37 @@ const mockSections = [
   },
 ];
 
+// description: string;
+//   amount: string;
+//   notes: string;
+//   type: "nrc" | "mrc";
+//   totalUser?: string;
+//   feesPerUser?: string;
+
+const mockFees: Fee[] = [
+  {
+    id: "1",
+    amount: "100",
+    description: "Setup Fee",
+    notes: "This is a setup fee",
+    type: "nrc",
+    feesPerUser: "10",
+    totalUser: "10",
+  },
+  {
+    id: "2",
+    amount: "100",
+    description: "Monthly Fee",
+    notes: "This is a monthly fee",
+    type: "mrc",
+    feesPerUser: "10",
+    totalUser: "10",
+  },
+];
+
 export default function RenderPreview() {
   const proposalTypeInfo = {
-    id: "buildouts",
+    id: "unm",
     name: "Managed IT Services",
     description: "Managed Service Provider",
   };
@@ -67,6 +96,7 @@ export default function RenderPreview() {
         proposalTypeInfo={proposalTypeInfo}
         clientInfo={clientInfo}
         sections={mockSections}
+        fees={mockFees}
       />
     </PDFViewer>
   );

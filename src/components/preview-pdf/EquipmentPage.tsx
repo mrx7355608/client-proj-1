@@ -45,7 +45,7 @@ const EquipmentPage = ({
                   <View style={styles.priceQuantityContainer}>
                     {proposalType === "buildouts" && item.unit_price && (
                       <Text style={styles.itemPrice}>
-                        ${item.unit_price.toFixed(2)}
+                        ${item.unit_price.toFixed(2)}/unit
                       </Text>
                     )}
                     <Text style={styles.itemQuantity}>
@@ -140,25 +140,35 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   itemCategory: {
-    fontSize: 9, // Reduced from 10
+    fontSize: 9,
     color: "#6B7280",
+    backgroundColor: "#F3F4F6",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 99,
+    alignSelf: "flex-start",
+    marginTop: 6,
   },
   itemDescription: {
     fontSize: 9,
     color: "#4B5563",
-    marginBottom: 4,
+    marginBottom: 10,
   },
   priceQuantityContainer: {
-    alignItems: "flex-end",
-    gap: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   itemPrice: {
-    fontSize: 9,
-    fontWeight: "500",
-    color: "#111827",
+    fontSize: 10,
+    fontWeight: "600",
+    color: "#15803D",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
   itemQuantity: {
-    fontSize: 9, // Reduced from 10
+    fontSize: 9,
     fontWeight: "500",
     color: "#111827",
   },

@@ -1,13 +1,12 @@
 import { Document } from "@react-pdf/renderer";
 import CoverPage from "./CoverPage";
 import EquipmentPage from "./EquipmentPage";
-import ServiceFeesPage from "./ServiceFeesPage";
-import TermsAndConditionsPage from "./TermsAndCondition";
 import SignaturePage from "./SignaturePage";
 import UNMServicesPage from "./unm/UNMServicesPage";
 import MSPServicesPage from "./msp/MSPServicePage";
 import UNMTermsPage from "./unm/UNMTermsPage";
 import MSPTermsPage from "./msp/MSPTermsPage";
+import ServiceFeesPage from "./ServiceFeesPage";
 
 // Main Document Component
 const MyProposalPdf = ({
@@ -30,7 +29,7 @@ const MyProposalPdf = ({
 
       <EquipmentPage sections={sections} proposalType={proposalTypeInfo.id} />
 
-      {/*<ServiceFeesPage fees={fees} /> */}
+      <ServiceFeesPage fees={fees} />
 
       {proposalTypeInfo.id === "unm" && <UNMTermsPage />}
       {proposalTypeInfo.id === "msp" && <MSPTermsPage />}
