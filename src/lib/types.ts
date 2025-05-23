@@ -20,6 +20,7 @@ export interface Section {
     category: string;
     image_url: string | null;
     description?: string;
+    unit_price?: number;
   }[];
 }
 export interface FeeInput {

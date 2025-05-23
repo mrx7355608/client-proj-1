@@ -12,6 +12,9 @@ const mockSections = [
         category: "Router",
         quantity: 2,
         image_url: null, // no image, should show fallback
+        description:
+          "Router X100 is a network device that connects devices to the network.",
+        unit_price: 100,
       },
       {
         id: "2",
@@ -19,6 +22,9 @@ const mockSections = [
         category: "Switch",
         quantity: 5,
         image_url: "https://via.placeholder.com/64", // mock image
+        description:
+          "Switch Y200 is a network device that connects devices to the network.",
+        unit_price: 100,
       },
     ],
   },
@@ -32,6 +38,9 @@ const mockSections = [
         category: "Firewall",
         quantity: 1,
         image_url: "https://via.placeholder.com/64", // mock image
+        description:
+          "Firewall Z300 is a security device that protects the network from unauthorized access.",
+        unit_price: 100,
       },
     ],
   },
@@ -39,7 +48,7 @@ const mockSections = [
 
 export default function RenderPreview() {
   const proposalTypeInfo = {
-    id: "msp",
+    id: "buildouts",
     name: "Managed IT Services",
     description: "Managed Service Provider",
   };

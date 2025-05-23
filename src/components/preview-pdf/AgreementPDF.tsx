@@ -28,9 +28,9 @@ const MyProposalPdf = ({
       {proposalTypeInfo.id === "fullsuite" && <UNMServicesPage />}
       {proposalTypeInfo.id === "compliancy" && <UNMServicesPage />}
 
-      {/* <EquipmentPage sections={sections} />
-      <ServiceFeesPage fees={fees} />
-      <TermsAndConditionsPage /> */}
+      <EquipmentPage sections={sections} proposalType={proposalTypeInfo.id} />
+
+      {/*<ServiceFeesPage fees={fees} /> */}
 
       {proposalTypeInfo.id === "unm" && <UNMTermsPage />}
       {proposalTypeInfo.id === "msp" && <MSPTermsPage />}
