@@ -73,6 +73,8 @@ export default function ReviewStep({
   const [isSaving, setIsSaving] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [taxRate, setTaxRate] = useState(7);
+  const [isTaxConfirmed, setIsTaxConfirmed] = useState(false);
   const { proposal, setProposal } = useProposal();
 
   useEffect(() => {
@@ -222,6 +224,23 @@ export default function ReviewStep({
     const unmText = "";
     const mspText =
       "By signing this Service Order Form, Milestone Title Services is acknowledging to have read and understood the Terms and Conditions which are incorporated in this Service Order Form. Please sign and date below and return it to ITX Solutions, Inc.";
+
+    const calculateTotalEquipments = () => {
+      const totalEquipments = sections.map((s) => s.equipment).flat();
+      return totalEquipments.reduce((acc, curr) => acc + curr.quantity, 0);
+    };
+
+    const calculateHalfLaborFee = () => {
+      const totalLaborFee = fees
+        .filter((fee: Fee) => fee.type === "nrc")
+        .reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
+      return totalLaborFee / 2;
+    };
+
+    const calculateTotalEquipmentsFee = () => {
+      const totalEquipments = sections.map((s) => s.equipment).flat();
+      return totalEquipments.reduce((acc, curr) => acc + curr.unit_price, 0);
+    };
 
     return (
       <div className="bg-gray-100">
@@ -532,14 +551,47 @@ export default function ReviewStep({
                     </div>
                   </>
                 ) : (
-                  <div className="flex flex-col gap-3">
-                    <div className="p-3 rounded-lg bg-white">
-                      <p className="text-gray-600">Total Equipment</p>
-                      <p className="text-gray-600">Tax</p>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between p-3 px-4 rounded-lg bg-gray-100">
+                      <p className="text-gray-600 font-bold">Total Equipment</p>
+                      <p className="text-gray-900 font-bold">
+                        {calculateTotalEquipments()}
+                      </p>
                     </div>
-                    <div className="p-3 rounded-lg bg-white">
-                      <p className="text-gray-600">Total Labor</p>
-                      <div className="mt-6 space-y-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-gray-100">
+                      <p className="text-gray-600 font-bold">Tax</p>
+                      {!isTaxConfirmed ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            value={taxRate}
+                            onChange={(e) => setTaxRate(Number(e.target.value))}
+                            className="w-20 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            min="0"
+                            max="100"
+                            step="0.1"
+                          />
+                          <span className="text-gray-900 font-bold">%</span>
+                          <button
+                            onClick={() => setIsTaxConfirmed(true)}
+                            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                          >
+                            Confirm
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-gray-900">
+                            {taxRate}%
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 rounded-lg bg-gray-100">
+                      <p className="mb-4 text-gray-600 font-bold">
+                        Total Labor
+                      </p>
+                      <div className="space-y-3">
                         {fees
                           .filter((fee: Fee) => fee.type === "nrc")
                           .map((fee: Fee) => (
@@ -558,11 +610,28 @@ export default function ReviewStep({
                                 )}
                               </div>
                               <p className="font-medium text-gray-900">
-                                {formatCurrency(parseFloat(fee.amount) / 2)}
+                                {formatCurrency(parseFloat(fee.amount))}
                               </p>
                             </div>
                           ))}
                       </div>
+                    </div>
+
+                    {/* Total due */}
+                    <p className="text-gray-900 font-bold mt-5">
+                      Total due at signing:
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-gray-600">Equipment:</p>
+                      <p className="text-blue-600 text-2xl font-bold">
+                        ${calculateTotalEquipmentsFee()}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-gray-600">Labor:</p>
+                      <p className="text-blue-600 text-2xl font-bold">
+                        ${calculateHalfLaborFee()}
+                      </p>
                     </div>
                   </div>
                 )}
