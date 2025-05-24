@@ -7,6 +7,7 @@ import MSPServicesPage from "./msp/MSPServicePage";
 import UNMTermsPage from "./unm/UNMTermsPage";
 import MSPTermsPage from "./msp/MSPTermsPage";
 import ServiceFeesPage from "./ServiceFeesPage";
+import VulscanTermsPage from "./vulscan/VulscanTermsPage";
 
 // Main Document Component
 const MyProposalPdf = ({
@@ -33,7 +34,7 @@ const MyProposalPdf = ({
 
       {proposalTypeInfo.id === "unm" && <UNMTermsPage />}
       {proposalTypeInfo.id === "msp" && <MSPTermsPage />}
-      {proposalTypeInfo.id === "vulscan" && <UNMTermsPage />}
+      {proposalTypeInfo.id === "vulscan" && <VulscanTermsPage />}
       {proposalTypeInfo.id === "pentest" && <UNMTermsPage />}
       {proposalTypeInfo.id === "fullsuite" && <UNMTermsPage />}
       {proposalTypeInfo.id === "compliancy" && <UNMTermsPage />}

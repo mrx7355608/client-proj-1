@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { ClientForm, Fee, Quote, Section } from "../lib/types";
-import ClientInfoStep from "../pages/proposals/steps/ClientInfoStep";
-import EquipmentStep from "../pages/proposals/steps/EquipmentStep";
-import FeesStep from "../pages/proposals/steps/FeesStep";
-import ReviewStep from "../pages/proposals/steps/ReviewStep";
+import ClientInfoStep from "./proposals/steps/ClientInfoStep";
+import EquipmentStep from "./proposals/steps/EquipmentStep";
+import FeesStep from "./proposals/steps/FeesStep";
+import ReviewStep from "./proposals/steps/ReviewStep";
 import { useProposal } from "../contexts/proposals";
 
 type Props = {
@@ -48,13 +48,10 @@ export default function EditProposalItem({ proposalTypeInfo, quote }: Props) {
     setProposal(quote);
 
     // Update client form based on the quote
-    const varObject = quote.variables.reduce(
-      (acc, item) => {
-        acc[item.name] = item.value;
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
+    const varObject = quote.variables.reduce((acc, item) => {
+      acc[item.name] = item.value;
+      return acc;
+    }, {} as Record<string, string>);
     const [address, city, stateZip] = varObject.address.split(", ");
     const formData = {
       name: varObject.client_name,

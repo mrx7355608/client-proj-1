@@ -1,10 +1,10 @@
 import { useState } from "react";
-import ClientInfoStep from "../steps/ClientInfoStep";
-import EquipmentStep from "../steps/EquipmentStep";
-import FeesStep from "../steps/FeesStep";
-import ReviewStep from "../steps/ReviewStep";
-import { useProposal } from "../../../contexts/proposals";
-import { Fee, ClientForm, Section } from "../../../lib/types";
+import ClientInfoStep from "./steps/ClientInfoStep";
+import EquipmentStep from "./steps/EquipmentStep";
+import FeesStep from "./steps/FeesStep";
+import ReviewStep from "./steps/ReviewStep";
+import { useProposal } from "../../contexts/proposals";
+import { Fee, ClientForm, Section } from "../../lib/types";
 
 type Props = {
   data: {

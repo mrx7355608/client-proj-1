@@ -19,11 +19,11 @@ import { useProposal } from "../../../contexts/proposals";
 import { saveProposal } from "../../../lib/data/proposals.data";
 import { Fee, FeeInput, Quote, QuoteInput } from "../../../lib/types";
 import { generatePDF } from "../../../lib/generate-pdf";
-import MSPTermsOfService from "../../../components/terms-of-service/msp-tos";
-import VulscanTermsOfService from "../../../components/terms-of-service/vulscan-tos";
-import UNMTermsOfService from "../../../components/terms-of-service/unm-tos";
-import UNMServices from "../../../components/proposals/services/unm-services";
-import MSPServices from "../../../components/proposals/services/msp-services";
+import MSPTermsOfService from "../msp/msp-tos";
+import VulscanTermsOfService from "../vulscan/vulscan-tos";
+import UNMTermsOfService from "../unm/unm-tos";
+import UNMServices from "../unm/unm-services";
+import MSPServices from "../msp/msp-services";
 
 interface ReviewStepProps {
   clientInfo: {

@@ -77,4 +77,26 @@ export const pdfStyles = StyleSheet.create({
     fontWeight: "bold",
     color: "#111827",
   },
+  section: {
+    marginBottom: 24,
+  },
+  termBox: {
+    backgroundColor: "#F9FAFB",
+    borderRadius: 8,
+    padding: 20,
+    marginBottom: 24,
+  },
+  termHeading: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 8,
+  },
+  bulletList: {
+    marginTop: 12,
+  },
+  bulletLabel: {
+    fontWeight: "600",
+    color: "#111827",
+  },
 }); 

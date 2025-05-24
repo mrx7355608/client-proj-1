@@ -77,7 +77,7 @@ const mockFees: Fee[] = [
 
 export default function RenderPreview() {
   const proposalTypeInfo = {
-    id: "msp",
+    id: "vulscan",
     name: "Managed IT Services",
     description: "Managed Service Provider",
   };

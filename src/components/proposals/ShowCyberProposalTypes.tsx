@@ -1,7 +1,7 @@
 import { ShieldAlert, Bug, BadgeCheck, Layers, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import ProposalItem from "./ProposalItem";
-import ProposalsProvider from "../../../contexts/proposals";
+import ProposalsProvider from "../../contexts/proposals";
 
 type ProposalType = "vulscan" | "pentest" | "compliancy" | "fullsuite";
 
