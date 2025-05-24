@@ -24,6 +24,7 @@ import VulscanTermsOfService from "../vulscan/vulscan-tos";
 import UNMTermsOfService from "../unm/unm-tos";
 import UNMServices from "../unm/unm-services";
 import MSPServices from "../msp/msp-services";
+import VulscanServices from "../vulscan/vulscan-services";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -187,7 +188,7 @@ export default function ReviewStep({
         .replace(/\//g, "");
 
       setIsGeneratingPDF(true);
-      const pdfLink = await generatePDF(
+      await generatePDF(
         `${quote.title}-${time}.pdf`,
         proposalTypeInfo,
         clientInfo,
@@ -393,6 +394,7 @@ export default function ReviewStep({
           {/* Services page */}
           {proposalTypeInfo.id === "unm" && <UNMServices />}
           {proposalTypeInfo.id === "msp" && <MSPServices />}
+          {proposalTypeInfo.id === "vulscan" && <VulscanServices />}
 
           {/* Equipment page */}
           <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
