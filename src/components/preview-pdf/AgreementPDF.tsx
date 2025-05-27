@@ -9,6 +9,7 @@ import MSPTermsPage from "./msp/MSPTermsPage";
 import ServiceFeesPage from "./ServiceFeesPage";
 import VulscanTermsPage from "./vulscan/VulscanTermsPage";
 import VulscanServicePage from "./vulscan/VulscanServicePage";
+import BuildoutsFeesPage from "./buildouts/BuildoutsFeesPage";
 
 // Main Document Component
 const MyProposalPdf = ({
@@ -19,6 +20,22 @@ const MyProposalPdf = ({
   sections,
   fees,
 }: any) => {
+  const calculateTotalEquipments = () => {
+    const totalEquipments = sections.map((s: any) => s.equipment).flat();
+    return totalEquipments.reduce(
+      (acc: number, curr: any) => acc + curr.quantity,
+      0
+    );
+  };
+
+  const calculateTotalEquipmentsFee = () => {
+    const totalEquipments = sections.map((s: any) => s.equipment).flat();
+    return totalEquipments.reduce(
+      (acc: number, curr: any) => acc + (curr.unit_price || 0) * curr.quantity,
+      0
+    );
+  };
+
   return (
     <Document style={{ fontFamily: "Helvetica" }}>
       <CoverPage proposalTypeInfo={proposalTypeInfo} clientInfo={clientInfo} />
@@ -31,7 +48,16 @@ const MyProposalPdf = ({
 
       <EquipmentPage sections={sections} proposalType={proposalTypeInfo.id} />
 
-      <ServiceFeesPage fees={fees} proposalType={proposalTypeInfo.id} />
+      {proposalTypeInfo.id === "buildouts" ? (
+        <BuildoutsFeesPage
+          fees={fees}
+          totalEquipment={calculateTotalEquipments()}
+          tax={10}
+          totalEquipmentFees={calculateTotalEquipmentsFee()}
+        />
+      ) : (
+        <ServiceFeesPage fees={fees} proposalType={proposalTypeInfo.id} />
+      )}
 
       {proposalTypeInfo.id === "unm" && <UNMTermsPage />}
       {proposalTypeInfo.id === "msp" && <MSPTermsPage />}

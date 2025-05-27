@@ -152,7 +152,8 @@ const styles = StyleSheet.create({
   itemDescription: {
     fontSize: 9,
     color: "#4B5563",
-    marginBottom: 10,
+    marginBottom: 4,
+    marginTop: 2,
   },
   priceQuantityContainer: {
     flexDirection: "row",

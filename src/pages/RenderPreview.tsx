@@ -47,13 +47,6 @@ const mockSections = [
   },
 ];
 
-// description: string;
-//   amount: string;
-//   notes: string;
-//   type: "nrc" | "mrc";
-//   totalUser?: string;
-//   feesPerUser?: string;
-
 const mockFees: Fee[] = [
   {
     id: "1",
@@ -77,7 +70,7 @@ const mockFees: Fee[] = [
 
 export default function RenderPreview() {
   const proposalTypeInfo = {
-    id: "vulscan",
+    id: "buildouts",
     name: "Vulnerability Scanning",
     description: "Managed Service Provider",
     bgImage: "/proposal-cyber-bg.png",
