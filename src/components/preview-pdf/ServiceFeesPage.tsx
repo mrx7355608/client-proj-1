@@ -3,60 +3,112 @@ import { Fee } from "../../lib/types";
 
 const ServiceFeesPage = ({
   fees,
+  proposalType,
 }: {
-  fees: {
-    nrc: Fee[];
-    mrc: string;
-  };
+  fees: Fee[];
+  proposalType?: string;
 }) => {
   const formatCurrency = (value: number) => {
     return value.toFixed(2);
   };
 
   const calculateNRCTotal = () => {
-    return fees.nrc.reduce((total, fee) => total + Number(fee.amount), 0);
+    return fees
+      .filter((fee) => fee.type === "nrc")
+      .reduce((total: number, fee: Fee) => total + Number(fee.amount), 0);
   };
+
+  const getMRCFee = () => fees.find((fee) => fee.type === "mrc");
+  const getMRCAmount = () => {
+    const mrcFee = getMRCFee();
+    return mrcFee ? Number(mrcFee.amount) : 0;
+  };
+
+  const nrcFees = fees.filter((fee) => fee.type === "nrc");
+  const mrcFee = getMRCFee();
+
+  // For MSP: extract per user and user count if available
+  const perUser =
+    mrcFee && mrcFee.feesPerUser ? Number(mrcFee.feesPerUser) : undefined;
+  const totalUsers =
+    mrcFee && mrcFee.totalUser ? Number(mrcFee.totalUser) : undefined;
+
   return (
     <Page style={styles.page}>
       <Text style={styles.title}>Service Fees</Text>
 
       <View style={styles.feeContainer}>
-        {/* MRC */}
+        {/* MRC Section */}
         <View style={styles.feeBox}>
           <View style={styles.feeHeader}>
             <Image
               src={`${import.meta.env.VITE_BASE_URL}/clock.png`}
               style={styles.icons}
-            />{" "}
-            <Text style={styles.feeHeading}>
-              Monthly Recurring Charges (MRC)
-            </Text>
+            />
+            <View>
+              <Text style={styles.feeHeading}>
+                Monthly Recurring Charges (MRC)
+              </Text>
+            </View>
           </View>
-          <Text style={styles.feeSubText}>Billed monthly for 36 months</Text>
-          <Text style={styles.amountText}>
-            ${formatCurrency(Number(fees.mrc))}
-            <Text style={styles.amountUnit}>/month</Text>
-          </Text>
+
+          {proposalType === "msp" && perUser && totalUsers ? (
+            <>
+              <View
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  width: "100%",
+                }}
+              >
+                <Text style={styles.feeSubText}>Monthly Service Fee</Text>
+                <Text style={styles.mspPerUserText}>
+                  ${formatCurrency(perUser)}/user x {totalUsers} Users
+                </Text>
+              </View>
+              <View style={styles.divider} />
+              <Text style={styles.feeSubText}>Total Monthly Fee</Text>
+              <Text style={styles.totalAmount}>
+                ${formatCurrency(getMRCAmount())}
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.feeSubText}>
+                Billed Monthly for 36 months
+              </Text>
+              <Text style={styles.amountText}>
+                ${formatCurrency(getMRCAmount())}
+                <Text style={styles.amountUnit}>/month</Text>
+              </Text>
+            </>
+          )}
         </View>
 
-        {/* NRC */}
+        {/* NRC Section */}
         <View style={styles.feeBox}>
           <View style={styles.feeHeader}>
             <Image
               src={`${import.meta.env.VITE_BASE_URL}/dollar.png`}
               style={styles.icons}
-            />{" "}
-            <Text style={styles.feeHeading}>Non-Recurring Charges (NRC)</Text>
+            />
+            <View>
+              <Text style={styles.feeHeading}>Non-Recurring Charges (NRC)</Text>
+            </View>
           </View>
+
           <Text style={styles.feeSubText}>One-time setup and installation</Text>
+
           <Text style={styles.amountText}>
             ${formatCurrency(calculateNRCTotal())}
           </Text>
 
           <View style={styles.nrcList}>
-            {fees.nrc.map((fee, index) => (
-              <View key={index} style={styles.nrcItem}>
-                <View style={{ flex: 1 }}>
+            {nrcFees.map((fee) => (
+              <View key={fee.id} style={styles.nrcItem}>
+                <View style={styles.nrcInfo}>
                   <Text style={styles.nrcDescription}>{fee.description}</Text>
                   {fee.notes && (
                     <Text style={styles.nrcNotes}>{fee.notes}</Text>
@@ -96,63 +148,73 @@ const styles = StyleSheet.create({
     width: 816, // 8.5in
     minHeight: 1056, // min-height 11in
     alignSelf: "center",
-    padding: 44,
-    marginTop: 32,
+    padding: 40,
+    marginTop: 24,
+    position: "relative",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    position: "relative",
   },
   title: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#111827",
-    marginBottom: 48,
+    marginBottom: 32,
   },
   feeContainer: {
-    gap: 24,
-    maxWidth: 512, // max-w-2xl
+    gap: 18,
+    maxWidth: 512,
   },
   feeBox: {
     backgroundColor: "#F9FAFB",
-    borderRadius: 12,
-    padding: 24,
+    borderRadius: 8,
+    padding: 20,
     marginBottom: 24,
   },
   feeHeader: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 12,
-    marginBottom: 24,
-  },
-  feeHeading: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#111827",
-  },
-  feeSubText: {
-    fontSize: 12,
-    color: "#6B7280",
     marginBottom: 16,
   },
-  amountText: {
-    fontSize: 36,
+  feeHeading: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 4,
+  },
+  feeSubText: {
+    fontSize: 11,
+    color: "#6B7280",
+    marginBottom: 0,
+    marginTop: 4,
+  },
+  mspPerUserText: {
+    fontSize: 16,
     fontWeight: "bold",
     color: "#2563EB",
+    marginBottom: 8,
   },
-  amountUnit: {
-    fontSize: 18,
-    color: "#6B7280",
+  divider: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#D1D5DB",
+    marginVertical: 5,
+    width: "100%",
   },
   nrcList: {
-    marginTop: 14,
-    gap: 10,
+    marginTop: 16,
+    gap: 8,
   },
   nrcItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    padding: 0,
+  },
+  nrcInfo: {
+    flex: 1,
+    minWidth: 0,
   },
   nrcDescription: {
     fontSize: 10,
@@ -160,48 +222,61 @@ const styles = StyleSheet.create({
     color: "#111827",
   },
   nrcNotes: {
-    fontSize: 10,
+    fontSize: 8,
     color: "#6B7280",
     marginTop: 4,
   },
   nrcAmount: {
-    fontSize: 10,
-    fontWeight: "500",
-    color: "#111827",
+    fontSize: 9,
+  },
+  totalAmount: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#2563EB",
+    marginLeft: 4,
+    marginTop: 8,
+  },
+  amountText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#2563EB",
+    marginTop: 12,
+  },
+  amountUnit: {
+    fontSize: 14,
+    color: "#6B7280",
   },
   termsBox: {
     backgroundColor: "#F9FAFB",
-    borderRadius: 12,
-    padding: 32,
-    marginTop: 22,
-    paddingBottom: 25,
+    borderRadius: 8,
+    padding: 24,
+    marginTop: 24,
   },
   termsTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: "600",
     color: "#111827",
-    marginBottom: 24,
+    marginBottom: 16,
   },
   termItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    marginBottom: 12,
+    gap: 8,
+    marginBottom: 10,
   },
   bulletPoint: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: "#2563EB",
   },
   termText: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#6B7280",
-    flexShrink: 1,
   },
   icons: {
-    width: 18,
-    height: 18,
+    width: 16,
+    height: 16,
   },
 });
 

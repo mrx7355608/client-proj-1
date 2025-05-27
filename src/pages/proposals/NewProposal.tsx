@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Network, Settings, Shield, Building2 } from "lucide-react";
 import ProposalsProvider from "../../contexts/proposals";
-import ProposalItem from "./types/ProposalItem";
-import ShowCyberProposalTypes from "./types/ShowCyberProposalTypes";
+import ProposalItem from "../../components/proposals/ProposalItem";
+import ShowCyberProposalTypes from "../../components/proposals/ShowCyberProposalTypes";
 
 type ProposalType = "unm" | "msp" | "cybersecurity" | "buildouts";
 

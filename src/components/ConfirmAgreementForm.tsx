@@ -53,8 +53,8 @@ export default function ConfirmAgreementForm({
   quote: any;
   manipulatePDF: (
     signText: string | null,
-    signUrl: string | null,
-  ) => Promise<{ file: File; pdfname: string }>;
+    signUrl: string | null
+  ) => Promise<{ file: File | null; pdfname: string | null }>;
 }) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState("");
@@ -127,7 +127,7 @@ export default function ConfirmAgreementForm({
 
   // Handle billing form input changes
   const handleBillingChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setBillingForm((prev) => ({
@@ -146,7 +146,7 @@ export default function ConfirmAgreementForm({
 
   // Handle shipping form input changes
   const handleShippingChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setShippingForm((prev) => ({
@@ -199,9 +199,7 @@ export default function ConfirmAgreementForm({
   }, []);
 
   const startDrawing = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>,
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
     setIsDrawing(true);
     const canvas = canvasRef.current;
@@ -228,9 +226,7 @@ export default function ConfirmAgreementForm({
   };
 
   const draw = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>,
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
     if (!isDrawing) return;
 
@@ -333,15 +329,15 @@ export default function ConfirmAgreementForm({
 
       if (!emailReceiver) {
         throw new Error(
-          "Reciever's email is not defined, please define VITE_EMAIL_RECEIVER in .env",
+          "Reciever's email is not defined, please define VITE_EMAIL_RECEIVER in .env"
         );
       }
 
       const clientName = quote.variables.filter(
-        (f) => f.name === "client_name",
+        (f: QuoteVariable) => f.name === "client_name"
       )[0].value;
       const clientOrg = quote.variables.filter(
-        (f) => f.name === "organization",
+        (f: QuoteVariable) => f.name === "organization"
       )[0].value;
 
       await sendSimpleMessage({

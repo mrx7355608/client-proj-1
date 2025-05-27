@@ -1,5 +1,6 @@
 import { PDFViewer } from "@react-pdf/renderer";
 import AgreementPDF from "../components/preview-pdf/AgreementPDF";
+import { Fee } from "../lib/types";
 
 const mockSections = [
   {
@@ -12,6 +13,9 @@ const mockSections = [
         category: "Router",
         quantity: 2,
         image_url: null, // no image, should show fallback
+        description:
+          "Router X100 is a network device that connects devices to the network.",
+        unit_price: 100,
       },
       {
         id: "2",
@@ -19,6 +23,9 @@ const mockSections = [
         category: "Switch",
         quantity: 5,
         image_url: "https://via.placeholder.com/64", // mock image
+        description:
+          "Switch Y200 is a network device that connects devices to the network.",
+        unit_price: 100,
       },
     ],
   },
@@ -32,15 +39,41 @@ const mockSections = [
         category: "Firewall",
         quantity: 1,
         image_url: "https://via.placeholder.com/64", // mock image
+        description:
+          "Firewall Z300 is a security device that protects the network from unauthorized access.",
+        unit_price: 100,
       },
     ],
   },
 ];
 
+const mockFees: Fee[] = [
+  {
+    id: "1",
+    amount: "100",
+    description: "Setup Fee",
+    notes: "This is a setup fee",
+    type: "nrc",
+    feesPerUser: "10",
+    totalUser: "10",
+  },
+  {
+    id: "2",
+    amount: "100",
+    description: "Monthly Fee",
+    notes: "This is a monthly fee",
+    type: "mrc",
+    feesPerUser: "10",
+    totalUser: "10",
+  },
+];
+
 export default function RenderPreview() {
   const proposalTypeInfo = {
-    name: "Managed IT Services",
+    id: "buildouts",
+    name: "Vulnerability Scanning",
     description: "Managed Service Provider",
+    bgImage: "/proposal-cyber-bg.png",
   };
   const clientInfo = {
     organization: "Acme Corporation",
@@ -57,6 +90,7 @@ export default function RenderPreview() {
         proposalTypeInfo={proposalTypeInfo}
         clientInfo={clientInfo}
         sections={mockSections}
+        fees={mockFees}
       />
     </PDFViewer>
   );

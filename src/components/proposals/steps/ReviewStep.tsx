@@ -19,11 +19,12 @@ import { useProposal } from "../../../contexts/proposals";
 import { saveProposal } from "../../../lib/data/proposals.data";
 import { Fee, FeeInput, Quote, QuoteInput } from "../../../lib/types";
 import { generatePDF } from "../../../lib/generate-pdf";
-import MSPTermsOfService from "../../../components/terms-of-service/msp-tos";
-import VulscanTermsOfService from "../../../components/terms-of-service/vulscan-tos";
-import UNMTermsOfService from "../../../components/terms-of-service/unm-tos";
-import UNMServices from "../../../components/proposals/services/unm-services";
-import MSPServices from "../../../components/proposals/services/msp-services";
+import MSPTermsOfService from "../msp/msp-tos";
+import VulscanTermsOfService from "../vulscan/vulscan-tos";
+import UNMTermsOfService from "../unm/unm-tos";
+import UNMServices from "../unm/unm-services";
+import MSPServices from "../msp/msp-services";
+import VulscanServices from "../vulscan/vulscan-services";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -111,9 +112,10 @@ export default function ReviewStep({
       term_months: 36,
       notes: `Proposal for ${clientInfo.organization}`,
       total_users:
-        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0].totalUser) || 0,
+        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0]?.totalUser) ||
+        0,
       amount_per_user:
-        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0].feesPerUser) ||
+        Number(fees.filter((fee: Fee) => fee.type === "mrc")[0]?.feesPerUser) ||
         0,
     };
 
@@ -192,10 +194,7 @@ export default function ReviewStep({
         clientInfo,
         quote.id,
         sections,
-        {
-          nrc: fees.filter((fee: Fee) => fee.type === "nrc"),
-          mrc: calculateMRCTotal().toString(),
-        }
+        fees
       );
       setIsGeneratingPDF(false);
       console.log("PDF generated!");
@@ -392,6 +391,7 @@ export default function ReviewStep({
           {/* Services page */}
           {proposalTypeInfo.id === "unm" && <UNMServices />}
           {proposalTypeInfo.id === "msp" && <MSPServices />}
+          {proposalTypeInfo.id === "vulscan" && <VulscanServices />}
 
           {/* Equipment page */}
           <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">

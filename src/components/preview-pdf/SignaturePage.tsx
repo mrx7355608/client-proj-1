@@ -3,14 +3,41 @@ import { Page, View, Text, StyleSheet, Link } from "@react-pdf/renderer";
 const SignaturePage = ({
   proposalId,
   filename,
+  proposalType,
 }: {
   proposalId: string;
   filename: string;
+  proposalType:
+    | "unm"
+    | "msp"
+    | "vulscan"
+    | "pentest"
+    | "fullsuite"
+    | "compliancy"
+    | "buildouts";
 }) => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
+  const cyberText =
+    "By signing this Service Order Form, NSB Board of Realtors is acknowledging to have read and understood the Terms and Conditions which are incorporated in this Service Order Form. Please sign and date below and return it to ITX Solutions, Inc.";
+  const unmText = "";
+  const mspText =
+    "By signing this Service Order Form, Milestone Title Services is acknowledging to have read and understood the Terms and Conditions which are incorporated in this Service Order Form. Please sign and date below and return it to ITX Solutions, Inc.";
+  const buildoutsText = "";
+
   return (
     <Page style={styles.page}>
+      <View style={styles.proposalTextBox}>
+        <Text style={styles.proposalText}>
+          {proposalType === "unm" && unmText}
+          {proposalType === "msp" && mspText}
+          {proposalType === "vulscan" && cyberText}
+          {proposalType === "pentest" && cyberText}
+          {proposalType === "fullsuite" && cyberText}
+          {proposalType === "compliancy" && cyberText}
+          {proposalType === "buildouts" && buildoutsText}
+        </Text>
+      </View>
       <View style={styles.sectionContainer}>
         <View style={styles.inputBlock}>
           <View style={styles.line} />
@@ -57,6 +84,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
     position: "relative",
+  },
+  proposalTextBox: {
+    marginBottom: 24,
+  },
+  proposalText: {
+    fontSize: 11,
+    color: "#374151",
+    lineHeight: 1.5,
   },
   sectionContainer: {
     gap: 32,

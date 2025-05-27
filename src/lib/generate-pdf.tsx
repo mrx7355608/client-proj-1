@@ -23,7 +23,7 @@ export const generatePDF = async (
   cinfo: any,
   proposalId: string,
   sections: Section[],
-  fees: { nrc: Fee[]; mrc: string },
+  fees: Fee[]
 ) => {
   const pdfBlob = await pdf(
     <MyProposalPdf
@@ -33,7 +33,7 @@ export const generatePDF = async (
       pdfFilename={filename}
       fees={fees}
       sections={sections}
-    />,
+    />
   ).toBlob();
 
   // Update pdfname in quotes table
