@@ -78,8 +78,9 @@ const mockFees: Fee[] = [
 export default function RenderPreview() {
   const proposalTypeInfo = {
     id: "vulscan",
-    name: "Managed IT Services",
+    name: "Vulnerability Scanning",
     description: "Managed Service Provider",
+    bgImage: "/proposal-cyber-bg.png",
   };
   const clientInfo = {
     organization: "Acme Corporation",

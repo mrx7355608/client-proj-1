@@ -97,7 +97,7 @@ const howItHelps = [
 const VulscanServicePage = () => (
   <Page style={styles.page}>
     <View>
-      <Text style={styles.title}>Vulnerability Scanning Service Overview</Text>
+      <Text style={styles.title}>Services</Text>
 
       {/* What We're Doing */}
       <Text style={styles.sectionHeading}>What We're Doing</Text>

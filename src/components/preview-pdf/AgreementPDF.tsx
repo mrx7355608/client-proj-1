@@ -25,9 +25,9 @@ const MyProposalPdf = ({
       {proposalTypeInfo.id === "unm" && <UNMServicesPage />}
       {proposalTypeInfo.id === "msp" && <MSPServicesPage />}
       {proposalTypeInfo.id === "vulscan" && <VulscanServicePage />}
-      {proposalTypeInfo.id === "pentest" && <UNMServicesPage />}
-      {proposalTypeInfo.id === "fullsuite" && <UNMServicesPage />}
-      {proposalTypeInfo.id === "compliancy" && <UNMServicesPage />}
+      {proposalTypeInfo.id === "pentest" && <VulscanServicePage />}
+      {proposalTypeInfo.id === "fullsuite" && <VulscanServicePage />}
+      {proposalTypeInfo.id === "compliancy" && <VulscanServicePage />}
 
       <EquipmentPage sections={sections} proposalType={proposalTypeInfo.id} />
 
@@ -36,10 +36,14 @@ const MyProposalPdf = ({
       {proposalTypeInfo.id === "unm" && <UNMTermsPage />}
       {proposalTypeInfo.id === "msp" && <MSPTermsPage />}
       {proposalTypeInfo.id === "vulscan" && <VulscanTermsPage />}
-      {proposalTypeInfo.id === "pentest" && <UNMTermsPage />}
-      {proposalTypeInfo.id === "fullsuite" && <UNMTermsPage />}
-      {proposalTypeInfo.id === "compliancy" && <UNMTermsPage />}
-      <SignaturePage proposalId={proposalId} filename={pdfFilename} />
+      {proposalTypeInfo.id === "pentest" && <VulscanTermsPage />}
+      {proposalTypeInfo.id === "fullsuite" && <VulscanTermsPage />}
+      {proposalTypeInfo.id === "compliancy" && <VulscanTermsPage />}
+      <SignaturePage
+        proposalType={proposalTypeInfo.id}
+        proposalId={proposalId}
+        filename={pdfFilename}
+      />
     </Document>
   );
 };

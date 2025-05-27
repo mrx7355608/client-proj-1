@@ -148,8 +148,6 @@ export default function UNMTermsPage() {
           content="If a piece of equipment installed by ITX Solutions fails and needs to be replaced, but the replacement part is not immediately available, ITX Solutions will install a temporary alternative part at no additional charge, to ensure the continuity of service until the replacement part arrives and can be installed."
         />
       </View>
-
-      <View style={styles.page}></View>
     </Page>
   );
 }

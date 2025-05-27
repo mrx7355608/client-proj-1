@@ -16,7 +16,7 @@ export default function ShowCyberProposalTypes({
     {
       id: "vulscan",
       name: "Vulnerability Security",
-      description: "Vulnerability scans for your whole system",
+      description: "Vulnerability Scanning",
       icon: <ShieldAlert className="w-6 h-6" />,
       color: "bg-red-500",
       bgImage: "/proposal-cyber-bg.png",
@@ -40,7 +40,7 @@ export default function ShowCyberProposalTypes({
     {
       id: "fullsuite",
       name: "Fullsuite Cubersecurity",
-      description: "Complete Cybersecurity Package",
+      description: "Complete Cybersecurity Services",
       icon: <Layers className="w-6 h-6" />,
       color: "bg-red-500",
       bgImage: "/proposal-cyber-bg.png",

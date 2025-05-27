@@ -1,6 +1,6 @@
 import { Page, View, Text, StyleSheet, Image } from "@react-pdf/renderer";
 
-const CoverPage = ({ proposalTypeInfo, clientInfo }) => {
+const CoverPage = ({ proposalTypeInfo, clientInfo }: any) => {
   const todayDate = new Date().toLocaleDateString("en-US", {
     month: "numeric",
     day: "numeric",
@@ -15,7 +15,7 @@ const CoverPage = ({ proposalTypeInfo, clientInfo }) => {
       <View style={styles.cover}>
         {/* Background Image */}
         <Image
-          src={`${import.meta.env.VITE_BASE_URL}/proposal-unm-bg.png`}
+          src={`${import.meta.env.VITE_BASE_URL}${proposalTypeInfo.bgImage}`}
           style={styles.coverBackground}
         />
 

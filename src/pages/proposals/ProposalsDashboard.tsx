@@ -503,15 +503,16 @@ export default function ProposalsDashboard() {
                           {isConverting ? "Converting..." : "Convert to Client"}
                         </button>
                       )}
-                      {proposal.status === "signed" && (
-                        <button
-                          onClick={() => downloadPdf(proposal.id)}
-                          className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
-                          disabled={isConverting}
-                        >
-                          Download PDF
-                        </button>
-                      )}
+                      {proposal.status === "signed" ||
+                        (proposal.status === "fulfilled" && (
+                          <button
+                            onClick={() => downloadPdf(proposal.id)}
+                            className="border border-sky-500 text-sky-600 px-3 py-1 rounded-full hover:text-white hover:bg-sky-500"
+                            disabled={isConverting}
+                          >
+                            Download PDF
+                          </button>
+                        ))}
                       <button
                         onClick={() => handleDeleteProposal(proposal.id)}
                         className="border border-red-500 text-red-600 px-3 py-1 rounded-full hover:text-white hover:bg-red-500"
