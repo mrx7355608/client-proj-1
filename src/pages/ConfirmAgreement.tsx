@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import ConfirmAgreementForm from "../components/ConfirmAgreementForm";
 import { AlertTriangle } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
+import { QuoteVariable } from "../lib/types";
 
 export default function ConfirmAgreement() {
   const { id } = useParams();
@@ -63,9 +64,13 @@ export default function ConfirmAgreement() {
 
   const manipulateFile = async (
     signatureText: string | null,
-    signImageUrl: string | null,
+    signImageUrl: string | null
   ) => {
-    if (!pdfFile) return;
+    if (!pdfFile)
+      return {
+        file: null,
+        pdfname: null,
+      };
 
     const pdfBuffer = await pdfFile.arrayBuffer();
     const pdf = await PDFDocument.load(pdfBuffer);
@@ -75,7 +80,7 @@ export default function ConfirmAgreement() {
     // Get signature image
     if (signImageUrl) {
       const signatureImageBuffer = await fetch(signImageUrl).then((res) =>
-        res.arrayBuffer(),
+        res.arrayBuffer()
       );
       const signatureImage = await pdf.embedPng(signatureImageBuffer);
       page.drawImage(signatureImage, {
@@ -90,7 +95,7 @@ export default function ConfirmAgreement() {
 
     // Get client name
     const clientName = quote.variables.filter(
-      (f) => f.name === "client_name",
+      (f: QuoteVariable) => f.name === "client_name"
     )[0].value;
 
     // Draw on pdf

@@ -188,21 +188,18 @@ export default function ReviewStep({
         .replace(/\//g, "");
 
       setIsGeneratingPDF(true);
-      await generatePDF(
+      const pdfLink = await generatePDF(
         `${quote.title}-${time}.pdf`,
         proposalTypeInfo,
         clientInfo,
         quote.id,
         sections,
-        {
-          nrc: fees.filter((fee: Fee) => fee.type === "nrc"),
-          mrc: calculateMRCTotal().toString(),
-        }
+        fees
       );
       setIsGeneratingPDF(false);
       console.log("PDF generated!");
 
-      // location.href = `/request-signature/${proposal?.id}?pdf=${pdfLink}&name=${quote.title}`;
+      location.href = `/request-signature/${proposal?.id}?pdf=${pdfLink}&name=${quote.title}`;
     } catch (error) {
       console.log(error);
       setIsRequesting(false);
