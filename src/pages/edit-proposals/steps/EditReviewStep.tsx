@@ -74,6 +74,7 @@ export default function EditReviewStep({
   proposalTypeInfo,
   taxRate,
 }: ReviewStepProps) {
+  console.log("Sections: ", sections);
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
@@ -148,12 +149,6 @@ export default function EditReviewStep({
       notes: fee.notes,
       type: fee.type,
     }));
-
-    console.log("Quote Data: ", quoteData);
-    console.log("Quote Variables: ", quoteVariables);
-    console.log("Quote Items: ", quoteItems);
-    console.log("Quote Fees: ", quoteFees);
-    console.log("Quote Details: ", quoteDetails);
 
     const quote = await updateQuote(
       quoteDetails.id,

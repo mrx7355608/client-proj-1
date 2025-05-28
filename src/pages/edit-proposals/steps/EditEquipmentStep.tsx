@@ -45,6 +45,7 @@ interface EquipmentStepProps {
   onBack: () => void;
   onSubmit: (sections: Section[]) => void;
   proposalType: string;
+  quoteId: string;
 }
 
 interface InventoryItem {
@@ -506,6 +507,7 @@ export default function EditEquipmentStep({
   onBack,
   onSubmit,
   proposalType,
+  quoteId,
 }: EquipmentStepProps) {
   const [sections, setSections] = useState<Section[]>(initialSections);
   const [equipmentDetails, setEquipmentDetails] = useState<
@@ -647,7 +649,24 @@ export default function EditEquipmentStep({
     }));
   };
 
-  const removeEquipmentFromSection = (sectionId: string, itemId: string) => {
+  const removeEquipmentFromSection = async (
+    sectionId: string,
+    itemId: string
+  ) => {
+    const itemExist = await supabase
+      .from("quote_items")
+      .select()
+      .eq("inventory_item_id", itemId)
+      .eq("quote_id", quoteId)
+      .single();
+    if (itemExist) {
+      await supabase
+        .from("quote_items")
+        .delete()
+        .eq("inventory_item_id", itemId)
+        .eq("quote_id", quoteId);
+    }
+
     setSections(
       sections.map((section) =>
         section.id === sectionId
@@ -667,6 +686,10 @@ export default function EditEquipmentStep({
     itemId: string,
     quantity: number
   ) => {
+    if (quantity === 0) {
+      removeEquipmentFromSection(sectionId, itemId);
+    }
+
     setSections(
       sections.map((section) =>
         section.id === sectionId

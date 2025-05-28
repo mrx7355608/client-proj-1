@@ -84,6 +84,7 @@ export default function EditProposalItem() {
   };
 
   const handleEquipmentSubmit = (updatedSections: Section[]) => {
+    console.log("Updated Sections: ", updatedSections);
     setSections(updatedSections);
     setCurrentStep(3);
   };
@@ -151,6 +152,7 @@ export default function EditProposalItem() {
             onBack={onBack}
             onSubmit={handleEquipmentSubmit}
             proposalType={proposalType.toLocaleLowerCase()}
+            quoteId={quote.id}
           />
         )}
         {currentStep === 3 && (
