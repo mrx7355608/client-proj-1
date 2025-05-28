@@ -23,7 +23,8 @@ export const generatePDF = async (
   cinfo: any,
   proposalId: string,
   sections: Section[],
-  fees: Fee[]
+  fees: Fee[],
+  tax?: number
 ) => {
   const pdfBlob = await pdf(
     <MyProposalPdf
@@ -33,6 +34,7 @@ export const generatePDF = async (
       pdfFilename={filename}
       fees={fees}
       sections={sections}
+      tax={tax || 7}
     />
   ).toBlob();
 

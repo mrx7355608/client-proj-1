@@ -6,7 +6,7 @@ import {
   QuoteVariableInput,
 } from "../types";
 
-const updateQuote = async (
+export const updateQuote = async (
   proposalId: string,
   quoteData: QuoteInput,
   quoteVariables: QuoteVariableInput[],
@@ -41,14 +41,18 @@ const updateQuote = async (
 
   // Update quote items
   if (quoteItems.length > 0) {
+    // Delete existing quote items  
+    await supabase.from("quote_items").delete().eq("quote_id", proposalId);
+
+    // Insert new quote items
     const { error: itemsError } = await supabase
       .from("quote_items")
-      .upsert(quoteItems, { onConflict: "id" });
+      .insert(quoteItems.map((qi) => ({ ...qi, quote_id: proposalId })));
 
     if (itemsError) throw itemsError;
   }
 
-  if (quoteFees && quoteFees.length > 0) {
+  if (quoteFees.length > 0) {
     // Update quote fees
     // Delete exisiting
     await supabase.from("quote_fees").delete().eq("quote_id", proposalId);

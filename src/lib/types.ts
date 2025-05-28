@@ -48,6 +48,8 @@ export interface Quote {
   updated_at: Date;
   variables: QuoteVariable[];
   items: QuoteItem[];
+  total_users: number;
+  amount_per_user: number;
 }
 
 export interface QuoteVariable {
@@ -64,6 +66,9 @@ export interface QuoteItemInput {
   quantity: number;
   unit_price: number;
   is_recurring: boolean;
+  description?: string;
+  image_url?: string;
+  category: string;
 }
 
 export interface QuoteItem extends QuoteItemInput {

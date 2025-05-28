@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FileText,
   Building2,
@@ -12,11 +12,9 @@ import {
   DollarSign,
   Clock,
   Save,
-  IconNode,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useProposal } from "../../../contexts/proposals";
-import { saveProposal } from "../../../lib/data/proposals.data";
+import { updateQuote } from "../../../lib/data/proposals.data";
 import { Fee, FeeInput, Quote, QuoteInput } from "../../../lib/types";
 import { generatePDF } from "../../../lib/generate-pdf";
 import MSPTermsOfService from "../msp/msp-tos";
@@ -25,6 +23,7 @@ import UNMTermsOfService from "../unm/unm-tos";
 import UNMServices from "../unm/unm-services";
 import MSPServices from "../msp/msp-services";
 import VulscanServices from "../vulscan/vulscan-services";
+import { LucideIcon } from "lucide-react";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -52,35 +51,36 @@ interface ReviewStepProps {
     }[];
   }[];
   fees: Fee[];
+  quoteDetails: Quote;
+  quoteTitle: string;
+  taxRate: number;
+  onBack: () => void;
   proposalTypeInfo: {
     id: string;
     name: string;
     description: string;
-    icon: IconNode;
-    color: string;
+    icon: LucideIcon;
     bgImage: string;
   };
-  onBack: () => void;
 }
 
-export default function ReviewStep({
-  proposalTypeInfo,
+export default function EditReviewStep({
+  quoteDetails,
   clientInfo,
   sections,
   fees,
   onBack,
+  quoteTitle,
+  proposalTypeInfo,
+  taxRate,
 }: ReviewStepProps) {
+  console.log("Sections: ", sections);
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [taxRate, setTaxRate] = useState(7);
+  const [tax, setTax] = useState(taxRate);
   const [isTaxConfirmed, setIsTaxConfirmed] = useState(false);
-  const { proposal, setProposal } = useProposal();
-
-  useEffect(() => {
-    saveQuote("draft");
-  }, []);
 
   const calculateNRCTotal = (): number => {
     return fees
@@ -103,14 +103,14 @@ export default function ReviewStep({
     }).format(amount);
   };
 
-  const saveQuote = async (status: string) => {
+  const saveQuote = async (status?: string) => {
     const quoteData: QuoteInput = {
-      title: `${proposalTypeInfo.name} Agreement - ${clientInfo.organization}`,
-      status: status,
+      title: quoteTitle,
+      status: status || quoteDetails.status,
       total_mrr: calculateMRCTotal(),
       total_nrc: calculateNRCTotal(),
       term_months: 36,
-      notes: `Proposal for ${clientInfo.organization}`,
+      notes: quoteDetails.notes,
       total_users:
         Number(fees.filter((fee: Fee) => fee.type === "mrc")[0]?.totalUser) ||
         0,
@@ -153,18 +153,17 @@ export default function ReviewStep({
       type: fee.type,
     }));
 
-    const quote = await saveProposal(
-      proposal?.id || null,
+    const quote = await updateQuote(
+      quoteDetails.id,
       quoteData,
       quoteVariables,
       quoteItems,
       quoteFees
     );
-    setProposal(quote);
     return quote;
   };
 
-  const handleSaveAsDraft = async () => {
+  const handleSave = async () => {
     try {
       setIsSaving(true);
       await saveQuote("draft");
@@ -178,7 +177,7 @@ export default function ReviewStep({
     try {
       // Save quote
       setIsRequesting(true);
-      const quote: Quote = await saveQuote("draft");
+      const quote: Quote = await saveQuote();
       setIsRequesting(false);
       console.log("Quote saved successfully");
 
@@ -191,18 +190,20 @@ export default function ReviewStep({
         .replace(/\//g, "");
 
       setIsGeneratingPDF(true);
+
       const pdfLink = await generatePDF(
         `${quote.title}-${time}.pdf`,
         proposalTypeInfo,
         clientInfo,
         quote.id,
         sections,
-        fees
+        fees,
+        tax
       );
       setIsGeneratingPDF(false);
       console.log("PDF generated!");
 
-      location.href = `/request-signature/${proposal?.id}?pdf=${pdfLink}&name=${quote.title}`;
+      location.href = `/request-signature/${quoteDetails.id}?pdf=${pdfLink}&name=${quote.title}`;
     } catch (error) {
       console.log(error);
       setIsRequesting(false);
@@ -212,9 +213,8 @@ export default function ReviewStep({
   };
 
   const downloadPDF = () => {
-    const pdfname = `${proposal?.title}`;
     const originalTitle = document.title;
-    document.title = pdfname;
+    document.title = quoteTitle;
     window.print();
     document.title = originalTitle;
   };
@@ -569,8 +569,8 @@ export default function ReviewStep({
                         <div className="flex items-center gap-2">
                           <input
                             type="number"
-                            value={taxRate}
-                            onChange={(e) => setTaxRate(Number(e.target.value))}
+                            value={tax}
+                            onChange={(e) => setTax(Number(e.target.value))}
                             className="w-20 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             min="0"
                             max="100"
@@ -587,7 +587,7 @@ export default function ReviewStep({
                       ) : (
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-gray-900">
-                            {taxRate}%
+                            {tax}%
                           </span>
                         </div>
                       )}
@@ -724,7 +724,7 @@ export default function ReviewStep({
 
               <Link
                 to={`${import.meta.env.VITE_BASE_URL}/confirm-agreement/${
-                  proposal?.id
+                  quoteDetails.id
                 }`}
               >
                 <button className="bg-sky-500 text-white text-xl font-bold px-7 py-4 mt-8">
@@ -965,7 +965,7 @@ export default function ReviewStep({
           </button>
           <button
             type="button"
-            onClick={handleSaveAsDraft}
+            onClick={handleSave}
             disabled={isSaving}
             className="px-6 py-2.5 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center"
           >
