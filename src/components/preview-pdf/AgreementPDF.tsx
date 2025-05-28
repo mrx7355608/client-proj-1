@@ -19,6 +19,7 @@ const MyProposalPdf = ({
   clientInfo,
   sections,
   fees,
+  tax,
 }: any) => {
   const calculateTotalEquipments = () => {
     const totalEquipments = sections.map((s: any) => s.equipment).flat();
@@ -52,7 +53,7 @@ const MyProposalPdf = ({
         <BuildoutsFeesPage
           fees={fees}
           totalEquipment={calculateTotalEquipments()}
-          tax={10}
+          tax={tax}
           totalEquipmentFees={calculateTotalEquipmentsFee()}
         />
       ) : (

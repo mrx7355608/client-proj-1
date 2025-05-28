@@ -35,9 +35,9 @@ import NewProposal from "./pages/proposals/NewProposal";
 import Auth from "./components/Auth";
 import ConfirmAgreement from "./pages/ConfirmAgreement";
 import RequestSignature from "./pages/RequestSignature";
-import EditProposal from "./pages/EditProposal";
 import RenderPreview from "./pages/RenderPreview";
 import TermsOfService from "./pages/terms/TermsOfService";
+import EditProposalPage from "./pages/edit-proposals/EditProposalPage";
 
 interface UserProfile {
   first_name: string | null;
@@ -100,7 +100,7 @@ function App() {
     return (
       <Router>
         <Routes>
-          <Route path="/proposals/edit/:id" element={<EditProposal />} />
+          <Route path="/proposals/edit/:id" element={<EditProposalPage />} />
         </Routes>
       </Router>
     );

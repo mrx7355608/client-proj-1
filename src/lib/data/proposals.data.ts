@@ -6,7 +6,7 @@ import {
   QuoteVariableInput,
 } from "../types";
 
-const updateQuote = async (
+export const updateQuote = async (
   proposalId: string,
   quoteData: QuoteInput,
   quoteVariables: QuoteVariableInput[],
@@ -48,7 +48,7 @@ const updateQuote = async (
     if (itemsError) throw itemsError;
   }
 
-  if (quoteFees && quoteFees.length > 0) {
+  if (quoteFees.length > 0) {
     // Update quote fees
     // Delete exisiting
     await supabase.from("quote_fees").delete().eq("quote_id", proposalId);
