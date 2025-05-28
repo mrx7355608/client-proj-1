@@ -10,6 +10,8 @@ interface FeesStepProps {
   fees: Fee[];
   onBack: () => void;
   onSubmit: (fees: Fee[]) => void;
+  perUserFee: number;
+  totalUsersCount: number;
 }
 
 export default function EditFeesStep({
@@ -17,10 +19,12 @@ export default function EditFeesStep({
   fees,
   onBack,
   onSubmit,
+  perUserFee,
+  totalUsersCount,
 }: FeesStepProps) {
   const [proposalFees, setProposalFees] = useState<Fee[]>(fees);
-  const [perUserAmount, setPerUserAmount] = useState("");
-  const [totalUsers, setTotalUsers] = useState("");
+  const [perUserAmount, setPerUserAmount] = useState(perUserFee.toString());
+  const [totalUsers, setTotalUsers] = useState(totalUsersCount.toString());
 
   // Calculate total MRC for MSP proposals
   const calculateTotalMRC = useCallback(() => {

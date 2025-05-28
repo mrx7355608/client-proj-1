@@ -201,6 +201,8 @@ export default function EditProposalItem() {
             fees={fees}
             onBack={onBack}
             onSubmit={handleFeesSubmit}
+            perUserFee={quote.amount_per_user}
+            totalUsersCount={quote.total_users}
           />
         )}
         {currentStep === 4 && (

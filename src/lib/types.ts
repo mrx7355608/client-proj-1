@@ -48,6 +48,8 @@ export interface Quote {
   updated_at: Date;
   variables: QuoteVariable[];
   items: QuoteItem[];
+  total_users: number;
+  amount_per_user: number;
 }
 
 export interface QuoteVariable {
