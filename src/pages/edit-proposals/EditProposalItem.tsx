@@ -14,7 +14,16 @@ import {
   QuoteItem,
   Fee,
 } from "../../lib/types";
-import { Network, Settings, Shield, Building2 } from "lucide-react";
+import {
+  Network,
+  Settings,
+  Shield,
+  Building2,
+  ShieldAlert,
+  Bug,
+  BadgeCheck,
+  Layers,
+} from "lucide-react";
 
 const INITIAL_CLIENT_FORM: ClientForm = {
   name: "",
@@ -132,6 +141,38 @@ export default function EditProposalItem() {
       icon: <Building2 className="w-6 h-6" />,
       color: "bg-orange-500",
       bgImage: "/proposal-unm-bg.png",
+    },
+    {
+      id: "vulscan",
+      name: "Vulnerability Security",
+      description: "Vulnerability Scanning",
+      icon: <ShieldAlert className="w-6 h-6" />,
+      color: "bg-red-500",
+      bgImage: "/proposal-cyber-bg.png",
+    },
+    {
+      id: "pentest",
+      name: "PenTest",
+      description: "Pen Testing Solutions",
+      icon: <Bug className="w-6 h-6" />,
+      color: "bg-red-500",
+      bgImage: "/proposal-cyber-bg.png",
+    },
+    {
+      id: "compliancy",
+      name: "Compliancy",
+      description: "Compliancy Service",
+      icon: <BadgeCheck className="w-6 h-6" />,
+      color: "bg-red-500",
+      bgImage: "/proposal-cyber-bg.png",
+    },
+    {
+      id: "fullsuite",
+      name: "Fullsuite Cubersecurity",
+      description: "Complete Cybersecurity Services",
+      icon: <Layers className="w-6 h-6" />,
+      color: "bg-red-500",
+      bgImage: "/proposal-cyber-bg.png",
     },
   ];
 

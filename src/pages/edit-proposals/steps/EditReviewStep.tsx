@@ -103,10 +103,10 @@ export default function EditReviewStep({
     }).format(amount);
   };
 
-  const saveQuote = async () => {
+  const saveQuote = async (status?: string) => {
     const quoteData: QuoteInput = {
       title: quoteTitle,
-      status: quoteDetails.status,
+      status: status || quoteDetails.status,
       total_mrr: calculateMRCTotal(),
       total_nrc: calculateNRCTotal(),
       term_months: 36,
@@ -139,6 +139,9 @@ export default function EditReviewStep({
         quantity: item.quantity,
         unit_price: item.unit_price || 0,
         is_recurring: false,
+        description: item.description || "",
+        image_url: item.image_url || "",
+        category: item.category,
       }))
     );
 
@@ -163,7 +166,7 @@ export default function EditReviewStep({
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      await saveQuote();
+      await saveQuote("draft");
       alert("Proposal saved as draft");
     } finally {
       setIsSaving(false);

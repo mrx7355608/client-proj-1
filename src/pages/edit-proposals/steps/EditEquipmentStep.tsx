@@ -609,7 +609,7 @@ export default function EditEquipmentStep({
             (e) => e.inventory_item_id === item.id
           );
           if (existingItem) {
-            console.log("adding exisiting:", section);
+            console.log("adding exisiting:", item);
             return {
               ...section,
               equipment: section.equipment.map((e) =>
@@ -620,7 +620,7 @@ export default function EditEquipmentStep({
             };
           }
 
-          console.log("adding new item...", section);
+          console.log("adding new item...");
           return {
             ...section,
             equipment: [

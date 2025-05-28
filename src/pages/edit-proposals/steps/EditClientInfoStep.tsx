@@ -55,7 +55,7 @@ export default function EditClientInfoStep({
 
     const quoteData: QuoteInput = {
       title: quoteTitle,
-      status: quoteDetails.status,
+      status: "draft",
       total_mrr: quoteDetails.total_mrr,
       total_nrc: quoteDetails.total_nrc,
       term_months: quoteDetails.term_months,

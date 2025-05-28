@@ -139,6 +139,9 @@ export default function ReviewStep({
         quantity: item.quantity,
         unit_price: item.unit_price || 0,
         is_recurring: false,
+        description: item.description || "",
+        image_url: item.image_url || "",
+        category: item.category,
       }))
     );
 

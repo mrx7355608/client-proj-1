@@ -64,6 +64,9 @@ export interface QuoteItemInput {
   quantity: number;
   unit_price: number;
   is_recurring: boolean;
+  description?: string;
+  image_url?: string;
+  category: string;
 }
 
 export interface QuoteItem extends QuoteItemInput {
