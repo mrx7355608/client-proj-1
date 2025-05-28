@@ -152,7 +152,6 @@ export default function EditProposalItem() {
             onBack={onBack}
             onSubmit={handleEquipmentSubmit}
             proposalType={proposalType.toLocaleLowerCase()}
-            quoteId={quote.id}
           />
         )}
         {currentStep === 3 && (
