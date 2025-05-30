@@ -1,6 +1,7 @@
 import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { Package } from "lucide-react";
 import { Section } from "../../lib/types";
+import { useMemo } from "react";
 
 const EquipmentPage = ({
   sections,
@@ -9,56 +10,65 @@ const EquipmentPage = ({
   sections: Section[];
   proposalType?: string;
 }) => {
+  const pages = useMemo(() => paginateEquipments(sections), [sections]);
+
   return (
-    <Page style={styles.page}>
-      <Text style={styles.title}>Equipment</Text>
+    <>
+      {pages.map((page) => (
+        <Page style={styles.page}>
+          <Text style={styles.title}>Equipment</Text>
 
-      <View style={styles.contentBox}>
-        {sections.map((section) => (
-          <View key={section.id} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.name}</Text>
+          <View style={styles.contentBox}>
+            {page.sections.map((section: any) => (
+              <View key={section.id} style={styles.section}>
+                <Text style={styles.sectionTitle}>{section.name}</Text>
 
-            <View style={styles.equipmentList}>
-              {section.equipment.map((item) => (
-                <View key={item.inventory_item_id} style={styles.equipmentItem}>
-                  {item.image_url ? (
-                    <Image
-                      source={{ uri: item.image_url }}
-                      style={styles.itemImage}
-                    />
-                  ) : (
-                    <View style={styles.imagePlaceholder}>
-                      <Package size={20} color="#9CA3AF" />
+                <View style={styles.equipmentList}>
+                  {section.equipment.map((item) => (
+                    <View
+                      key={item.inventory_item_id}
+                      style={styles.equipmentItem}
+                    >
+                      {item.image_url ? (
+                        <Image
+                          source={{ uri: item.image_url }}
+                          style={styles.itemImage}
+                        />
+                      ) : (
+                        <View style={styles.imagePlaceholder}>
+                          <Package size={20} color="#9CA3AF" />
+                        </View>
+                      )}
+
+                      <View style={styles.itemInfo}>
+                        <Text style={styles.itemName}>{item.name}</Text>
+                        {proposalType === "buildouts" && item.description && (
+                          <Text style={styles.itemDescription}>
+                            {item.description}
+                          </Text>
+                        )}
+                        <Text style={styles.itemCategory}>{item.category}</Text>
+                      </View>
+
+                      <View style={styles.priceQuantityContainer}>
+                        {proposalType === "buildouts" && item.unit_price && (
+                          <Text style={styles.itemPrice}>
+                            ${item.unit_price.toFixed(2)}/unit
+                          </Text>
+                        )}
+                        <Text style={styles.itemQuantity}>
+                          Quantity: {item.quantity}
+                        </Text>
+                      </View>
                     </View>
-                  )}
-
-                  <View style={styles.itemInfo}>
-                    <Text style={styles.itemName}>{item.name}</Text>
-                    {proposalType === "buildouts" && item.description && (
-                      <Text style={styles.itemDescription}>
-                        {item.description}
-                      </Text>
-                    )}
-                    <Text style={styles.itemCategory}>{item.category}</Text>
-                  </View>
-
-                  <View style={styles.priceQuantityContainer}>
-                    {proposalType === "buildouts" && item.unit_price && (
-                      <Text style={styles.itemPrice}>
-                        ${item.unit_price.toFixed(2)}/unit
-                      </Text>
-                    )}
-                    <Text style={styles.itemQuantity}>
-                      Quantity: {item.quantity}
-                    </Text>
-                  </View>
+                  ))}
                 </View>
-              ))}
-            </View>
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
-    </Page>
+        </Page>
+      ))}
+    </>
   );
 };
 
@@ -66,7 +76,7 @@ const styles = StyleSheet.create({
   page: {
     backgroundColor: "#ffffff",
     width: 816, // 8.5in
-    height: 1056, // 11in
+    height: 756, // 11in
     alignSelf: "center",
     padding: 40, // Reduced from 54
     marginTop: 24, // Reduced from 32
@@ -174,5 +184,57 @@ const styles = StyleSheet.create({
     color: "#111827",
   },
 });
+
+function paginateEquipments(sections: Section[]) {
+  const itemsPerPage = 7;
+  const pages: any[] = [];
+  let pageCount = 1;
+  let page = {
+    id: pageCount,
+    sections: [] as any[],
+  };
+
+  let itemsRendered = 0;
+  let currentSection = 0;
+
+  while (currentSection < sections.length) {
+    const section = sections[currentSection];
+
+    if (section.equipment.length <= itemsPerPage - itemsRendered) {
+      itemsRendered += section.equipment.length;
+      page.sections.push({
+        name: section.name,
+        equipment: section.equipment,
+      });
+      currentSection++;
+    } else if (section.equipment.length > itemsPerPage - itemsRendered) {
+      const remainingItemsSpace = itemsPerPage - itemsRendered;
+      const slicedEquipments = section.equipment.slice(0, remainingItemsSpace);
+      itemsRendered += slicedEquipments.length;
+
+      section.equipment = section.equipment.slice(remainingItemsSpace);
+
+      page.sections.push({
+        name: section.name,
+        equipment: slicedEquipments,
+      });
+    }
+
+    // Add existing page to pages array
+    if (itemsRendered === itemsPerPage || currentSection === sections.length) {
+      pages.push(page);
+      pageCount++;
+      itemsRendered = 0;
+
+      // Reset page
+      page = {
+        id: pageCount,
+        sections: [] as any[],
+      };
+    }
+  }
+
+  return pages;
+}
 
 export default EquipmentPage;

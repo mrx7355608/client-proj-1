@@ -1,5 +1,4 @@
 import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
-import { Shield, Server } from "lucide-react";
 
 const ServicesPage = () => {
   return (

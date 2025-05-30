@@ -4,6 +4,52 @@ import { Fee } from "../lib/types";
 
 const mockSections = [
   {
+    id: "2",
+    name: "Security Devices",
+    equipment: [
+      {
+        id: "3",
+        name: "Firewall Z300",
+        category: "Firewall",
+        quantity: 1,
+        image_url: "https://via.placeholder.com/64", // mock image
+        description:
+          "Firewall Z300 is a security device that protects the network from unauthorized access.",
+        unit_price: 100,
+      },
+      {
+        id: "3",
+        name: "Firewall Z300",
+        category: "Firewall",
+        quantity: 1,
+        image_url: "https://via.placeholder.com/64", // mock image
+        description:
+          "Firewall Z300 is a security device that protects the network from unauthorized access.",
+        unit_price: 100,
+      },
+      {
+        id: "3",
+        name: "Firewall Z300",
+        category: "Firewall",
+        quantity: 1,
+        image_url: "https://via.placeholder.com/64", // mock image
+        description:
+          "Firewall Z300 is a security device that protects the network from unauthorized access.",
+        unit_price: 100,
+      },
+      {
+        id: "3",
+        name: "Firewall Z300",
+        category: "Firewall",
+        quantity: 1,
+        image_url: "https://via.placeholder.com/64", // mock image
+        description:
+          "Firewall Z300 is a security device that protects the network from unauthorized access.",
+        unit_price: 100,
+      },
+    ],
+  },
+  {
     id: "1",
     name: "Networking Equipment",
     equipment: [
@@ -30,17 +76,27 @@ const mockSections = [
     ],
   },
   {
-    id: "2",
+    id: "3",
     name: "Security Devices",
     equipment: [
       {
-        id: "3",
-        name: "Firewall Z300",
-        category: "Firewall",
-        quantity: 1,
+        id: "2",
+        name: "Switch Y200",
+        category: "Switch",
+        quantity: 5,
         image_url: "https://via.placeholder.com/64", // mock image
         description:
-          "Firewall Z300 is a security device that protects the network from unauthorized access.",
+          "Switch Y200 is a network device that connects devices to the network.",
+        unit_price: 100,
+      },
+      {
+        id: "2",
+        name: "Switch Y200",
+        category: "Switch",
+        quantity: 5,
+        image_url: "https://via.placeholder.com/64", // mock image
+        description:
+          "Switch Y200 is a network device that connects devices to the network.",
         unit_price: 100,
       },
     ],
