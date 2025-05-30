@@ -629,13 +629,13 @@ export default function EditReviewStep({
                     <div className="flex items-center justify-between">
                       <p className="text-gray-600">Equipment:</p>
                       <p className="text-blue-600 text-2xl font-bold">
-                        ${calculateTotalEquipmentsFee()}
+                        ${formatCurrency(calculateTotalEquipmentsFee())}
                       </p>
                     </div>
                     <div className="flex items-center justify-between">
                       <p className="text-gray-600">Labor:</p>
                       <p className="text-blue-600 text-2xl font-bold">
-                        ${calculateHalfLaborFee()}
+                        ${formatCurrency(calculateHalfLaborFee())}
                       </p>
                     </div>
                   </div>

@@ -9,7 +9,12 @@ const ServiceFeesPage = ({
   proposalType?: string;
 }) => {
   const formatCurrency = (value: number) => {
-    return value.toFixed(2);
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
   };
 
   const calculateNRCTotal = () => {
