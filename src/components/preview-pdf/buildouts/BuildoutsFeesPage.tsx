@@ -77,7 +77,7 @@ const BuildoutsFeesPage = ({
                   )}
                 </View>
                 <Text style={styles.nrcAmount}>
-                  ${formatCurrency(Number(fee.amount))}
+                  {formatCurrency(Number(fee.amount))}
                 </Text>
               </View>
             ))}
@@ -101,7 +101,7 @@ const BuildoutsFeesPage = ({
           <View style={styles.sectionHeader}>
             <Text style={{ color: "#111827", fontSize: 10 }}>Equipment:</Text>
             <Text style={styles.sectionAmount}>
-              ${formatCurrency(totalEquipmentFees)}
+              {formatCurrency(totalEquipmentFees)}
             </Text>
           </View>
         </View>
@@ -110,7 +110,7 @@ const BuildoutsFeesPage = ({
           <View style={styles.sectionHeader}>
             <Text style={{ color: "#111827", fontSize: 10 }}>Labor:</Text>
             <Text style={styles.sectionAmount}>
-              ${formatCurrency(calculateHalfLaborFee())}
+              {formatCurrency(calculateHalfLaborFee())}
             </Text>
           </View>
         </View>

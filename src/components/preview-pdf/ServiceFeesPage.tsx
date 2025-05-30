@@ -70,13 +70,13 @@ const ServiceFeesPage = ({
               >
                 <Text style={styles.feeSubText}>Monthly Service Fee</Text>
                 <Text style={styles.mspPerUserText}>
-                  ${formatCurrency(perUser)}/user x {totalUsers} Users
+                  {formatCurrency(perUser)}/user x {totalUsers} Users
                 </Text>
               </View>
               <View style={styles.divider} />
               <Text style={styles.feeSubText}>Total Monthly Fee</Text>
               <Text style={styles.totalAmount}>
-                ${formatCurrency(getMRCAmount())}
+                {formatCurrency(getMRCAmount())}
               </Text>
             </>
           ) : (
@@ -85,7 +85,7 @@ const ServiceFeesPage = ({
                 Billed Monthly for 36 months
               </Text>
               <Text style={styles.amountText}>
-                ${formatCurrency(getMRCAmount())}
+                {formatCurrency(getMRCAmount())}
                 <Text style={styles.amountUnit}>/month</Text>
               </Text>
             </>
@@ -107,7 +107,7 @@ const ServiceFeesPage = ({
           <Text style={styles.feeSubText}>One-time setup and installation</Text>
 
           <Text style={styles.amountText}>
-            ${formatCurrency(calculateNRCTotal())}
+            {formatCurrency(calculateNRCTotal())}
           </Text>
 
           <View style={styles.nrcList}>
@@ -120,7 +120,7 @@ const ServiceFeesPage = ({
                   )}
                 </View>
                 <Text style={styles.nrcAmount}>
-                  ${formatCurrency(Number(fee.amount))}
+                  {formatCurrency(Number(fee.amount))}
                 </Text>
               </View>
             ))}

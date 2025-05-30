@@ -1,7 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
 
 .font-signature {
   font-family: "Dancing Script", cursive;
@@ -9,15 +9,6 @@
 
 /* Print styles */
 @media print {
-  /* ----- THIS CSS CAUSED THE PRINT ISSUES ----- */
-
-  /* Hide all UI elements except the proposal content */
-  /* body > *:not(.print-content) { */
-  /*   display: none !important; */
-  /* } */
-
-  /* ----------------------------------------------- */
-
   /* Reset page margins */
   @page {
     margin: 0;
@@ -57,7 +48,7 @@
   }
 }
 .page-break {
-  page-break-before: always; /* or "after" */
+  break-after: always; /* or "after" */
   break-before: page; /* modern, works with flex/grid too */
 }
 
