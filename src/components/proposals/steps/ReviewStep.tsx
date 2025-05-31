@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FileText,
   Building2,
@@ -17,7 +17,7 @@ import {
 import { Link } from "react-router-dom";
 import { useProposal } from "../../../contexts/proposals";
 import { saveProposal } from "../../../lib/data/proposals.data";
-import { Fee, FeeInput, Quote, QuoteInput } from "../../../lib/types";
+import { Fee, FeeInput, Quote, QuoteInput, Section } from "../../../lib/types";
 import { generatePDF } from "../../../lib/generate-pdf";
 import MSPTermsOfService from "../msp/msp-tos";
 import VulscanTermsOfService from "../vulscan/vulscan-tos";
@@ -25,6 +25,7 @@ import UNMTermsOfService from "../unm/unm-tos";
 import UNMServices from "../unm/unm-services";
 import MSPServices from "../msp/msp-services";
 import VulscanServices from "../vulscan/vulscan-services";
+import { paginateEquipments } from "../../../lib/paginatedSections";
 
 interface ReviewStepProps {
   clientInfo: {
@@ -81,6 +82,11 @@ export default function ReviewStep({
   useEffect(() => {
     saveQuote("draft");
   }, []);
+
+  const paginatedSections = useMemo(
+    () => paginateEquipments(JSON.parse(JSON.stringify(sections)), 5),
+    [sections]
+  );
 
   const calculateNRCTotal = (): number => {
     return fees
@@ -395,76 +401,86 @@ export default function ReviewStep({
           {proposalTypeInfo.id === "unm" && <UNMServices />}
           {proposalTypeInfo.id === "msp" && <MSPServices />}
           {proposalTypeInfo.id === "vulscan" && <VulscanServices />}
+          {proposalTypeInfo.id === "pentest" && <VulscanServices />}
+          {proposalTypeInfo.id === "compliancy" && <VulscanServices />}
+          {proposalTypeInfo.id === "fullsuite" && <VulscanServices />}
 
           {/* Equipment page */}
-          <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12">
-              Equipment
-            </h2>
-            <div className="bg-gray-50 rounded-xl p-6 mb-8">
-              <div className="space-y-4">
-                {sections.map((section) => (
-                  <div key={section.id}>
-                    <h4 className="text-lg font-bold text-gray-800 mb-4">
-                      {section.name}
-                    </h4>
-                    <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
-                      <div className="divide-y divide-gray-200">
-                        {section.equipment.map((item) => (
-                          <div
-                            key={item.inventory_item_id}
-                            className="flex items-center gap-3 p-4"
-                          >
-                            {item.image_url ? (
-                              <img
-                                src={item.image_url}
-                                alt={item.name}
-                                className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                              />
-                            ) : (
-                              <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                                <Package className="w-6 h-6 text-gray-400" />
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <h5 className="text-base font-medium text-gray-900">
-                                {item.name}
-                              </h5>
-                              {proposalTypeInfo.id === "buildouts" &&
-                                item.description && (
-                                  <p className="text-sm text-gray-600 mt-0.5 mb-2">
-                                    {item.description}
-                                  </p>
-                                )}
-                              <p className="text-sm text-gray-500">
-                                {item.category}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-6">
-                              {proposalTypeInfo.id === "buildouts" &&
-                                item.unit_price !== undefined && (
-                                  <div className="px-4 py-2 rounded-lg">
-                                    <span className="text-base font-semibold text-green-700">
-                                      ${item.unit_price.toLocaleString()} / unit
-                                    </span>
+          {paginatedSections.map((page) => {
+            return (
+              <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+                {page.id === 1 && (
+                  <h2 className="text-3xl font-bold text-gray-900 mb-12">
+                    Equipment
+                  </h2>
+                )}
+                <div className="bg-gray-50 rounded-xl p-6 mb-8">
+                  <div className="space-y-4">
+                    {page.sections.map((section: Section) => (
+                      <div key={section.id}>
+                        <h4 className="text-lg font-bold text-gray-800 mb-4">
+                          {section.name}
+                        </h4>
+                        <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
+                          <div className="divide-y divide-gray-200">
+                            {section.equipment.map((item) => (
+                              <div
+                                key={item.inventory_item_id}
+                                className="flex items-center gap-3 p-4"
+                              >
+                                {item.image_url ? (
+                                  <img
+                                    src={item.image_url}
+                                    alt={item.name}
+                                    className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                                  />
+                                ) : (
+                                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                    <Package className="w-6 h-6 text-gray-400" />
                                   </div>
                                 )}
-                              <div className="text-sm font-medium text-gray-900">
-                                Quantity: {item.quantity}
+                                <div className="flex-1 min-w-0">
+                                  <h5 className="text-base font-medium text-gray-900">
+                                    {item.name}
+                                  </h5>
+                                  {proposalTypeInfo.id === "buildouts" &&
+                                    item.description && (
+                                      <p className="text-sm text-gray-600 mt-0.5 mb-2">
+                                        {item.description}
+                                      </p>
+                                    )}
+                                  <p className="text-sm text-gray-500">
+                                    {item.category}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-6">
+                                  {proposalTypeInfo.id === "buildouts" &&
+                                    item.unit_price !== undefined && (
+                                      <div className="px-4 py-2 rounded-lg">
+                                        <span className="text-base font-semibold text-green-700">
+                                          ${item.unit_price.toLocaleString()} /
+                                          unit
+                                        </span>
+                                      </div>
+                                    )}
+                                  <div className="text-sm font-medium text-gray-900">
+                                    Quantity: {item.quantity}
+                                  </div>
+                                </div>
                               </div>
-                            </div>
+                            ))}
                           </div>
-                        ))}
+                        </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          </div>
+            );
+          })}
 
           {/* Service Fees */}
-          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Service Fees
             </h2>
@@ -685,11 +701,17 @@ export default function ReviewStep({
           {proposalTypeInfo.id === "unm" && <UNMTermsOfService />}
           {proposalTypeInfo.id === "msp" && <MSPTermsOfService />}
           {proposalTypeInfo.id === "vulscan" && <VulscanTermsOfService />}
+          {proposalTypeInfo.id === "pentest" && <VulscanTermsOfService />}
+          {proposalTypeInfo.id === "compliancy" && <VulscanTermsOfService />}
+          {proposalTypeInfo.id === "fullsuite" && <VulscanTermsOfService />}
 
           {/* Signature Page */}
           <div className="html2pdf__page-break proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <span className="text-sm text-gray-600">
               {proposalTypeInfo.id === "vulscan" && vulscanText}
+              {proposalTypeInfo.id === "pentest" && vulscanText}
+              {proposalTypeInfo.id === "compliancy" && vulscanText}
+              {proposalTypeInfo.id === "fullsuite" && vulscanText}
               {proposalTypeInfo.id === "unm" && unmText}
               {proposalTypeInfo.id === "msp" && mspText}
             </span>
