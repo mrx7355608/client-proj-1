@@ -15,7 +15,7 @@ export default function ShowCyberProposalTypes({
   const cyberProposalsTypes = [
     {
       id: "vulscan",
-      name: "Vulnerability Security",
+      name: "Vulscan",
       description: "Vulnerability Scanning",
       icon: <ShieldAlert className="w-6 h-6" />,
       color: "bg-red-500",
@@ -24,7 +24,7 @@ export default function ShowCyberProposalTypes({
     {
       id: "pentest",
       name: "PenTest",
-      description: "Pen Testing Solutions",
+      description: "PenTesting Solutions",
       icon: <Bug className="w-6 h-6" />,
       color: "bg-red-500",
       bgImage: "/proposal-cyber-bg.png",
@@ -39,7 +39,7 @@ export default function ShowCyberProposalTypes({
     },
     {
       id: "fullsuite",
-      name: "Fullsuite Cubersecurity",
+      name: "Fullsuite",
       description: "Complete Cybersecurity Services",
       icon: <Layers className="w-6 h-6" />,
       color: "bg-red-500",
