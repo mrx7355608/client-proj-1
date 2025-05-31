@@ -77,31 +77,29 @@ export default function VulscanTermsOfService() {
                 ITX Solutions 121 S Orange Ave, Suite 1500, Orlando, FL 32801
               </p>
             </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                5. Alterations to Services or Equipment
-              </h3>
-              <p className="text-sm leading-relaxed">
-                If NSB Board of Realtors alters any Services or Equipment
-                conducted by ITX Solutions without the express written consent
-                of ITX Solutions, NSB Board of Realtors does so at its own risk
-                and expense. ITX Solutions shall not be liable or responsible
-                for problems created because of NSB Board of Realtors alteration
-                of Services, Equipment and/or network system. If NSB Board of
-                Realtors wishes ITX Solutions to correct or fix its alterations
-                or problems relating thereto, such Services by ITX Solutions
-                will be considered a new project and NSB Board of Realtors
-                agrees that the same terms and conditions set out in this
-                Agreement shall apply.
-              </p>
-            </div>
           </div>
         </div>
       </div>
 
       <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
         <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              5. Alterations to Services or Equipment
+            </h3>
+            <p className="text-sm leading-relaxed">
+              If NSB Board of Realtors alters any Services or Equipment
+              conducted by ITX Solutions without the express written consent of
+              ITX Solutions, NSB Board of Realtors does so at its own risk and
+              expense. ITX Solutions shall not be liable or responsible for
+              problems created because of NSB Board of Realtors alteration of
+              Services, Equipment and/or network system. If NSB Board of
+              Realtors wishes ITX Solutions to correct or fix its alterations or
+              problems relating thereto, such Services by ITX Solutions will be
+              considered a new project and NSB Board of Realtors agrees that the
+              same terms and conditions set out in this Agreement shall apply.
+            </p>
+          </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               6. Reimbursement for Supplies
@@ -159,7 +157,11 @@ export default function VulscanTermsOfService() {
               construed as a partnership or joint venture.
             </p>
           </div>
+        </div>
+      </div>
 
+      <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
+        <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               10. Non-Solicitation of Employees
@@ -181,11 +183,6 @@ export default function VulscanTermsOfService() {
               Solutions to such employee.
             </p>
           </div>
-        </div>
-      </div>
-
-      <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
-        <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               11. Severability
@@ -242,7 +239,11 @@ export default function VulscanTermsOfService() {
               of its obligations.
             </p>
           </div>
+        </div>
+      </div>
 
+      <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 overflow-hidden">
+        <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               15. Limitations and Exclusions

@@ -2,9 +2,7 @@ import React from "react";
 
 const VulscanServices = () => (
   <div className=" proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
-    <h2 className="text-3xl font-bold text-gray-900 mb-10">
-      Vulnerability Scanning Service Overview
-    </h2>
+    <h2 className="text-3xl font-bold text-gray-900 mb-10">Services</h2>
 
     {/* What We're Doing */}
     <div className="my-4">
