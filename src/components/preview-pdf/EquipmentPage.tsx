@@ -2,7 +2,7 @@ import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { Package } from "lucide-react";
 import { Section } from "../../lib/types";
 import { useMemo } from "react";
-
+import { paginateEquipments } from "../../lib/paginatedSections";
 const EquipmentPage = ({
   sections,
   proposalType,
@@ -10,13 +10,13 @@ const EquipmentPage = ({
   sections: Section[];
   proposalType?: string;
 }) => {
-  const pages = useMemo(() => paginateEquipments(sections), [sections]);
+  const pages = useMemo(() => paginateEquipments(sections, 7), [sections]);
 
   return (
     <>
       {pages.map((page) => (
         <Page style={styles.page}>
-          <Text style={styles.title}>Equipment</Text>
+          {page.id === 1 && <Text style={styles.title}>Equipment</Text>}
 
           <View style={styles.contentBox}>
             {page.sections.map((section: any) => (
@@ -184,57 +184,5 @@ const styles = StyleSheet.create({
     color: "#111827",
   },
 });
-
-function paginateEquipments(sections: Section[]) {
-  const itemsPerPage = 7;
-  const pages: any[] = [];
-  let pageCount = 1;
-  let page = {
-    id: pageCount,
-    sections: [] as any[],
-  };
-
-  let itemsRendered = 0;
-  let currentSection = 0;
-
-  while (currentSection < sections.length) {
-    const section = sections[currentSection];
-
-    if (section.equipment.length <= itemsPerPage - itemsRendered) {
-      itemsRendered += section.equipment.length;
-      page.sections.push({
-        name: section.name,
-        equipment: section.equipment,
-      });
-      currentSection++;
-    } else if (section.equipment.length > itemsPerPage - itemsRendered) {
-      const remainingItemsSpace = itemsPerPage - itemsRendered;
-      const slicedEquipments = section.equipment.slice(0, remainingItemsSpace);
-      itemsRendered += slicedEquipments.length;
-
-      section.equipment = section.equipment.slice(remainingItemsSpace);
-
-      page.sections.push({
-        name: section.name,
-        equipment: slicedEquipments,
-      });
-    }
-
-    // Add existing page to pages array
-    if (itemsRendered === itemsPerPage || currentSection === sections.length) {
-      pages.push(page);
-      pageCount++;
-      itemsRendered = 0;
-
-      // Reset page
-      page = {
-        id: pageCount,
-        sections: [] as any[],
-      };
-    }
-  }
-
-  return pages;
-}
 
 export default EquipmentPage;
