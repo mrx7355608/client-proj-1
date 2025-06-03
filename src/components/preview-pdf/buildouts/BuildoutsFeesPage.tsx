@@ -31,10 +31,10 @@ const BuildoutsFeesPage = ({
   const nrcFees = fees.filter((fee) => fee.type === "nrc");
 
   return (
-    <Page style={styles.page}>
+    <Page wrap={true} style={styles.page}>
       <Text style={styles.title}>Service Fees</Text>
 
-      <View style={styles.feeBox}>
+      <View wrap={true} style={styles.feeBox}>
         <View style={styles.feeHeader}>
           <Image
             src={`${import.meta.env.VITE_BASE_URL}/dollar.png`}
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     padding: 40,
     marginTop: 24,
-    position: "relative",
+    // position: "relative",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

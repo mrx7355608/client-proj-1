@@ -408,7 +408,7 @@ export default function EditReviewStep({
           {/* Equipment page */}
           {paginatedSections.map((page) => {
             return (
-              <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+              <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
                 {page.id === 1 && (
                   <h2 className="text-3xl font-bold text-gray-900 mb-12">
                     Equipment
