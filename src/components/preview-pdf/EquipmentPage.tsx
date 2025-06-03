@@ -10,7 +10,10 @@ const EquipmentPage = ({
   sections: Section[];
   proposalType?: string;
 }) => {
-  const pages = useMemo(() => paginateEquipments(sections, 7), [sections]);
+  const pages = useMemo(
+    () => paginateEquipments(sections, proposalType === "buildouts" ? 7 : 10),
+    [sections]
+  );
 
   return (
     <>

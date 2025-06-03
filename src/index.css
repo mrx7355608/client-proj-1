@@ -25,7 +25,7 @@
   /* Ensure proper page sizing */
   .proposal-page {
     width: 8.5in !important;
-    height: 11in !important;
+    min-height: 11in !important;
     margin: 0 !important;
     box-shadow: none !important;
     border: none !important;

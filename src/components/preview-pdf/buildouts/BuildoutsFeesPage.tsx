@@ -195,8 +195,9 @@ const styles = StyleSheet.create({
     color: "#111827",
   },
   sectionAmount: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "600",
+    color: "#2563EB",
   },
   nrcList: {
     marginTop: 12,

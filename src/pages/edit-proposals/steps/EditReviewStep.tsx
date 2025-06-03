@@ -84,7 +84,11 @@ export default function EditReviewStep({
   const [isTaxConfirmed, setIsTaxConfirmed] = useState(false);
 
   const paginatedSections = useMemo(
-    () => paginateEquipments(JSON.parse(JSON.stringify(sections)), 5),
+    () =>
+      paginateEquipments(
+        JSON.parse(JSON.stringify(sections)),
+        proposalTypeInfo.id === "buildouts" ? 5 : 7
+      ),
     [sections]
   );
 
@@ -480,10 +484,7 @@ export default function EditReviewStep({
           })}
 
           {/* Service Fees */}
-          <div
-            style={{ pageBreakAfter: "always" }}
-            className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8"
-          >
+          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Service Fees
             </h2>

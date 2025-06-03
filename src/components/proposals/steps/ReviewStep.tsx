@@ -84,7 +84,11 @@ export default function ReviewStep({
   }, []);
 
   const paginatedSections = useMemo(
-    () => paginateEquipments(JSON.parse(JSON.stringify(sections)), 5),
+    () =>
+      paginateEquipments(
+        JSON.parse(JSON.stringify(sections)),
+        proposalTypeInfo.id === "buildouts" ? 5 : 7
+      ),
     [sections]
   );
 
@@ -408,7 +412,7 @@ export default function ReviewStep({
           {/* Equipment page */}
           {paginatedSections.map((page) => {
             return (
-              <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8 page-break">
+              <div className="print-content proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
                 {page.id === 1 && (
                   <h2 className="text-3xl font-bold text-gray-900 mb-12">
                     Equipment
@@ -480,7 +484,7 @@ export default function ReviewStep({
           })}
 
           {/* Service Fees */}
-          <div className="proposal-page bg-white w-[8.5in] h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
+          <div className="proposal-page bg-white w-[8.5in] min-h-[11in] mx-auto p-[0.75in] shadow-lg relative mt-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-12">
               Service Fees
             </h2>
